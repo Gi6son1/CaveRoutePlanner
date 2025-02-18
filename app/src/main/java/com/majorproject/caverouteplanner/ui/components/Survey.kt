@@ -16,6 +16,7 @@ data class Survey(
     fun imageBitmap(): ImageBitmap {
         return ImageBitmap.imageResource(imageReference)
     }
+
 }
 
 val llSurvey = Survey(
@@ -30,6 +31,21 @@ val llSurvey = Survey(
         SurveyNode(
             isEntrance = true,
             coordinates = Pair(0.5f , 0.5f),
+            edges = mutableListOf()
+        ),
+        SurveyNode(
+            isEntrance = false,
+            coordinates = Pair(1.0f , 1.0f),
+            edges = mutableListOf()
+        ),
+        SurveyNode(
+            isEntrance = false,
+            coordinates = Pair(1.0f , 0f),
+            edges = mutableListOf()
+        ),
+        SurveyNode(
+            isEntrance = false,
+            coordinates = Pair(0.0f , 1.0f),
             edges = mutableListOf()
         )
     ),

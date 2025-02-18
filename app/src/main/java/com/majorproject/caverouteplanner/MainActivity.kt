@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,31 +7,35 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.height
-import androidx.compose.ui.unit.width
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CaveRoutePlannerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ImageWithGraph(
+                    ImageWithGraphOverlay(
                         survey = llSurvey,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -57,81 +60,91 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ImageWithGraph(
+fun ImageWithGraphOverlay(
     survey: Survey,
     modifier: Modifier = Modifier
-){
-    var scaledImageSize by remember { mutableStateOf(IntSize.Zero) }
-    Box(
-        modifier = modifier
-            .wrapContentSize()
-            .onGloballyPositioned { coordinates ->
-                scaledImageSize = coordinates.size
-            }
-    ){
-        Image(
-            bitmap = survey.imageBitmap(),
+) {
+    var scale by remember { mutableFloatStateOf(1f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
 
-            contentDescription = survey.caveName,
-            modifier = Modifier.border(1.dp, Color.Green),
-            contentScale = ContentScale.Fit
-        )
-        GraphOverlay(
-            nodes = survey.pathNodes,
-            paths = survey.paths,
-            size = IntSize(survey.imageBitmap().width, survey.imageBitmap().height),
-        )
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        scale *= zoomChange
+        rotation += rotationChange
+        offset += offsetChange
     }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, rotate ->
+                        offset += pan
+                        scale = (scale * zoom).coerceIn(1f, 5f)
+                        rotation += rotate
+                    }
+                }
+                .transformable(state = state)
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+        ) {
+            Image(
+                bitmap = survey.imageBitmap(),
+                contentDescription = survey.caveName,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
 
+            GraphOverlay(
+                nodes = survey.pathNodes,
+                paths = survey.paths,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
 }
 
 @Composable
 fun GraphOverlay(
+    modifier: Modifier = Modifier,
     nodes: List<SurveyNode>,
-    paths: List<SurveyPath>,
-    size: IntSize
+    paths: List<SurveyPath>
 ) {
-
-    Canvas(modifier = Modifier.border(5.dp, Color.Red)) {
-        val imageWidth = size.width.toFloat()
-        val imageHeight = size.height.toFloat()
-
+    Canvas(modifier = modifier) {
         paths.forEach { path ->
-            val startNode = nodes.find { it == path.ends.first }
-            val endNode = nodes.find { it == path.ends.second }
+            val startNode = path.ends.first
+            val endNode = path.ends.second
 
-            if (startNode != null && endNode != null) {
-                drawLine(
-                    color = Color.Red,
-                    start = Offset(
-                        startNode.coordinates.first * imageWidth,
-                        startNode.coordinates.second * imageHeight
-                    ),
-                    end = Offset(
-                        endNode.coordinates.first * imageWidth,
-                        endNode.coordinates.second * imageHeight
-                    ),
-                    strokeWidth = 5f
-                )
-            }
+            drawLine(
+                color = Color.Red,
+                start = Offset(startNode.coordinates.first * size.width, startNode.coordinates.second * size.height),
+                end = Offset(endNode.coordinates.first * size.width, endNode.coordinates.second * size.height),
+                strokeWidth = 5f
+            )
         }
 
         nodes.forEach { node ->
             drawCircle(
                 color = if (node.isEntrance) Color.Green else Color.Blue,
                 radius = 10f,
-                center = Offset(node.coordinates.first * imageWidth, node.coordinates.second * imageHeight)
+                center = Offset(node.coordinates.first * size.width, node.coordinates.second * size.height)
             )
         }
     }
 }
 
+
 @Preview
 @Composable
 fun GraphOverlayPreview() {
     CaveRoutePlannerTheme {
-        ImageWithGraph(
+        ImageWithGraphOverlay(
             survey = llSurvey,
             modifier = Modifier.fillMaxSize()
         )
