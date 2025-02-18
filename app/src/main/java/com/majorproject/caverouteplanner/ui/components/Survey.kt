@@ -12,12 +12,10 @@ data class Survey(
     var pathNodes: MutableList<SurveyNode>,
     var paths: MutableList<SurveyPath>
 ){
-
-}
-
-@Composable
-fun GetImageBitmap(imageRef: Int): ImageBitmap {
-    return ImageBitmap.imageResource(id = imageRef)
+    @Composable
+    fun imageBitmap(): ImageBitmap {
+        return ImageBitmap.imageResource(imageReference)
+    }
 }
 
 val llSurvey = Survey(
@@ -26,7 +24,12 @@ val llSurvey = Survey(
     pathNodes = mutableListOf(
         SurveyNode(
             isEntrance = false,
-            coordinates = Pair(0.82f, 0.5f),
+            coordinates = Pair(0.0f , 0.0f),
+            edges = mutableListOf()
+        ),
+        SurveyNode(
+            isEntrance = true,
+            coordinates = Pair(0.5f , 0.5f),
             edges = mutableListOf()
         )
     ),

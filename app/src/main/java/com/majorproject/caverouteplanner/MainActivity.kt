@@ -7,9 +7,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +30,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
-import com.majorproject.caverouteplanner.ui.components.GetImageBitmap
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.height
+import androidx.compose.ui.unit.width
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
@@ -55,41 +61,41 @@ fun ImageWithGraph(
     survey: Survey,
     modifier: Modifier = Modifier
 ){
-    var boxSize by remember { mutableStateOf(IntSize.Zero) }
-
+    var scaledImageSize by remember { mutableStateOf(IntSize.Zero) }
     Box(
         modifier = modifier
-            .onGloballyPositioned {
-                coordinates ->
-                boxSize = coordinates.size
+            .wrapContentSize()
+            .onGloballyPositioned { coordinates ->
+                scaledImageSize = coordinates.size
             }
     ){
         Image(
-            bitmap = GetImageBitmap(survey.imageReference),
+            bitmap = survey.imageBitmap(),
 
             contentDescription = survey.caveName,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.border(1.dp, Color.Green),
             contentScale = ContentScale.Fit
+        )
+        GraphOverlay(
+            nodes = survey.pathNodes,
+            paths = survey.paths,
+            size = IntSize(survey.imageBitmap().width, survey.imageBitmap().height),
         )
     }
 
-    GraphOverlay(
-        nodes = survey.pathNodes,
-        paths = survey.paths,
-        imageSize = IntSize(GetImageBitmap(survey.imageReference).width, GetImageBitmap(survey.imageReference).height),
-    )
+
 }
 
 @Composable
 fun GraphOverlay(
     nodes: List<SurveyNode>,
     paths: List<SurveyPath>,
-    imageSize: IntSize
+    size: IntSize
 ) {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val width = imageSize.width.toFloat()
-        val height = imageSize.height.toFloat()
 
+    Canvas(modifier = Modifier.border(5.dp, Color.Red)) {
+        val imageWidth = size.width.toFloat()
+        val imageHeight = size.height.toFloat()
 
         paths.forEach { path ->
             val startNode = nodes.find { it == path.ends.first }
@@ -99,12 +105,12 @@ fun GraphOverlay(
                 drawLine(
                     color = Color.Red,
                     start = Offset(
-                        startNode.coordinates.first * width,
-                        startNode.coordinates.second * height
+                        startNode.coordinates.first * imageWidth,
+                        startNode.coordinates.second * imageHeight
                     ),
                     end = Offset(
-                        endNode.coordinates.first * width,
-                        endNode.coordinates.second * height
+                        endNode.coordinates.first * imageWidth,
+                        endNode.coordinates.second * imageHeight
                     ),
                     strokeWidth = 5f
                 )
@@ -115,7 +121,7 @@ fun GraphOverlay(
             drawCircle(
                 color = if (node.isEntrance) Color.Green else Color.Blue,
                 radius = 10f,
-                center = Offset(node.coordinates.first * width, node.coordinates.second * height)
+                center = Offset(node.coordinates.first * imageWidth, node.coordinates.second * imageHeight)
             )
         }
     }
