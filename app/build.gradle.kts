@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.majorproject.caverouteplanner"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.majorproject.caverouteplanner"
