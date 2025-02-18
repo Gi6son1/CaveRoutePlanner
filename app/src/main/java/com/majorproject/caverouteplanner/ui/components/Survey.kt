@@ -29,6 +29,11 @@ val llSurvey = Survey(
             edges = mutableListOf()
         ),
         SurveyNode(
+            isEntrance = false,
+            coordinates = Pair(0.53f , 0.451f),
+            edges = mutableListOf()
+        ),
+        SurveyNode(
             isEntrance = true,
             coordinates = Pair(0.5f , 0.5f),
             edges = mutableListOf()

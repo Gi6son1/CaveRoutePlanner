@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -34,13 +36,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.llSurvey
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
+import kotlin.math.max
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageWithGraphOverlay(
     survey: Survey,
@@ -69,46 +71,41 @@ fun ImageWithGraphOverlay(
     var offset by remember { mutableStateOf(Offset.Zero) }
 
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        scale *= zoomChange
+        scale = max(scale * zoomChange, 1f)
         rotation += rotationChange
         offset += offsetChange
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, rotate ->
-                        offset += pan
-                        scale = (scale * zoom).coerceIn(1f, 5f)
-                        rotation += rotate
-                    }
-                }
-                .transformable(state = state)
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    rotationZ = rotation,
-                    translationX = offset.x,
-                    translationY = offset.y
-                )
-        ) {
-            Image(
-                bitmap = survey.imageBitmap(),
-                contentDescription = survey.caveName,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .transformable(state = state)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale,
+                rotationZ = rotation,
+                translationX = max(offset.x, 1f),
+                translationY = max(offset.y, 1f)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            bitmap = survey.imageBitmap(),
+            contentDescription = survey.caveName,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
 
-            GraphOverlay(
-                nodes = survey.pathNodes,
-                paths = survey.paths,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        GraphOverlay(
+            nodes = survey.pathNodes,
+            paths = survey.paths,
+            modifier = Modifier.fillMaxSize()
+        )
     }
+
 }
+
+
 
 @Composable
 fun GraphOverlay(
@@ -123,8 +120,14 @@ fun GraphOverlay(
 
             drawLine(
                 color = Color.Red,
-                start = Offset(startNode.coordinates.first * size.width, startNode.coordinates.second * size.height),
-                end = Offset(endNode.coordinates.first * size.width, endNode.coordinates.second * size.height),
+                start = Offset(
+                    startNode.coordinates.first * size.width,
+                    startNode.coordinates.second * size.height
+                ),
+                end = Offset(
+                    endNode.coordinates.first * size.width,
+                    endNode.coordinates.second * size.height
+                ),
                 strokeWidth = 5f
             )
         }
@@ -133,7 +136,10 @@ fun GraphOverlay(
             drawCircle(
                 color = if (node.isEntrance) Color.Green else Color.Blue,
                 radius = 10f,
-                center = Offset(node.coordinates.first * size.width, node.coordinates.second * size.height)
+                center = Offset(
+                    node.coordinates.first * size.width,
+                    node.coordinates.second * size.height
+                )
             )
         }
     }
