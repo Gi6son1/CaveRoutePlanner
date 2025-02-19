@@ -36,6 +36,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
@@ -76,31 +78,42 @@ fun ImageWithGraphOverlay(
         offset += offsetChange
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .transformable(state = state)
-            .graphicsLayer(
-                scaleX = scale,
-                scaleY = scale,
-                rotationZ = rotation,
-                translationX = max(offset.x, 1f),
-                translationY = max(offset.y, 1f)
-            ),
-        contentAlignment = Alignment.Center
+    ConstraintLayout(modifier = Modifier
+        .fillMaxSize()
+        .transformable(state = state)
+        .graphicsLayer(
+            scaleX = scale,
+            scaleY = scale,
+            rotationZ = rotation,
+            translationX = offset.x,
+            translationY = offset.y
+        )
     ) {
-        Image(
-            bitmap = survey.imageBitmap(),
-            contentDescription = survey.caveName,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
+        val surveyBox = createRef()
+        Box(
+            modifier = modifier
+                .constrainAs(surveyBox){
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
 
-        GraphOverlay(
-            nodes = survey.pathNodes,
-            paths = survey.paths,
-            modifier = Modifier.fillMaxSize()
-        )
+                .border(2.dp, Color.Red)
+                ,
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                bitmap = survey.imageBitmap(),
+                contentDescription = survey.caveName,
+                modifier = Modifier,
+                contentScale = ContentScale.Fit
+            )
+
+            GraphOverlay(
+                nodes = survey.pathNodes,
+                paths = survey.paths,
+                modifier = Modifier.matchParentSize()
+            )
+        }
     }
 
 }
@@ -113,7 +126,7 @@ fun GraphOverlay(
     nodes: List<SurveyNode>,
     paths: List<SurveyPath>
 ) {
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.border(3.dp, Color.Green)) {
         paths.forEach { path ->
             val startNode = path.ends.first
             val endNode = path.ends.second
