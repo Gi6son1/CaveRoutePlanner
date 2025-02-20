@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,8 @@ import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.llSurvey
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
+import moe.tlaster.zoomable.Zoomable
+import moe.tlaster.zoomable.rememberZoomableState
 import kotlin.math.max
 
 class MainActivity : ComponentActivity() {
@@ -68,6 +71,7 @@ fun ImageWithGraphOverlay(
     survey: Survey,
     modifier: Modifier = Modifier
 ) {
+
     var scale by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -81,13 +85,7 @@ fun ImageWithGraphOverlay(
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .transformable(state = state)
-        .graphicsLayer(
-            scaleX = scale,
-            scaleY = scale,
-            rotationZ = rotation,
-            translationX = offset.x,
-            translationY = offset.y
-        )
+
     ) {
         val surveyBox = createRef()
         Box(
@@ -96,7 +94,13 @@ fun ImageWithGraphOverlay(
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
-
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
                 .border(2.dp, Color.Red)
                 ,
             contentAlignment = Alignment.Center
