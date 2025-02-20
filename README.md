@@ -21,3 +21,5 @@ Progress Diary:
     I've sone some research, and can possibly find a solution:
     https://github.com/Tlaster/Zoomable
     This is a library that allows an object to be panned and zoomed without leaving the boundaries of the object, although, I am unsure if matchParentSize() applies to anything else but boxes.
+
+    After, trying there was an error with the zoomable state - even if I tried zooming with a basic object, it still failed, suggesting that the library is too outdated to use.
