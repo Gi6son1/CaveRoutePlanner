@@ -132,8 +132,8 @@ fun GraphOverlay(
 ) {
     Canvas(modifier = modifier.border(3.dp, Color.Green)) {
         paths.forEach { path ->
-            val startNode = path.ends.first
-            val endNode = path.ends.second
+            val startNode = nodes.find { it.id == path.ends.first } !!
+            val endNode = nodes.find { it.id == path.ends.second } !!
 
             drawLine(
                 color = Color.Red,
@@ -152,7 +152,7 @@ fun GraphOverlay(
         nodes.forEach { node ->
             drawCircle(
                 color = if (node.isEntrance) Color.Green else Color.Blue,
-                radius = 10f,
+                radius = 5f,
                 center = Offset(
                     node.coordinates.first * size.width,
                     node.coordinates.second * size.height
