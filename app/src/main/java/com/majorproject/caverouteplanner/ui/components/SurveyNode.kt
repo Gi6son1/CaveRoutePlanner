@@ -1,9 +1,9 @@
 package com.majorproject.caverouteplanner.ui.components
 
 data class SurveyNode(
-    var id: Int = 0,
+    var id: Int,
     var isEntrance: Boolean = false,
-    var coordinates: Pair<Float, Float>,
+    var isJunction: Boolean = false,
+    var coordinates: Pair<Int, Int>,
     var edges: MutableList<SurveyPath>
-) {
-}
+)

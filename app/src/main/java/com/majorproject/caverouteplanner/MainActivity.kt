@@ -36,8 +36,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
@@ -65,7 +70,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageWithGraphOverlay(
     survey: Survey,
@@ -115,11 +119,14 @@ fun ImageWithGraphOverlay(
             GraphOverlay(
                 nodes = survey.pathNodes,
                 paths = survey.paths,
-                modifier = Modifier.matchParentSize()
+                modifier = Modifier.matchParentSize(),
+                surveySize = IntSize(
+                    width = survey.imageBitmap().width,
+                    height = survey.imageBitmap().height
+                )
             )
         }
     }
-
 }
 
 
@@ -128,34 +135,64 @@ fun ImageWithGraphOverlay(
 fun GraphOverlay(
     modifier: Modifier = Modifier,
     nodes: List<SurveyNode>,
-    paths: List<SurveyPath>
+    paths: List<SurveyPath>,
+    surveySize: IntSize
 ) {
+    val textRememberer = rememberTextMeasurer()
     Canvas(modifier = modifier.border(3.dp, Color.Green)) {
+
         paths.forEach { path ->
             val startNode = nodes.find { it.id == path.ends.first } !!
             val endNode = nodes.find { it.id == path.ends.second } !!
+            val textResult = textRememberer.measure("${path.id}", style = TextStyle(color = Color. Red,fontSize = 8.sp))
 
             drawLine(
                 color = Color.Red,
                 start = Offset(
-                    startNode.coordinates.first * size.width,
-                    startNode.coordinates.second * size.height
+                    (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                    (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
                 ),
                 end = Offset(
-                    endNode.coordinates.first * size.width,
-                    endNode.coordinates.second * size.height
+                    (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                    (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
                 ),
-                strokeWidth = 5f
+                strokeWidth = 4f
+            )
+
+            drawText(
+                textLayoutResult = textResult,
+                color = Color.Blue,
+                topLeft = Offset(
+                    ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width/2,
+                    ((startNode.coordinates.second + endNode.coordinates.second)/ surveySize.height.toFloat()) / 2 * size.height - textResult.size.height/2),
             )
         }
 
         nodes.forEach { node ->
+
+            val textResult = textRememberer.measure("${node.id}", style = TextStyle(color = Color. Red,fontSize = 6.sp))
+
             drawCircle(
-                color = if (node.isEntrance) Color.Green else Color.Blue,
-                radius = 5f,
+                color = if (node.isEntrance) {
+                    Color.Green
+                } else if (node.isJunction){
+                    Color.Blue
+                } else {
+                    Color.Red
+                },
+                radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
                 center = Offset(
-                    node.coordinates.first * size.width,
-                    node.coordinates.second * size.height
+                    (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                    (node.coordinates.second /surveySize.height.toFloat()) * size.height
+                )
+            )
+
+            drawText(
+                textLayoutResult = textResult,
+                color = Color.Blue,
+                topLeft = Offset(
+                    (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                    (node.coordinates.second /surveySize.height.toFloat()) * size.height
                 )
             )
         }
@@ -169,7 +206,7 @@ fun GraphOverlayPreview() {
     CaveRoutePlannerTheme {
         ImageWithGraphOverlay(
             survey = llSurvey,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
         )
     }
 }
