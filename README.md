@@ -13,7 +13,7 @@ Progress Diary:
 
 19/02/2025
   So, I found out that the TileView library is not to my suiting. The issue is that, in order to render an image onto a screen, with POIs and useful scrolling, the library requires the PNG image to be transformed into a series of tiles, which can only be done via bash scripts.
-  Because of this, and I researched, it will be hard for a user to turn an image into a bunch of tiles, save them locally, and then transform them into a tilemap. Therefore this method has been made redundant, because I want a user to be able to simply import an image and       mark it up into a workable map, without the tile map conversion.
+  Because of this, and I researched, it will be hard for a user to turn an image into a bunch of tiles, save them locally, and then transform them into a tilemap. Therefore this method has been made redundant, because I want a user to be able to simply import an image and       mark it up into a workable map, without the   tile map conversion.
 
   As a fix, I decided to implement a transformable modifier to the box (which includes the image and the canvas(which holds the graph), allowing it to be zoomed). See below for documentation which I used:
     https://developer.android.com/reference/kotlin/androidx/compose/foundation/gestures/package-summary#(androidx.compose.ui.Modifier).transformable(androidx.compose.foundation.gestures.TransformableState,kotlin.Boolean,kotlin.Boolean)
@@ -22,3 +22,6 @@ Progress Diary:
     https://github.com/Tlaster/Zoomable
     This is a library that allows an object to be panned and zoomed without leaving the boundaries of the object, although, I am unsure if matchParentSize() applies to anything else but boxes.
     After, trying there was an error with the zoomable state - even if I tried zooming with a basic object, it still failed, suggesting that the library is too outdated to use.
+
+20/02/2025
+  I have Success! I've been able to line up the canvas over the top of the survey in such a way that the coordinates of points and lines on the survey line are displayed correclty on the canvas, and any transformations done to the survey don't impact the points on the canvas, and they will still line up perfectly no matter     what.
