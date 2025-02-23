@@ -159,6 +159,7 @@ fun GraphOverlay(
                 strokeWidth = 4f
             )
 
+            /*
             drawText(
                 textLayoutResult = textResult,
                 color = Color.Blue,
@@ -166,6 +167,8 @@ fun GraphOverlay(
                     ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width/2,
                     ((startNode.coordinates.second + endNode.coordinates.second)/ surveySize.height.toFloat()) / 2 * size.height - textResult.size.height/2),
             )
+
+             */
         }
 
         nodes.forEach { node ->
