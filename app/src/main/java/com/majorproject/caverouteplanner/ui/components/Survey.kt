@@ -542,6 +542,35 @@ val llSurvey = Survey(
             id = 14,
             ends = Pair(19, 20),
         ),
+        SurveyPath(
+            id = 15,
+            ends = Pair(18, 48),
+        ),
+        SurveyPath(
+            id = 16,
+            ends = Pair(48, 47),
+            altitude = -1,
+            hasWater = true
+        ),
+        SurveyPath(
+            id = 17,
+            ends = Pair(47, 46),
+            altitude = -1,
+            hasWater = true
+        ),
+        SurveyPath(
+            id = 18,
+            ends = Pair(47, 49),
+            altitude = -1,
+            hasWater = true
+        ),
+        SurveyPath(
+            id = 19,
+            ends = Pair(49, 50),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true
+        )
     )
 )
 
