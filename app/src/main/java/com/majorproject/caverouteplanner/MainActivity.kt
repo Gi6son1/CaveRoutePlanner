@@ -1,6 +1,7 @@
 package com.majorproject.caverouteplanner
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -144,10 +145,12 @@ fun GraphOverlay(
         paths.forEach { path ->
             val startNode = nodes.find { it.id == path.ends.first } !!
             val endNode = nodes.find { it.id == path.ends.second } !!
-            val textResult = textRememberer.measure("${path.id}", style = TextStyle(color = Color. Red,fontSize = 8.sp))
+            val textResult = textRememberer.measure("%.2f".format(path.distance), style = TextStyle(color = Color. Red,fontSize = 8.sp))
+            //val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
 
+            //Log.d("Line Details", "Line ${path.id} from Node ${startNode.id} to Node ${endNode.id} has length $length")
             drawLine(
-                color = Color.Red,
+                color = if (path.hasWater) Color.Blue else Color.LightGray,
                 start = Offset(
                     (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                     (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -159,16 +162,16 @@ fun GraphOverlay(
                 strokeWidth = 4f
             )
 
-            /*
+/*
             drawText(
                 textLayoutResult = textResult,
-                color = Color.Blue,
+                color = Color.Magenta,
                 topLeft = Offset(
                     ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width/2,
                     ((startNode.coordinates.second + endNode.coordinates.second)/ surveySize.height.toFloat()) / 2 * size.height - textResult.size.height/2),
             )
+*/
 
-             */
         }
 
         nodes.forEach { node ->
@@ -179,9 +182,9 @@ fun GraphOverlay(
                 color = if (node.isEntrance) {
                     Color.Green
                 } else if (node.isJunction){
-                    Color.Blue
-                } else {
                     Color.Red
+                } else {
+                    Color.LightGray
                 },
                 radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
                 center = Offset(
@@ -189,7 +192,7 @@ fun GraphOverlay(
                     (node.coordinates.second /surveySize.height.toFloat()) * size.height
                 )
             )
-
+/*
             drawText(
                 textLayoutResult = textResult,
                 color = Color.Blue,
@@ -198,8 +201,19 @@ fun GraphOverlay(
                     (node.coordinates.second /surveySize.height.toFloat()) * size.height
                 )
             )
+
+
+ */
+
         }
     }
+}
+
+fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
+    val pixelsPerMeter = 14.600609f
+    val xDiff = (end.first - start.first).toFloat()
+    val yDiff = (end.second - start.second).toFloat()
+    return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
 }
 
 

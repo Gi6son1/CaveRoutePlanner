@@ -11,6 +11,7 @@ data class Survey(
     var imageReference: Int,
     var pathNodes: MutableList<SurveyNode>,
     var paths: MutableList<SurveyPath>,
+    var pixelsPerMeter: Float
     //1991×1429
 ){
     @Composable
@@ -21,24 +22,25 @@ data class Survey(
 
 val llSurvey = Survey(
     caveName = "LL",
+    pixelsPerMeter = 14.600609f,
     imageReference = R.drawable.llygadlchwr,
     pathNodes = mutableListOf(
         SurveyNode(
             id = 7,
             isEntrance = true,
             coordinates = Pair(368 , 85),
-            edges = mutableListOf(),
+            edges = mutableListOf(8),
             isJunction = true
         ),
         SurveyNode(
             id = 8,
             coordinates = Pair(332 , 144),
-            edges = mutableListOf()
+            edges = mutableListOf(7,9)
         ),
         SurveyNode(
             id = 9,
             coordinates = Pair(332 , 183),
-            edges = mutableListOf()
+            edges = mutableListOf(8,10)
         ),
         SurveyNode(
             id = 10,
@@ -401,7 +403,8 @@ val llSurvey = Survey(
         SurveyNode(
             id = 6,
             coordinates = Pair(1185 , 855),
-            edges = mutableListOf()
+            edges = mutableListOf(),
+            isJunction = true
         ),
         SurveyNode(
             id = 0,
@@ -411,7 +414,8 @@ val llSurvey = Survey(
         SurveyNode(
             id = 73,
             coordinates = Pair(1140 , 840),
-            edges = mutableListOf()
+            edges = mutableListOf(),
+            isJunction = true
         ),
         SurveyNode(
             id = 74,
@@ -485,91 +489,572 @@ val llSurvey = Survey(
         SurveyPath(
             id = 0,
             ends = Pair(7, 8),
+            distance = 4.7337646f
         ),
         SurveyPath(
             id = 1,
             ends = Pair(8, 9),
+            distance = 2.6711216f
         ),
         SurveyPath(
             id = 2,
             ends = Pair(9, 10),
+            distance = 3.8574083f
         ),
         SurveyPath(
             id = 3,
             ends = Pair(10, 13),
+            distance = 6.2862f
         ),
         SurveyPath(
             id = 4,
             ends = Pair(13, 14),
+            distance = 3.0942154f
         ),
         SurveyPath(
             id = 5,
             ends = Pair(14, 15),
+            distance = 6.7123985f
         ),
         SurveyPath(
             id = 6,
             ends = Pair(11, 15),
+            distance = 4.388192f
         ),
         SurveyPath(
             id = 7,
             ends = Pair(13, 11),
+            distance = 8.686395f
         ),
         SurveyPath(
             id = 8,
             ends = Pair(15, 12),
+            distance = 4.6618705f
         ),
         SurveyPath(
             id = 9,
             ends = Pair(12, 16),
+            distance = 2.9450827f
         ),
         SurveyPath(
             id = 10,
             ends = Pair(16, 17),
+            distance = 2.5341408f
         ),
         SurveyPath(
             id = 11,
             ends = Pair(16, 18),
+            distance = 2.2674322f
         ),
         SurveyPath(
             id = 12,
             ends = Pair(17, 20),
+            distance = 2.5590086f
         ),
         SurveyPath(
             id = 13,
             ends = Pair(18, 19),
+            distance = 1.9335624f
         ),
         SurveyPath(
             id = 14,
             ends = Pair(19, 20),
+            distance = 2.4694526f
         ),
         SurveyPath(
             id = 15,
             ends = Pair(18, 48),
+            distance = 10.205284f
         ),
         SurveyPath(
             id = 16,
             ends = Pair(48, 47),
             altitude = -1,
-            hasWater = true
+            hasWater = true,
+            distance = 5.1481743f
         ),
         SurveyPath(
             id = 17,
             ends = Pair(47, 46),
             altitude = -1,
-            hasWater = true
+            hasWater = true,
+            distance = 3.6883152f
         ),
         SurveyPath(
             id = 18,
             ends = Pair(47, 49),
             altitude = -1,
-            hasWater = true
+            hasWater = true,
+            distance = 1.8441576f
         ),
         SurveyPath(
             id = 19,
             ends = Pair(49, 50),
             altitude = -1,
             hasWater = true,
-            isHardTraverse = true
+            isHardTraverse = true,
+            distance = 16.08064f
+        ),
+        SurveyPath(
+            id = 20,
+            ends = Pair(46, 45),
+            altitude = -1,
+            hasWater = true,
+            distance = 4.9031587f
+        ),
+        SurveyPath(
+            id = 21,
+            ends = Pair(45, 43),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 5.4792237f
+        ),
+        SurveyPath(
+            id = 22,
+            ends = Pair(43, 44),
+            altitude = -1,
+            hasWater = true,
+            distance = 6.8575854f
+        ),
+        SurveyPath(
+            id = 23,
+            ends = Pair(44, 42),
+            altitude = -1,
+            hasWater = true,
+            distance = 8.607462f
+        ),
+        SurveyPath(
+            id = 24,
+            ends = Pair(42, 41),
+            altitude = -1,
+            hasWater = true,
+            distance = 2.7812457f
+        ),
+        SurveyPath(
+            id = 25,
+            ends = Pair(41, 40),
+            altitude = -1,
+            hasWater = true,
+            distance = 5.4792237f
+        ),
+        SurveyPath(
+            id = 26,
+            ends = Pair(40, 39),
+            altitude = -1,
+            hasWater = true,
+            distance = 4.5944686f
+        ),
+        SurveyPath(
+            id = 27,
+            ends = Pair(39, 38),
+            altitude = -1,
+            hasWater = true,
+            distance = 2.0547087f
+        ),
+        SurveyPath(
+            id = 28,
+            ends = Pair(38, 37),
+            distance = 5.521864f
+        ),
+        SurveyPath(
+            id = 29,
+            ends = Pair(37, 35),
+            distance = 13.698059f
+        ),
+        SurveyPath(
+            id = 30,
+            ends = Pair(35, 36),
+            distance = 8.016583f
+        ),
+        SurveyPath(
+            id = 31,
+            ends = Pair(35, 29),
+            distance = 5.2385f
+        ),
+        SurveyPath(
+            id = 32,
+            ends = Pair(29, 30),
+            distance = 6.125958f
+        ),
+        SurveyPath(
+            id = 33,
+            ends = Pair(29, 28),
+            distance = 5.090907f
+        ),
+        SurveyPath(
+            id = 34,
+            ends = Pair(28, 27),
+            distance = 4.451869f
+        ),
+        SurveyPath(
+            id = 35,
+            ends = Pair(27, 26),
+            distance = 5.521864f
+        ),
+        SurveyPath(
+            id = 36,
+            ends = Pair(26, 24),
+            distance = 7.479253f
+        ),
+        SurveyPath(
+            id = 37,
+            ends = Pair(24, 25),
+            distance = 4.8065357f
+        ),
+        SurveyPath(
+            id = 38,
+            ends = Pair(24, 23),
+            distance = 5.532473f
+        ),
+        SurveyPath(
+            id = 39,
+            ends = Pair(23, 22),
+            distance = 7.280618f
+        ),
+        SurveyPath(
+            id = 40,
+            ends = Pair(22, 21),
+            distance = 15.257357f
+        ),
+        SurveyPath(
+            id = 41,
+            ends = Pair(21, 17),
+            distance = 4.533313f
+        ),
+        SurveyPath(
+            id = 42,
+            ends = Pair(39, 51),
+            hasWater = true,
+            altitude = -1,
+            distance = 5.7405324f
+        ),
+        SurveyPath(
+            id = 43,
+            ends = Pair(51, 52),
+            hasWater = true,
+            altitude = -1,
+            distance = 10.958447f
+        ),
+        SurveyPath(
+            id = 44,
+            ends = Pair(52, 53),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 2.6746314f
+        ),
+        SurveyPath(
+            id = 45,
+            ends = Pair(53, 54),
+            hasWater = true,
+            altitude = -1,
+            distance = 2.945879f
+        ),
+        SurveyPath(
+            id = 46,
+            ends = Pair(54, 55),
+            hasWater = true,
+            altitude = -1,
+            distance = 5.861825f
+        ),
+        SurveyPath(
+            id = 47,
+            ends = Pair(55, 56),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 16.127974f
+        ),
+        SurveyPath(
+            id = 48,
+            ends = Pair(56, 57),
+            hasWater = true,
+            altitude = -1,
+            distance = 2.6746314f
+        ),
+        SurveyPath(
+            id = 49,
+            ends = Pair(57, 58),
+            hasWater = true,
+            altitude = -1,
+            distance = 4.3317065f
+        ),
+        SurveyPath(
+            id = 50,
+            ends = Pair(58, 59),
+            hasWater = true,
+            altitude = -1,
+            distance = 4.451869f
+        ),
+        SurveyPath(
+            id = 51,
+            ends = Pair(59, 60),
+            hasWater = true,
+            altitude = -1,
+            distance = 8.274013f
+        ),
+        SurveyPath(
+            id = 52,
+            ends = Pair(60, 61),
+            hasWater = true,
+            altitude = -1,
+            distance =  3.4066606f
+        ),
+        SurveyPath(
+            id = 53,
+            ends = Pair(61, 62),
+            distance = 2.2972343f
+        ),
+        SurveyPath(
+            id = 54,
+            ends = Pair(62, 63),
+            distance = 2.5571747f
+        ),
+        SurveyPath(
+            id = 55,
+            ends = Pair(63, 64),
+            distance = 3.3399115f
+        ),
+        SurveyPath(
+            id = 56,
+            ends = Pair(64, 65),
+            distance = 11.32971f
+        ),
+        SurveyPath(
+            id = 57,
+            ends = Pair(64, 66),
+            distance = 3.4245148f
+        ),
+        SurveyPath(
+            id = 58,
+            ends = Pair(66, 67),
+            distance = 4.451869f
+        ),
+        SurveyPath(
+            id = 59,
+            ends = Pair(67, 30),
+            distance = 4.4854608f
+        ),
+        SurveyPath(
+            id = 60,
+            ends = Pair(30, 33),
+            distance = 3.2080958f
+        ),
+        SurveyPath(
+            id = 61,
+            ends = Pair(33, 34),
+            distance = 2.5341408f
+        ),
+        SurveyPath(
+            id = 62,
+            ends = Pair(30, 32),
+            distance = 2.4010708f
+        ),
+        SurveyPath(
+            id = 63,
+            ends = Pair(32 , 31),
+            distance = 1.9103758f
+        ),
+        SurveyPath(
+            id = 64,
+            ends = Pair(60, 68),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 2.7812457f
+        ),
+        SurveyPath(
+            id = 65,
+            ends = Pair(68, 69),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 5.414633f
+        ),
+        SurveyPath(
+            id = 66,
+            ends = Pair(69, 70),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 5.574706f
+        ),
+        SurveyPath(
+            id = 67,
+            ends = Pair(70, 57),
+            altitude = -1,
+            hasWater = true,
+            distance = 6.506578f
+        ),
+        SurveyPath(
+            id = 68,
+            ends = Pair(70, 71),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 3.6883152f
+        ),
+        SurveyPath(
+            id = 69,
+            ends = Pair(71, 72),
+            altitude = -1,
+            hasWater = true,
+            isHardTraverse = true,
+            distance = 5.911629f
+        ),
+        SurveyPath(
+            id = 70,
+            ends = Pair(72, 2),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 1.7122574f
+        ),
+        SurveyPath(
+            id = 71,
+            ends = Pair(2, 3),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 5.414633f
+        ),
+        SurveyPath(
+            id = 72,
+            ends = Pair(3, 1),
+            hasWater = true,
+            altitude = -1,
+            distance = 12.136512f
+        ),
+        SurveyPath(
+            id = 73,
+            ends = Pair(1, 0),
+            distance = 4.180153f
+        ),
+        SurveyPath(
+            id = 74,
+            ends = Pair(0, 6),
+            distance = 3.0820632f
+        ),
+        SurveyPath(
+            id = 75,
+            ends = Pair(6, 5),
+            distance = 5.136772f
+        ),
+        SurveyPath(
+            id = 76,
+            ends = Pair(5, 4),
+            distance = 3.4680715f
+        ),
+        SurveyPath(
+            id = 77,
+            ends = Pair(4, 1),
+            distance = 6.5654297f
+        ),
+        SurveyPath(
+            id = 78,
+            ends = Pair(73, 6),
+            distance = 3.24878f
+        ),
+        SurveyPath(
+            id = 80,
+            ends = Pair(73, 56),
+            distance = 7.0598183f
+        ),
+        SurveyPath(
+            id = 81,
+            ends = Pair(73, 74),
+            distance = 3.4245148f
+        ),
+        SurveyPath(
+            id = 82,
+            ends = Pair(74, 36),
+            distance = 7.150597f
+        ),
+        SurveyPath(
+            id = 79,
+            ends = Pair(75, 1),
+            hasWater = true,
+            altitude = -1,
+            distance = 6.1641264f
+        ),
+        SurveyPath(
+            id = 83,
+            ends = Pair(75, 76),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 10.477f
+        ),
+        SurveyPath(
+            id = 84,
+            ends = Pair(76, 78),
+            distance = 1.3698059f
+        ),
+        SurveyPath(
+            id = 85,
+            ends = Pair(78, 77),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 1.3698059f
+        ),
+        SurveyPath(
+            id = 86,
+            ends = Pair(78, 79),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 15.130001f
+        ),
+        SurveyPath(
+            id = 87,
+            ends = Pair(79, 80),
+            hasWater = true,
+            altitude = -1,
+            distance = 7.0598183f
+        ),
+        SurveyPath(
+            id = 88,
+            ends = Pair(79, 81),
+            hasWater = true,
+            altitude = -1,
+            distance = 4.842995f
+        ),
+        SurveyPath(
+            id = 89,
+            ends = Pair(78, 82),
+            distance = 2.8239272f
+        ),
+        SurveyPath(
+            id = 90,
+            ends = Pair(82, 83),
+            hasWater = true,
+            altitude = -1,
+            isHardTraverse = true,
+            distance = 17.67859f
+        ),
+        SurveyPath(
+            id = 91,
+            ends = Pair(83, 85),
+            altitude = -1,
+            distance = 1.4528985f
+        ),
+        SurveyPath(
+            id = 92,
+            ends = Pair(85, 84),
+            distance = 5.911629f
+        ),
+        SurveyPath(
+            id = 93,
+            ends = Pair(84, 86),
+            altitude = 1,
+            distance = 5.182231f
+        ),
+        SurveyPath(
+            id = 94,
+            ends = Pair(58, 36),
+            distance = 6.2020597f
         )
     )
 )

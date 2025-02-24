@@ -5,5 +5,5 @@ data class SurveyNode(
     var isEntrance: Boolean = false,
     var isJunction: Boolean = false,
     var coordinates: Pair<Int, Int>,
-    var edges: MutableList<SurveyPath>
+    var edges: MutableList<Int>
 )
