@@ -25,3 +25,9 @@ Progress Diary:
 
 20/02/2025
   I have Success! I've been able to line up the canvas over the top of the survey in such a way that the coordinates of points and lines on the survey line are displayed correclty on the canvas, and any transformations done to the survey don't impact the points on the canvas, and they will still line up perfectly no matter     what.
+
+23/02/2025
+  Took a few days off due to wanting to play videogames and I felt I had good progress. Now I'm back, and today I made some big strides. Using a graph points and trial and error, I manually filled in the cave survey with coordinates of junctions, paths and extra data about the areas i.e. if it's in water or hard to traverse, or altitude. I also took the liberty of using the distance bar in the survey to figure out approximately how many pixels in a meter, it's roughly 14.6, meaning that I now have all the distances for all the lines in the survey, and I should be good to move onto pathfinding between points. 
+  One thing to note is that although I used the graph to find the points, I made sure that I referenced the points with the pixels in teh survey bitmap instead of the percentage from the top left, since if I decide to not use canvas anymore, all the work I've done today will still be valid since it takes it's place from the survey's point of view, not the canvas. The pathfinding should also be unaffected by the frontend, meaning the work I do tomorrow is also stable.
+  If I can't do canvas anymore for any future reason, I need to remember that Maxim told me that I could be able to split the survey bitmap into multiple tiles for the tileView library as a backup plan, and since I now have all the bit coordinates, I should be able to still use the information I created today to transfer locations of points and lines into the newly split tiles using some a few cheeky calculations.
+  Successful day today. Yipee!
