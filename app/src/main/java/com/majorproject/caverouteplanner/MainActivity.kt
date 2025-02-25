@@ -146,9 +146,12 @@ fun GraphOverlay(
             val startNode = nodes.find { it.id == path.ends.first } !!
             val endNode = nodes.find { it.id == path.ends.second } !!
             val textResult = textRememberer.measure("%.2f".format(path.distance), style = TextStyle(color = Color. Red,fontSize = 8.sp))
-            //val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
+            val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
 
             //Log.d("Line Details", "Line ${path.id} from Node ${startNode.id} to Node ${endNode.id} has length $length")
+            Log.d("Line Details", "Node ${startNode.id} has edge ${path.id}")
+            Log.d("Line Details", "Node ${endNode.id} has edge ${path.id}")
+
             drawLine(
                 color = if (path.hasWater) Color.Blue else Color.LightGray,
                 start = Offset(
@@ -192,7 +195,7 @@ fun GraphOverlay(
                     (node.coordinates.second /surveySize.height.toFloat()) * size.height
                 )
             )
-/*
+
             drawText(
                 textLayoutResult = textResult,
                 color = Color.Blue,
@@ -203,7 +206,7 @@ fun GraphOverlay(
             )
 
 
- */
+
 
         }
     }

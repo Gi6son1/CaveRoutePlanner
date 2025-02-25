@@ -29,460 +29,461 @@ val llSurvey = Survey(
             id = 7,
             isEntrance = true,
             coordinates = Pair(368 , 85),
-            edges = mutableListOf(8),
+            edges = mutableListOf(0),
             isJunction = true
         ),
         SurveyNode(
             id = 8,
             coordinates = Pair(332 , 144),
-            edges = mutableListOf(7,9)
+            edges = mutableListOf(0,1)
         ),
         SurveyNode(
             id = 9,
             coordinates = Pair(332 , 183),
-            edges = mutableListOf(8,10)
+            edges = mutableListOf(1,2)
         ),
         SurveyNode(
             id = 10,
             coordinates = Pair(388 , 189),
-            edges = mutableListOf()
+            edges = mutableListOf(2,3)
         ),
         SurveyNode(
             id = 11,
             coordinates = Pair(332 , 400),
-            edges = mutableListOf()
+            edges = mutableListOf(6,7)
         ),
         SurveyNode(
             id = 12,
             coordinates = Pair(464 , 400),
-            edges = mutableListOf()
+            edges = mutableListOf(8,9)
         ),
         SurveyNode(
             id = 13,
             coordinates = Pair(370 , 279),
-            edges = mutableListOf(),
+            edges = mutableListOf(3,4,7),
             isJunction = true
         ),
         SurveyNode(
             id = 14,
             coordinates = Pair(410 , 300),
-            edges = mutableListOf(),
+            edges = mutableListOf(4,5),
         ),
         SurveyNode(
             id = 15,
             coordinates = Pair(396 , 397),
-            edges = mutableListOf(),
+            edges = mutableListOf(5,6,8),
             isJunction = true
         ),
         SurveyNode(
             id = 16,
             coordinates = Pair(464 , 443),
-            edges = mutableListOf(),
+            edges = mutableListOf(9,10,11),
             isJunction = true
         ),
         SurveyNode(
             id = 17,
             coordinates = Pair(464 , 480),
-            edges = mutableListOf(),
+            edges = mutableListOf(10,12,41),
             isJunction = true
         ),
         SurveyNode(
             id = 18,
             coordinates = Pair(494 , 429),
-            edges = mutableListOf(),
+            edges = mutableListOf(11,13,15),
             isJunction = true
         ),
         SurveyNode(
             id = 19,
             coordinates = Pair(520 , 440),
-            edges = mutableListOf(),
+            edges = mutableListOf(13,14),
         ),
         SurveyNode(
             id = 20,
             coordinates = Pair(500 , 470),
-            edges = mutableListOf()
+            edges = mutableListOf(12,14)
         ),
         SurveyNode(
             id = 21,
             coordinates = Pair(405 , 510),
-            edges = mutableListOf()
+            edges = mutableListOf(40,41)
         ),
         SurveyNode(
             id = 22,
             coordinates = Pair(370 , 730),
-            edges = mutableListOf()
+            edges = mutableListOf(39,40)
         ),
         SurveyNode(
             id = 23,
             coordinates = Pair(450 , 800),
-            edges = mutableListOf()
+            edges = mutableListOf(38,39)
         ),
         SurveyNode(
             id = 24,
             coordinates = Pair(525 , 830),
-            edges = mutableListOf(),
+            edges = mutableListOf(36,37,38),
             isJunction = true
         ),
         SurveyNode(
             id = 25,
             coordinates = Pair(530 , 900),
-            edges = mutableListOf(),
+            edges = mutableListOf(37),
         ),
         SurveyNode(
             id = 26,
             coordinates = Pair(630 , 800),
-            edges = mutableListOf(),
+            edges = mutableListOf(35,36),
         ),
         SurveyNode(
             id = 27,
             coordinates = Pair(700 , 760),
-            edges = mutableListOf(),
+            edges = mutableListOf(34,35),
         ),
         SurveyNode(
             id = 28,
             coordinates = Pair(765 , 760),
-            edges = mutableListOf(),
+            edges = mutableListOf(33,34),
         ),
         SurveyNode(
             id = 29,
             coordinates = Pair(815 , 815),
-            edges = mutableListOf(),
+            edges = mutableListOf(31,32,33),
             isJunction = true
         ),
         SurveyNode(
             id = 30,
             coordinates = Pair(775 , 895),
-            edges = mutableListOf(),
+            edges = mutableListOf(32,59,60,62),
             isJunction = true
         ),
         SurveyNode(
             id = 31,
             coordinates = Pair(733 , 920),
-            edges = mutableListOf(),
+            edges = mutableListOf(63),
         ),
         SurveyNode(
             id = 32,
             coordinates = Pair(740 , 893),
-            edges = mutableListOf(),
+            edges = mutableListOf(62,63),
         ),
         SurveyNode(
             id = 33,
             coordinates = Pair(820 , 908),
-            edges = mutableListOf(),
+            edges = mutableListOf(60,61),
         ),
         SurveyNode(
             id = 34,
             coordinates = Pair(820 , 945),
-            edges = mutableListOf(),
+            edges = mutableListOf(61),
         ),
         SurveyNode(
             id = 35,
             coordinates = Pair(890 , 800),
-            edges = mutableListOf(),
+            edges = mutableListOf(29,30,31),
             isJunction = true
         ),
         SurveyNode(
             id = 36,
             coordinates = Pair(1000 , 840),
-            edges = mutableListOf(),
+            edges = mutableListOf(30,82,94),
             isJunction = true
         ),
         SurveyNode(
             id = 37,
             coordinates = Pair(890 , 600),
-            edges = mutableListOf(),
+            edges = mutableListOf(28,29),
         ),
         SurveyNode(
             id = 38,
             coordinates = Pair(810 , 590),
-            edges = mutableListOf(),
+            edges = mutableListOf(27,28),
         ),
         SurveyNode(
             id = 39,
             coordinates = Pair(810 , 560),
-            edges = mutableListOf(),
+            edges = mutableListOf(26,27,42),
             isJunction = true
         ),
         SurveyNode(
             id = 40,
             coordinates = Pair(750 , 530),
-            edges = mutableListOf(),
+            edges = mutableListOf(25,26),
         ),
         SurveyNode(
             id = 41,
             coordinates = Pair(670 , 530),
-            edges = mutableListOf(),
+            edges = mutableListOf(24,25),
         ),
         SurveyNode(
             id = 42,
             coordinates = Pair(638 , 505),
-            edges = mutableListOf(),
+            edges = mutableListOf(23,24),
         ),
         SurveyNode(
             id = 43,
             coordinates = Pair(620 , 280),
-            edges = mutableListOf(),
+            edges = mutableListOf(21,22),
         ),
         SurveyNode(
             id = 44,
             coordinates = Pair(625 , 380),
-            edges = mutableListOf(),
+            edges = mutableListOf(22,23),
         ),
         SurveyNode(
             id = 45,
             coordinates = Pair(620 , 200),
-            edges = mutableListOf(),
+            edges = mutableListOf(20,21),
         ),
         SurveyNode(
             id = 46,
             coordinates = Pair(550 , 185),
-            edges = mutableListOf(),
+            edges = mutableListOf(17,20),
         ),
         SurveyNode(
             id = 47,
             coordinates = Pair(500 , 205),
-            edges = mutableListOf(),
+            edges = mutableListOf(16, 17, 18),
             isJunction = true
         ),
         SurveyNode(
             id = 48,
             coordinates = Pair(495 , 280),
-            edges = mutableListOf(),
+            edges = mutableListOf(15,16),
         ),
         SurveyNode(
             id = 49,
             coordinates = Pair(490 , 180),
-            edges = mutableListOf(),
+            edges = mutableListOf(18,19),
         ),
         SurveyNode(
             id = 50,
             coordinates = Pair(280 , 75),
-            edges = mutableListOf(),
+            edges = mutableListOf(19),
         ),
         SurveyNode(
             id = 51,
             coordinates = Pair(890 , 535),
-            edges = mutableListOf(),
+            edges = mutableListOf(42,43),
         ),
         SurveyNode(
             id = 52,
             coordinates = Pair(1050 , 535),
-            edges = mutableListOf(),
+            edges = mutableListOf(43,44),
         ),
         SurveyNode(
             id = 53,
             coordinates = Pair(1075 , 565),
-            edges = mutableListOf(),
+            edges = mutableListOf(44,45),
         ),
         SurveyNode(
             id = 54,
             coordinates = Pair(1100 , 600),
-            edges = mutableListOf(),
+            edges = mutableListOf(45,46),
         ),
         SurveyNode(
             id = 55,
             coordinates = Pair(1090, 685),
-            edges = mutableListOf(),
+            edges = mutableListOf(46,47),
         ),
         SurveyNode(
             id = 56,
             coordinates = Pair(1075 , 920),
-            edges = mutableListOf(),
+            edges = mutableListOf(47,48,80),
+            isJunction = true
         ),
         SurveyNode(
             id = 57,
             coordinates = Pair(1050 , 950),
-            edges = mutableListOf(),
+            edges = mutableListOf(48,49,67),
             isJunction = true
         ),
         SurveyNode(
             id = 58,
             coordinates = Pair(990 , 930),
-            edges = mutableListOf(),
+            edges = mutableListOf(49,50,94),
             isJunction = true
         ),
         SurveyNode(
             id = 59,
             coordinates = Pair(930 , 955),
-            edges = mutableListOf(),
+            edges = mutableListOf(50,51),
         ),
         SurveyNode(
             id = 60,
             coordinates = Pair(893 , 1070),
-            edges = mutableListOf(),
+            edges = mutableListOf(51,52,64),
             isJunction = true
         ),
         SurveyNode(
             id = 61,
             coordinates = Pair(850 , 1045),
-            edges = mutableListOf(),
+            edges = mutableListOf(52,53),
         ),
         SurveyNode(
             id = 62,
             coordinates = Pair(820 , 1060),
-            edges = mutableListOf(),
+            edges = mutableListOf(53,54),
         ),
         SurveyNode(
             id = 63,
             coordinates = Pair(785 , 1047),
-            edges = mutableListOf(),
+            edges = mutableListOf(54,55),
         ),
         SurveyNode(
             id = 64,
             coordinates = Pair(742 , 1070),
-            edges = mutableListOf(),
+            edges = mutableListOf(55,56,57),
             isJunction = true
         ),
         SurveyNode(
             id = 65,
             coordinates = Pair(700 , 1230),
-            edges = mutableListOf(),
+            edges = mutableListOf(56),
         ),
         SurveyNode(
             id = 66,
             coordinates = Pair(742 , 1020),
-            edges = mutableListOf(),
+            edges = mutableListOf(57,58),
         ),
         SurveyNode(
             id = 67,
             coordinates = Pair(767 , 960),
-            edges = mutableListOf(),
+            edges = mutableListOf(58,59),
         ),
         SurveyNode(
             id = 68,
             coordinates = Pair(925 , 1095),
-            edges = mutableListOf(),
+            edges = mutableListOf(64,65),
         ),
         SurveyNode(
             id = 69,
             coordinates = Pair(970 , 1030),
-            edges = mutableListOf(),
+            edges = mutableListOf(65,66),
         ),
         SurveyNode(
             id = 70,
             coordinates = Pair(1050 , 1045),
-            edges = mutableListOf(),
+            edges = mutableListOf(66,67,68),
             isJunction = true
         ),
         SurveyNode(
             id = 71,
             coordinates = Pair(1100 , 1065),
-            edges = mutableListOf(),
+            edges = mutableListOf(68,69),
         ),
         SurveyNode(
             id = 72,
             coordinates = Pair(1085 , 1150),
-            edges = mutableListOf(),
+            edges = mutableListOf(69,70),
         ),
         SurveyNode(
             id = 2,
             coordinates = Pair(1105 , 1165),
-            edges = mutableListOf()
+            edges = mutableListOf(70,71)
         ),
         SurveyNode(
             id = 3,
             coordinates = Pair(1170 , 1120),
-            edges = mutableListOf()
+            edges = mutableListOf(71,72)
         ),
         SurveyNode(
             id = 1,
             coordinates = Pair(1220 , 950),
-            edges = mutableListOf(),
+            edges = mutableListOf(72,73,77,79),
             isJunction = true
         ),
         SurveyNode(
             id = 4,
             coordinates = Pair(1253 , 860),
-            edges = mutableListOf()
+            edges = mutableListOf(76,77)
         ),
         SurveyNode(
             id = 5,
             coordinates = Pair(1245 , 810),
-            edges = mutableListOf()
+            edges = mutableListOf(75,76)
         ),
         SurveyNode(
             id = 6,
             coordinates = Pair(1185 , 855),
-            edges = mutableListOf(),
+            edges = mutableListOf(74,75,78),
             isJunction = true
         ),
         SurveyNode(
             id = 0,
             coordinates = Pair(1185 , 900),
-            edges = mutableListOf()
+            edges = mutableListOf(73,74)
         ),
         SurveyNode(
             id = 73,
             coordinates = Pair(1140 , 840),
-            edges = mutableListOf(),
+            edges = mutableListOf(78,80,81),
             isJunction = true
         ),
         SurveyNode(
             id = 74,
             coordinates = Pair(1100 , 810),
-            edges = mutableListOf()
+            edges = mutableListOf(81,82)
         ),
         SurveyNode(
             id = 75,
             coordinates = Pair(1310 , 950),
-            edges = mutableListOf()
+            edges = mutableListOf(79,83)
         ),
         SurveyNode(
             id = 76,
             coordinates = Pair(1460 , 980),
-            edges = mutableListOf()
+            edges = mutableListOf(83,84)
         ),
         SurveyNode(
             id = 77,
             coordinates = Pair(1500 , 980),
-            edges = mutableListOf()
+            edges = mutableListOf(85)
         ),
         SurveyNode(
             id = 78,
             coordinates = Pair(1480 , 980),
-            edges = mutableListOf(),
+            edges = mutableListOf(84,85,86,89),
             isJunction = true
         ),
         SurveyNode(
             id = 79,
             coordinates = Pair(1700 , 1000),
-            edges = mutableListOf(),
+            edges = mutableListOf(86,87,88),
             isJunction = true
         ),
         SurveyNode(
             id = 80,
             coordinates = Pair(1725 , 900),
-            edges = mutableListOf(),
+            edges = mutableListOf(87),
         ),
         SurveyNode(
             id = 81,
             coordinates = Pair(1690 , 1070),
-            edges = mutableListOf(),
+            edges = mutableListOf(88),
         ),
         SurveyNode(
             id = 82,
             coordinates = Pair(1470 , 1020),
-            edges = mutableListOf(),
+            edges = mutableListOf(89,90),
         ),
         SurveyNode(
             id = 83,
             coordinates = Pair(1430 , 1275),
-            edges = mutableListOf(),
+            edges = mutableListOf(90,91),
         ),
         SurveyNode(
             id = 84,
             coordinates = Pair(1460 , 1175),
-            edges = mutableListOf(),
+            edges = mutableListOf(92,93),
         ),
         SurveyNode(
             id = 85,
             coordinates = Pair(1445 , 1260),
-            edges = mutableListOf(),
+            edges = mutableListOf(91,92),
         ),
         SurveyNode(
             id = 86,
             coordinates = Pair(1450 , 1100),
-            edges = mutableListOf(),
+            edges = mutableListOf(93),
         ),
     ),
     paths = mutableListOf(
