@@ -47,4 +47,9 @@ Progress Diary:
 
   Goodbye for now
 
+26/02/2025
+  Today, I did a bit more work on the pathfinder. It works, Yipeee. I've made a few changes to the algorithm so that it now, instead of returning a list of distances to all the points, it instead returns a map of reachable nodes from the start node, with a value of the edge from that node that is the quickest edge to take to get closer to that start node. I've also made sure that depending on the requirements i.e. no water or no hard traversals or high altitude only, the pathfinding changes depending on those requirements. I then was able to use that map and through backtracking edges and nodes, generate a sequenced lists of edges to take for that route from start to goal, along with a total distance for the journey.
+  Next, I'll focus on how to visually show the route on the canvas, which shouldn't be too difficult, and then set up buttons to be used in the demo that demmonstrate the dynamic pathfinding on the interactable survey map
+
+  
   
