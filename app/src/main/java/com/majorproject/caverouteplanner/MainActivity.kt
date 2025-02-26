@@ -128,8 +128,10 @@ fun ImageWithGraphOverlay(
                 )
             )
         }
-        val routeFinder = RouteFinder(7, survey)
+        val routeFinder = RouteFinder(7, survey, Triple(false, false, false))
         Log.d("RouteFinder", "Route from 7 to 8: ${routeFinder.getRouteToNode(37)}")
+        val routeNew = RouteFinder(7, survey, Triple(true, false, false))
+        Log.d("RouteFinder", "Route from 7 to 8: ${routeNew.getRouteToNode(37)}")
     }
 }
 

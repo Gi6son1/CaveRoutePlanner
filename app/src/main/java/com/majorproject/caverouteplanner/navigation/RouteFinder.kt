@@ -3,12 +3,15 @@ package com.majorproject.caverouteplanner.navigation
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import java.util.PriorityQueue
+import kotlin.math.pow
 
-data class RouteFinder(val sourceId: Int, val survey: Survey) {
-    var routeMap: MutableMap<Int, Pair<Float, Int>> = mutableMapOf()
+data class RouteFinder(val sourceId: Int, val survey: Survey, val flags: Triple<Boolean, Boolean, Boolean>) {
+    var routeMap: MutableMap<Int, Int> = mutableMapOf()
 
 
     init {
+        val (noWater, noHardTraverse, highAltitude) = flags
+
         val visitedNodes = BooleanArray(survey.pathNodes.size)
         val routes: MutableMap<Int, Pair<Float, Int>> = mutableMapOf()
         val priorityQueue = PriorityQueue<Pair<Int, Int>>(compareBy { it.first })
@@ -29,7 +32,11 @@ data class RouteFinder(val sourceId: Int, val survey: Survey) {
                 val edge = survey.paths.find { it.id == edgeId }
 
                 val neighbour = if (edge!!.ends.first == currentNodeId) edge.ends.second else edge.ends.first
-                val weight = edge.distance
+
+                var weight = edge.distance
+                if (noWater && edge.hasWater) {weight *= 1.5f}
+                if (noHardTraverse && edge.isHardTraverse) {weight *= 1.5f}
+                if (highAltitude){ weight *= 0.5f.pow(edge.altitude) }
 
 
                 if (routes[currentNodeId]!!.first + weight < (routes[neighbour]?.first ?: Float.MAX_VALUE)) {
@@ -39,14 +46,14 @@ data class RouteFinder(val sourceId: Int, val survey: Survey) {
                 }
             }
         }
-        routeMap = routes
+        routeMap = routes.mapValues { it.value.second }.toMutableMap()
     }
 
 
     fun getRouteToNode(id: Int): Pair<List<Int>, Float> {
 
         fun getEdgeFromNode(id: Int): Triple<SurveyPath, Int, Float> {
-            val edge = routeMap[id]?.second ?: -1
+            val edge = routeMap[id] ?: -1
             val foundEdge = survey.paths.find { it.id == edge }
             val neighbour = if (foundEdge!!.ends.first == id) foundEdge.ends.second else foundEdge.ends.first
 
