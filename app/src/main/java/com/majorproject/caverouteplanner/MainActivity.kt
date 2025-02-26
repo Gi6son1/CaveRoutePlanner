@@ -129,6 +129,7 @@ fun ImageWithGraphOverlay(
             )
         }
         val routeFinder = RouteFinder(7, survey)
+        Log.d("RouteFinder", "Route from 7 to 8: ${routeFinder.getRouteToNode(37)}")
     }
 }
 
@@ -147,7 +148,7 @@ fun GraphOverlay(
         paths.forEach { path ->
             val startNode = nodes.find { it.id == path.ends.first } !!
             val endNode = nodes.find { it.id == path.ends.second } !!
-            val textResult = textRememberer.measure("%.2f".format(path.distance), style = TextStyle(color = Color. Red,fontSize = 8.sp))
+            val textResult = textRememberer.measure("${path.id}", style = TextStyle(color = Color. Red,fontSize = 8.sp))
             //val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
 
             //Log.d("Line Details", "Line ${path.id} from Node ${startNode.id} to Node ${endNode.id} has length $length")
@@ -165,7 +166,7 @@ fun GraphOverlay(
                 strokeWidth = 4f
             )
 
-/*
+
             drawText(
                 textLayoutResult = textResult,
                 color = Color.Magenta,
@@ -173,7 +174,7 @@ fun GraphOverlay(
                     ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width/2,
                     ((startNode.coordinates.second + endNode.coordinates.second)/ surveySize.height.toFloat()) / 2 * size.height - textResult.size.height/2),
             )
-*/
+
 
         }
 
