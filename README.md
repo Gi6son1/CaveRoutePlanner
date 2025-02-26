@@ -38,3 +38,13 @@ Progress Diary:
   If I can't do canvas anymore for any future reason, I need to remember that Maxim told me that I could be able to split the survey bitmap into multiple tiles for the tileView library as a backup plan, and since I now have all the bit coordinates, I should be able to still use the information I created today to transfer locations of points and lines into the newly split tiles using some a few cheeky calculations.
   
   Successful day today. Yipee!
+
+25/02/2025
+  Today I worked on the pathfinding algorithm. I decided to use Dijkstra'a algorithm because it means that it will always find the best route to a node instead of a best guess like A*. It also means that depending on where the person sets their orignal location, which will probably be entrance, I'll be able to preload all best routes so that when the user selects a node to travel to, the best route has already been calculated instead of being recalculated everytime. 
+  I used: https://medium.com/@chetanshingare2991/finding-the-shortest-route-graph-algorithms-in-kotlin-dijkstras-and-bellman-ford-77ff80c6d412 to help me find the kotlin version of the algorithm.
+
+  Tomorrow, I'm going to focus on tweaking this algorithm so that it displays which edge was the closest distance edge for each node, meaning that I should be able to then find paths, as the algorithm currenlty only returns the final distances to each node. I also need to add in the functionality to change the costs depending onn the requirements given i.e. altitude or hard traversal or water, but this can be done easily tomorrow; but for now I indend to add some cost that gradually increases the weight depending on the distance. i.e. hasWater doesn't increase the weight by a static amount because it will become less relevant for larger distances, but instead it will increase the orignal weight by, say 1.5 or 1.2 or whatever feels better after testing.
+
+  Goodbye for now
+
+  
