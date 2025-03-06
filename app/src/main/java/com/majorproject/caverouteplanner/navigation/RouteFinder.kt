@@ -1,37 +1,51 @@
 package com.majorproject.caverouteplanner.navigation
 
 import com.majorproject.caverouteplanner.ui.components.Survey
+import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import java.util.PriorityQueue
 import kotlin.math.pow
 
-data class RouteFinder(val sourceId: Int, val survey: Survey, val flags: Triple<Boolean, Boolean, Boolean>) {
-    var routeMap: MutableMap<Int, Int> = mutableMapOf()
+data class RouteFinder(
+    val sourceId: Int,
+    val survey: Survey,
+    val flags: Triple<Boolean, Boolean, Boolean> = Triple(false, false, false),
+    val avoidEdges: List<Int> = listOf()
+) {
+    var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf()
+    var costMap: MutableMap<SurveyPath, Float> = mutableMapOf()
 
 
     init {
+        val sourceNode = survey.pathNodes.find { it.id == sourceId} ?: throw Exception("Source node not found")
+
         val (noWater, noHardTraverse, highAltitude) = flags
 
         val visitedNodes = BooleanArray(survey.pathNodes.size)
-        val routes: MutableMap<Int, Pair<Float, Int>> = mutableMapOf()
-        val priorityQueue = PriorityQueue<Pair<Int, Int>>(compareBy { it.first })
+        val routes: MutableMap<SurveyNode?, Pair<Float, SurveyPath?>> = mutableMapOf()
+        val priorityQueue = PriorityQueue<Pair<Int, SurveyNode>>(compareBy { it.first })
 
-        routes.put(sourceId, Pair(0f, 0))
-        priorityQueue.add(Pair(0, sourceId))
+        //map key is source id, value is pair of distance and edge id to get there
+        routes.put(sourceNode, Pair(0f, null))
+        priorityQueue.add(Pair(0, sourceNode))
 
         while (priorityQueue.isNotEmpty()) {
-            val (currentDistance, currentNodeId) = priorityQueue.poll()
+            val (currentDistance, currentNode) = priorityQueue.poll()
 
-            if (visitedNodes[currentNodeId]) {
+            if (visitedNodes[currentNode.id]) {
                 continue
             }
 
-            visitedNodes[currentNodeId] = true
+            visitedNodes[currentNode.id] = true
 
-            for (edgeId in survey.pathNodes.find { it.id == currentNodeId }!!.edges) {
+            for (edgeId in currentNode.edges) {
+                if (edgeId in avoidEdges) {
+                    continue
+                }
                 val edge = survey.paths.find { it.id == edgeId }
 
-                val neighbour = if (edge!!.ends.first == currentNodeId) edge.ends.second else edge.ends.first
+                val neighbourId = if (edge!!.ends.first == currentNode.id) edge.ends.second else edge.ends.first
+                val neighbour = survey.pathNodes.find { it.id == neighbourId }
 
                 var weight = edge.distance
                 if (noWater && edge.hasWater) {weight *= 1.5f}
@@ -39,10 +53,11 @@ data class RouteFinder(val sourceId: Int, val survey: Survey, val flags: Triple<
                 if (highAltitude){ weight *= 0.5f.pow(edge.altitude) }
 
 
-                if (routes[currentNodeId]!!.first + weight < (routes[neighbour]?.first ?: Float.MAX_VALUE)) {
-                    routes.put(neighbour, Pair(routes[currentNodeId]!!.first + weight, edgeId))
+                if (routes[currentNode]!!.first + weight < (routes[neighbour]?.first ?: Float.MAX_VALUE)) {
+                    routes.put(neighbour, Pair(routes[currentNode]!!.first + weight, edge))
+                    costMap.put(edge, weight)
 
-                    priorityQueue.add(Pair(routes[neighbour]!!.first.toInt(), neighbour))
+                    priorityQueue.add(Pair(routes[neighbour]!!.first.toInt(), neighbour!!))
                 }
             }
         }
@@ -50,26 +65,30 @@ data class RouteFinder(val sourceId: Int, val survey: Survey, val flags: Triple<
     }
 
 
-    fun getRouteToNode(id: Int): Pair<List<Int>, Float> {
-
-        fun getEdgeFromNode(id: Int): Triple<SurveyPath, Int, Float> {
-            val edge = routeMap[id] ?: -1
-            val foundEdge = survey.paths.find { it.id == edge }
-            val neighbour = if (foundEdge!!.ends.first == id) foundEdge.ends.second else foundEdge.ends.first
-
-            return Triple(foundEdge, neighbour, foundEdge.distance)
-        }
-        var routeList = mutableListOf<Int>()
+    fun getRouteToNode(nodeId: Int): Pair<List<List<SurveyPath>>, Float>? {
+        var currentNode = survey.pathNodes.find { it.id == nodeId } ?: return null
+        var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
-        var currentNode = id
-        while (currentNode != sourceId) {
+        fun getEdgeFromNode(id: SurveyNode): Triple<SurveyPath, SurveyNode?, Float> {
+            val foundEdge = routeMap[id]
+            val neighbour = if (foundEdge?.ends?.first == id.id) foundEdge.ends.second else foundEdge?.ends?.first
+            val neighbourNode = survey.pathNodes.find { it.id == neighbour }
+
+            return Triple(foundEdge!!, neighbourNode, foundEdge.distance)
+        }
+
+
+        while (currentNode.id != sourceId) {
             val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode)
             totalDistance += newDistance
-            routeList.add(edge.id)
-            currentNode = neighbour
+            if (routeList.isEmpty() || currentNode.isJunction) {
+                routeList.add(mutableListOf(edge))
+            } else {
+                routeList.last().add(edge)
+            }
+            currentNode = neighbour!!
         }
         return Pair(routeList.reversed(), totalDistance)
     }
-
 }

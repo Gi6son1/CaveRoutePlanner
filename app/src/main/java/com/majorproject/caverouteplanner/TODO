@@ -1,0 +1,14 @@
+TODO list:
+
+Output route
+    Use list of junction edges to display step by step paths on map
+
+Make possible to tap on survey to get closest point on survey
+
+Add pathfinding that may take into account closest points if actual destination cannot be reached
+Add pathfinding that takes into account avoiding certain edges
+
+Make demo
+
+Make landing page i.e. list of surveys to select
+Make room database

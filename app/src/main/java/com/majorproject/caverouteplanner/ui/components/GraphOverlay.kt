@@ -1,0 +1,263 @@
+package com.majorproject.caverouteplanner.ui.components
+
+import android.util.Log
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.navigation.RouteFinder
+import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
+import kotlin.math.max
+
+@Composable
+fun ImageWithGraphOverlay(
+    survey: Survey,
+    modifier: Modifier = Modifier
+) {
+
+    var scale by remember { mutableFloatStateOf(1f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        scale = max(scale * zoomChange, 1f)
+        rotation += rotationChange
+        offset += offsetChange
+    }
+
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .transformable(state = state)
+
+    ) {
+        val surveyBox = createRef()
+        Box(
+            modifier = modifier
+                .constrainAs(surveyBox) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                bitmap = survey.imageBitmap(),
+                contentDescription = survey.caveName,
+                modifier = Modifier,
+                contentScale = ContentScale.Fit
+            )
+
+            val routeFinder = RouteFinder(
+                sourceId = 7,
+                survey = survey,
+                avoidEdges = listOf(7),
+            )
+
+            Log.d("RouteFinder", "RouteFinder created")
+            val route = routeFinder.getRouteToNode(30)?.first
+
+            GraphOverlay(
+                nodes = survey.pathNodes,
+                paths = survey.paths,
+                modifier = Modifier.matchParentSize(),
+                surveySize = IntSize(
+                    width = survey.imageBitmap().width,
+                    height = survey.imageBitmap().height
+                ),
+                routeFinder = routeFinder,
+                displayWeights = true
+            )
+        }
+    }
+}
+
+
+@Composable
+fun GraphOverlay(
+    modifier: Modifier = Modifier,
+    nodes: List<SurveyNode>,
+    paths: List<SurveyPath>,
+    surveySize: IntSize,
+    routeFinder: RouteFinder? = null,
+    destinationNode: Int = 0,
+    displayWeights: Boolean = false
+) {
+    val textRememberer = rememberTextMeasurer()
+    Canvas(modifier = modifier) {
+        if (routeFinder != null) {
+            if (destinationNode != 0) {
+                val route = routeFinder.getRouteToNode(destinationNode)
+                route?.first?.forEach { pathSection ->
+                    pathSection.forEach { path ->
+                        val startNode = nodes.find { it.id == path.ends.first }!!
+                        val endNode = nodes.find { it.id == path.ends.second }!!
+
+                        drawLine(
+                            color = if (path.hasWater) Color.Blue else Color.Red,
+                            start = Offset(
+                                (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                                (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            ),
+                            end = Offset(
+                                (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                                (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            ),
+                            strokeWidth = 4f
+                        )
+                    }
+                }
+            }
+            if (displayWeights) {
+                routeFinder.costMap.forEach { (path, weight) ->
+
+                    val startNode = nodes.find { it.id == path.ends.first }!!
+                    val endNode = nodes.find { it.id == path.ends.second }!!
+                    val textResult = textRememberer.measure(
+                        String.format("%.2f", weight),
+                        style = TextStyle(fontSize = 6.sp)
+                    )
+
+                    drawLine(
+                        color = Color.LightGray,
+                        start = Offset(
+                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        end = Offset(
+                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        strokeWidth = 4f
+                    )
+
+                    drawText(
+                        textLayoutResult = textResult,
+                        color = Color.Red,
+                        topLeft = Offset(
+                            ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
+                            ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
+                        ),
+                    )
+                }
+
+            } else {
+                paths.forEach { path ->
+                    val startNode = nodes.find { it.id == path.ends.first }!!
+                    val endNode = nodes.find { it.id == path.ends.second }!!
+                    val textResult = textRememberer.measure(
+                        "${path.id}",
+                        style = TextStyle(color = Color.Red, fontSize = 8.sp)
+                    )
+                    //val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
+
+                    //Log.d("Line Details", "Line ${path.id} from Node ${startNode.id} to Node ${endNode.id} has length $length")
+
+                    drawLine(
+                        color = if (path.hasWater) Color.Blue else Color.LightGray,
+                        start = Offset(
+                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        end = Offset(
+                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        strokeWidth = 4f
+                    )
+
+
+                    drawText(
+                        textLayoutResult = textResult,
+                        color = Color.Magenta,
+                        topLeft = Offset(
+                            ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
+                            ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
+                        ),
+                    )
+
+
+                }
+
+
+                nodes.forEach { node ->
+
+                    val textResult = textRememberer.measure(
+                        "${node.id}",
+                        style = TextStyle(color = Color.Red, fontSize = 6.sp)
+                    )
+
+                    drawCircle(
+                        color = if (node.isEntrance) {
+                            Color.Green
+                        } else if (node.isJunction) {
+                            Color.Red
+                        } else {
+                            Color.LightGray
+                        },
+                        radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
+                        center = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+
+                    drawText(
+                        textLayoutResult = textResult,
+                        color = Color.Blue,
+                        topLeft = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
+    val pixelsPerMeter = 14.600609f
+    val xDiff = (end.first - start.first).toFloat()
+    val yDiff = (end.second - start.second).toFloat()
+    return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
+}
+
+
+@Preview
+@Composable
+fun GraphOverlayPreview() {
+    CaveRoutePlannerTheme {
+        ImageWithGraphOverlay(
+            survey = llSurvey,
+            modifier = Modifier
+        )
+    }
+}
