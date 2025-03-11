@@ -54,7 +54,8 @@ fun ImageWithGraphOverlay(
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        scale = max(scale * zoomChange, 1f)
+        val newScale = (scale * zoomChange).coerceIn(1f, 20f)
+        scale = newScale
         rotation += rotationChange
         offset += offsetChange
     }
