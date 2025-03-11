@@ -1,21 +1,19 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.util.Log
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -36,7 +34,7 @@ fun MapScreen() {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            val (surveyGraph, demoButtons) = createRefs()
+            val (surveyGraph, demoButtons, flagColumn) = createRefs()
 
             var routeFinder by rememberSaveable {
                 mutableStateOf(
@@ -53,8 +51,20 @@ fun MapScreen() {
                 mutableStateOf(null)
             }
 
-            var newRoute by rememberSaveable {
+            var onlyFirstClick by rememberSaveable {
                 mutableStateOf(true)
+            }
+
+            var noWater by rememberSaveable {
+                mutableStateOf(false)
+            }
+
+            var highAltitude by rememberSaveable {
+                mutableStateOf(false)
+            }
+
+            var noHardTraverse by rememberSaveable {
+                mutableStateOf(false)
             }
 
             ImageWithGraphOverlay(
@@ -68,6 +78,74 @@ fun MapScreen() {
                 routeFinder = routeFinder,
                 currentRoute = currentRoute
             )
+            Column(modifier = Modifier.constrainAs(flagColumn){
+                bottom.linkTo(demoButtons.top, margin = 10.dp)
+                start.linkTo(parent.start, margin = 10.dp)
+                end.linkTo(parent.end, margin = 10.dp)
+            }){
+                Row {
+                    Switch(
+                        checked = noWater,
+                        onCheckedChange = {
+                            noWater = it
+                            routeFinder = RouteFinder(
+                                sourceId = 7,
+                                survey = llSurvey,
+                                flags = Triple(noWater, noHardTraverse, highAltitude)
+                            )
+                            if (demoNum != 0) {
+                                val routeNum = if (demoNum == 2) 55 else 37
+                                currentRoute = routeFinder.getRouteToNode(routeNum)
+                                onlyFirstClick = false
+                            }
+                        }
+
+                    )
+                    Text(text = "No Water", fontSize = 20.sp)
+                }
+
+                Row{
+                    Switch(
+                        checked = noHardTraverse,
+                        onCheckedChange = {
+                            noHardTraverse = it
+                            routeFinder = RouteFinder(
+                                sourceId = 7,
+                                survey = llSurvey,
+                                flags = Triple(noWater, noHardTraverse, highAltitude)
+                            )
+                            if (demoNum != 0) {
+                                val routeNum = if (demoNum == 2) 55 else 37
+                                currentRoute = routeFinder.getRouteToNode(routeNum)
+                                onlyFirstClick = false
+                            }
+                        }
+                    )
+                    Text(text = "No Hard Traverse", fontSize = 20.sp)
+                }
+
+                Row {
+                    Switch(
+                        checked = highAltitude,
+                        onCheckedChange = {
+                            highAltitude = it
+                            routeFinder = RouteFinder(
+                                sourceId = 7,
+                                survey = llSurvey,
+                                flags = Triple(noWater, noHardTraverse, highAltitude)
+                            )
+                            if (demoNum != 0){
+                                val routeNum = if (demoNum == 2) 55 else 37
+                                currentRoute = routeFinder.getRouteToNode(routeNum)
+                                onlyFirstClick = false
+                            }
+                        }
+                    )
+                    Text(text = "High Altitude", fontSize = 20.sp)
+                }
+
+
+            }
 
             Row(modifier = Modifier
                 .constrainAs(demoButtons) {
@@ -81,38 +159,22 @@ fun MapScreen() {
                 Button(onClick = {
                     if (demoNum != 1){
                         demoNum = 1
-                        routeFinder = RouteFinder(
-                            sourceId = 7,
-                            survey = llSurvey,
-                        )
-                        newRoute = true
-                    } else if (newRoute) {
                         currentRoute = routeFinder.getRouteToNode(37)
-                        newRoute = false
                     } else {
                         currentRoute?.nextStage()
                     }
-
                 }) {
-                    Text(text = "Shortest Dist", fontSize = 30.sp)
+                    Text(text = "Demo 1", fontSize = 30.sp)
                 }
                 Button(onClick = {
-                    if (demoNum != 2) {
+                    if (demoNum != 2){
                         demoNum = 2
-                        routeFinder = RouteFinder(
-                            sourceId = 7,
-                            survey = llSurvey,
-                            flags = Triple(true, false, false)
-                        )
-                        newRoute = true
-                    } else if (newRoute) {
-                        currentRoute = routeFinder.getRouteToNode(37)
-                        newRoute = false
+                        currentRoute = routeFinder.getRouteToNode(55)
                     } else {
                         currentRoute?.nextStage()
                     }
                 }) {
-                    Text(text = "No water", fontSize = 30.sp)
+                    Text(text = "Demo 2", fontSize = 30.sp)
                 }
             }
         }
