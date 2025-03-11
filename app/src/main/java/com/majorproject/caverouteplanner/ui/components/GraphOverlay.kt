@@ -28,17 +28,24 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.sin
 
 @Composable
 fun ImageWithGraphOverlay(
@@ -53,17 +60,41 @@ fun ImageWithGraphOverlay(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        val newScale = (scale * zoomChange).coerceIn(1f, 20f)
-        scale = newScale
-        rotation += rotationChange
-        offset += offsetChange
-    }
+    val density = LocalDensity.current
+    val screenWidth = with(density) {LocalConfiguration.current.screenWidthDp.dp.toPx()}
+    val screenHeight = with(density) {LocalConfiguration.current.screenHeightDp.dp.toPx()}
 
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .transformable(state = state)
+            .pointerInput(Unit) {
+                detectTransformGestures(
+                    onGesture = { centroid, pan, zoom, rotate ->
+                        val newScale = (scale * zoom).coerceIn(1f, 20f)
+
+                        val boxScaledWidth = boxSize.width * newScale
+                        val boxScaledHeight = boxSize.height * newScale
+
+                        val maxOffsetX = max(0f, (boxScaledWidth - screenWidth) / 2) + 50f
+                        val maxOffsetY = max(0f, (boxScaledHeight - screenHeight) / 2) + 50f
+
+                        // If survey size is bigger than the screen, user can pan survey
+                        val adjustedOffset = if (boxScaledWidth > screenWidth || boxScaledHeight > screenHeight) {
+                            val newOffset = offset + pan
+                            Offset(
+                                x = newOffset.x.coerceIn(-maxOffsetX, maxOffsetX),
+                                y = newOffset.y.coerceIn(-maxOffsetY, maxOffsetY)
+                            )
+                        } else {
+                            Offset.Zero // Reset offset when scaling down
+                        }
+
+                        scale = newScale
+                        rotation += rotate
+                        offset = adjustedOffset
+                    }
+                )
+            }
     ) {
         val (overlay) = createRefs()
         Box(
@@ -116,10 +147,22 @@ fun ImageWithGraphOverlay(
     }
 }
 
+private fun Dp.toPx() {
+    TODO("Not yet implemented")
+}
+
 fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
     return Offset(
         x = (tapLoc.x / size.width.toFloat()),
         y = (tapLoc.y / size.height.toFloat())
+    )
+}
+
+fun Offset.rotateBy(angle: Float): Offset {
+    val angleInRadians = angle * PI / 180
+    return Offset(
+        (x * cos(angleInRadians) - y * sin(angleInRadians)).toFloat(),
+        (x * sin(angleInRadians) + y * cos(angleInRadians)).toFloat()
     )
 }
 
