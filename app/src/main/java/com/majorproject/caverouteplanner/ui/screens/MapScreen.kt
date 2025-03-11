@@ -80,8 +80,7 @@ fun MapScreen() {
             )
             Column(modifier = Modifier.constrainAs(flagColumn){
                 bottom.linkTo(demoButtons.top, margin = 10.dp)
-                start.linkTo(parent.start, margin = 10.dp)
-                end.linkTo(parent.end, margin = 10.dp)
+                start.linkTo(parent.start, margin = 50.dp)
             }){
                 Row {
                     Switch(
