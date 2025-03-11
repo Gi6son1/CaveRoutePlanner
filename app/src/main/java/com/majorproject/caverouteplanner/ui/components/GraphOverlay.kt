@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 import kotlin.math.max
@@ -33,7 +34,9 @@ import kotlin.math.max
 @Composable
 fun ImageWithGraphOverlay(
     survey: Survey,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    routeFinder: RouteFinder? = null,
+    currentRoute: Route? = null
 ) {
 
     var scale by remember { mutableFloatStateOf(1f) }
@@ -47,15 +50,14 @@ fun ImageWithGraphOverlay(
     }
 
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .transformable(state = state)
-
     ) {
-        val surveyBox = createRef()
+        val (overlay) = createRefs()
         Box(
-            modifier = modifier
-                .constrainAs(surveyBox) {
+            modifier = Modifier
+                .constrainAs(overlay) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
@@ -75,15 +77,6 @@ fun ImageWithGraphOverlay(
                 contentScale = ContentScale.Fit
             )
 
-            val routeFinder = RouteFinder(
-                sourceId = 7,
-                survey = survey,
-                avoidEdges = listOf(7),
-            )
-
-            Log.d("RouteFinder", "RouteFinder created")
-            val route = routeFinder.getRouteToNode(30)?.first
-
             GraphOverlay(
                 nodes = survey.pathNodes,
                 paths = survey.paths,
@@ -93,7 +86,8 @@ fun ImageWithGraphOverlay(
                     height = survey.imageBitmap().height
                 ),
                 routeFinder = routeFinder,
-                displayWeights = true
+                displayWeights = true,
+                currentRoute = currentRoute
             )
         }
     }
@@ -107,34 +101,32 @@ fun GraphOverlay(
     paths: List<SurveyPath>,
     surveySize: IntSize,
     routeFinder: RouteFinder? = null,
-    destinationNode: Int = 0,
-    displayWeights: Boolean = false
+    currentRoute: Route? = null,
+    displayWeights: Boolean = false,
 ) {
     val textRememberer = rememberTextMeasurer()
     Canvas(modifier = modifier) {
-        if (routeFinder != null) {
-            if (destinationNode != 0) {
-                val route = routeFinder.getRouteToNode(destinationNode)
-                route?.first?.forEach { pathSection ->
-                    pathSection.forEach { path ->
-                        val startNode = nodes.find { it.id == path.ends.first }!!
-                        val endNode = nodes.find { it.id == path.ends.second }!!
+        if (currentRoute != null) {
+            currentRoute.routeList.forEach { pathSection ->
+                pathSection.forEach { path ->
+                    val startNode = nodes.find { it.id == path.ends.first }!!
+                    val endNode = nodes.find { it.id == path.ends.second }!!
 
-                        drawLine(
-                            color = if (path.hasWater) Color.Blue else Color.Red,
-                            start = Offset(
-                                (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            end = Offset(
-                                (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            strokeWidth = 4f
-                        )
-                    }
+                    drawLine(
+                        color = if (path.hasWater) Color.Blue else Color.Red,
+                        start = Offset(
+                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        end = Offset(
+                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        strokeWidth = 4f
+                    )
                 }
             }
+        } else if (routeFinder != null) {
             if (displayWeights) {
                 routeFinder.costMap.forEach { (path, weight) ->
 
@@ -168,77 +160,75 @@ fun GraphOverlay(
                     )
                 }
 
-            } else {
-                paths.forEach { path ->
-                    val startNode = nodes.find { it.id == path.ends.first }!!
-                    val endNode = nodes.find { it.id == path.ends.second }!!
-                    val textResult = textRememberer.measure(
-                        "${path.id}",
-                        style = TextStyle(color = Color.Red, fontSize = 8.sp)
-                    )
-                    //val length : Float = calculateLength(startNode.coordinates, endNode.coordinates)
-
-                    //Log.d("Line Details", "Line ${path.id} from Node ${startNode.id} to Node ${endNode.id} has length $length")
-
-                    drawLine(
-                        color = if (path.hasWater) Color.Blue else Color.LightGray,
-                        start = Offset(
-                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                        ),
-                        end = Offset(
-                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                        ),
-                        strokeWidth = 4f
-                    )
-
-
-                    drawText(
-                        textLayoutResult = textResult,
-                        color = Color.Magenta,
-                        topLeft = Offset(
-                            ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
-                            ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
-                        ),
-                    )
-
-
-                }
-
-
-                nodes.forEach { node ->
-
-                    val textResult = textRememberer.measure(
-                        "${node.id}",
-                        style = TextStyle(color = Color.Red, fontSize = 6.sp)
-                    )
-
-                    drawCircle(
-                        color = if (node.isEntrance) {
-                            Color.Green
-                        } else if (node.isJunction) {
-                            Color.Red
-                        } else {
-                            Color.LightGray
-                        },
-                        radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
-                        center = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
-                        )
-                    )
-
-                    drawText(
-                        textLayoutResult = textResult,
-                        color = Color.Blue,
-                        topLeft = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
-                        )
-                    )
-                }
             }
+        } else {
+            paths.forEach { path ->
+                val startNode = nodes.find { it.id == path.ends.first }!!
+                val endNode = nodes.find { it.id == path.ends.second }!!
+                val textResult = textRememberer.measure(
+                    "${path.id}",
+                    style = TextStyle(color = Color.Red, fontSize = 8.sp)
+                )
+
+                drawLine(
+                    color = if (path.hasWater) Color.Blue else Color.LightGray,
+                    start = Offset(
+                        (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                    ),
+                    end = Offset(
+                        (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                    ),
+                    strokeWidth = 4f
+                )
+
+
+                drawText(
+                    textLayoutResult = textResult,
+                    color = Color.Magenta,
+                    topLeft = Offset(
+                        ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
+                        ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
+                    ),
+                )
+
+
+            }
+
+
+            nodes.forEach { node ->
+
+                val textResult = textRememberer.measure(
+                    "${node.id}",
+                    style = TextStyle(color = Color.Red, fontSize = 6.sp)
+                )
+
+                drawCircle(
+                    color = if (node.isEntrance) {
+                        Color.Green
+                    } else if (node.isJunction) {
+                        Color.Red
+                    } else {
+                        Color.LightGray
+                    },
+                    radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
+                    center = Offset(
+                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                    )
+                )
+
+                drawText(
+                    textLayoutResult = textResult,
+                    color = Color.Blue,
+                    topLeft = Offset(
+                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                    )
+                )
+            }
+
         }
     }
 }

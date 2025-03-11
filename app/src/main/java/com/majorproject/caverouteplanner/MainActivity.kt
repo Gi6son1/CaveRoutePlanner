@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,19 +11,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.llSurvey
+import com.majorproject.caverouteplanner.ui.screens.MapScreen
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             CaveRoutePlannerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ImageWithGraphOverlay(
-                        survey = llSurvey,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Scaffold(modifier = Modifier.fillMaxSize()) {  innerPadding ->
+                    MapScreen()
                 }
             }
         }

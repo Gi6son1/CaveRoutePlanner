@@ -1,10 +1,13 @@
 package com.majorproject.caverouteplanner.ui.components
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import com.majorproject.caverouteplanner.R
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Survey(
     var id: Int = 0,
     var caveName: String = "",
@@ -13,7 +16,7 @@ data class Survey(
     var paths: MutableList<SurveyPath>,
     var pixelsPerMeter: Float
     //1991×1429
-){
+) : Parcelable {
     @Composable
     fun imageBitmap(): ImageBitmap {
         return ImageBitmap.imageResource(imageReference)

@@ -9,6 +9,11 @@ Add pathfinding that may take into account closest points if actual destination 
 Add pathfinding that takes into account avoiding certain edges
 
 Make demo
+show all weights for paths
+three tickboxes for flags
+two buttons for changing destination
+path changes depending on flags
+
 
 Make landing page i.e. list of surveys to select
 Make room database

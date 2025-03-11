@@ -1,19 +1,28 @@
 package com.majorproject.caverouteplanner.navigation
 
+import android.os.Parcelable
 import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.PriorityQueue
 import kotlin.math.pow
 
+@Parcelize
 data class RouteFinder(
     val sourceId: Int,
     val survey: Survey,
     val flags: Triple<Boolean, Boolean, Boolean> = Triple(false, false, false),
     val avoidEdges: List<Int> = listOf()
-) {
+) : Parcelable {
+    @IgnoredOnParcel //may be because it can be recreated in init everytime
     var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf()
+    @IgnoredOnParcel
     var costMap: MutableMap<SurveyPath, Float> = mutableMapOf()
+
+    @IgnoredOnParcel
+    var currentRoute: Route? = null
 
 
     init {
@@ -65,8 +74,8 @@ data class RouteFinder(
     }
 
 
-    fun getRouteToNode(nodeId: Int): Pair<List<List<SurveyPath>>, Float>? {
-        var currentNode = survey.pathNodes.find { it.id == nodeId } ?: return null
+    fun setRouteToNode(nodeId: Int) {
+        var currentNode = survey.pathNodes.find { it.id == nodeId } ?: return
         var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
@@ -89,6 +98,6 @@ data class RouteFinder(
             }
             currentNode = neighbour!!
         }
-        return Pair(routeList.reversed(), totalDistance)
+        currentRoute =  Route(routeList = routeList.reversed(), totalDistance = totalDistance)
     }
 }
