@@ -51,5 +51,12 @@ Progress Diary:
   Today, I did a bit more work on the pathfinder. It works, Yipeee. I've made a few changes to the algorithm so that it now, instead of returning a list of distances to all the points, it instead returns a map of reachable nodes from the start node, with a value of the edge from that node that is the quickest edge to take to get closer to that start node. I've also made sure that depending on the requirements i.e. no water or no hard traversals or high altitude only, the pathfinding changes depending on those requirements. I then was able to use that map and through backtracking edges and nodes, generate a sequenced lists of edges to take for that route from start to goal, along with a total distance for the journey.
   Next, I'll focus on how to visually show the route on the canvas, which shouldn't be too difficult, and then set up buttons to be used in the demo that demmonstrate the dynamic pathfinding on the interactable survey map
 
+11/03/2025
+  After my break from coding to do other things like touching grass and completing my other module's assignment, I got back to work today. As of now, the demo is completed. I've implemented a Route class to hold in the current route, and at what stage of the route the user is at. I then added code to go through the chosen route, and draw lines on the canvas of where the route is. For the demo I've also created buttons and sliders for use in the demo, to show how the pathfinding changes based on location and requirements.
+  
+  In order for the objects to save upon recomposition, and to even recompose the screen when those variables change, I made a bunch of the classes parcelizable https://developer.android.com/kotlin/parcelize meaning that I could use the rememberSaveable method on them, which essentially transforms the data structures and objects into a format that can be easily saved i.e. an object into a bunch of lists. 
+
+  I can continue to work on the demo tomorrow, although I may need to do some other prep first  i.e. do some more UI designs. Also, the next natural step now is to put my focus into the feature of touching a coordinate on the canvas and it finding the closest vertex to it, so that users can actually use the app.
+
   
   
