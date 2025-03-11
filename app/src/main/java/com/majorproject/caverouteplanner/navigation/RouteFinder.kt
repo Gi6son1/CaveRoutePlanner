@@ -21,10 +21,6 @@ data class RouteFinder(
     @IgnoredOnParcel
     var costMap: MutableMap<SurveyPath, Float> = mutableMapOf()
 
-    @IgnoredOnParcel
-    var currentRoute: Route? = null
-
-
     init {
         val sourceNode = survey.pathNodes.find { it.id == sourceId} ?: throw Exception("Source node not found")
 
@@ -74,8 +70,8 @@ data class RouteFinder(
     }
 
 
-    fun setRouteToNode(nodeId: Int) {
-        var currentNode = survey.pathNodes.find { it.id == nodeId } ?: return
+    fun getRouteToNode(nodeId: Int): Route? {
+        var currentNode = survey.pathNodes.find { it.id == nodeId } ?: return null
         var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
@@ -98,6 +94,6 @@ data class RouteFinder(
             }
             currentNode = neighbour!!
         }
-        currentRoute =  Route(routeList = routeList.reversed(), totalDistance = totalDistance)
+        return Route(routeList = routeList.reversed(), totalDistance = totalDistance)
     }
 }

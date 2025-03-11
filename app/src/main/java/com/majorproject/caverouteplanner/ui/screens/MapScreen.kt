@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import com.majorproject.caverouteplanner.ui.components.llSurvey
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import com.majorproject.caverouteplanner.navigation.Route
 
 @Composable
 fun MapScreen() {
@@ -45,7 +47,15 @@ fun MapScreen() {
                 )
             }
 
-            var demoNum by remember { mutableIntStateOf(0) }
+            var demoNum by rememberSaveable { mutableIntStateOf(0) }
+
+            var currentRoute: Route? by rememberSaveable {
+                mutableStateOf(null)
+            }
+
+            var newRoute by rememberSaveable {
+                mutableStateOf(true)
+            }
 
             ImageWithGraphOverlay(
                 survey = llSurvey,
@@ -56,7 +66,7 @@ fun MapScreen() {
                         bottom.linkTo(parent.bottom)
                     },
                 routeFinder = routeFinder,
-                currentRoute = if (demoNum != 0) routeFinder.currentRoute else null
+                currentRoute = currentRoute
             )
 
             Row(modifier = Modifier
@@ -69,25 +79,40 @@ fun MapScreen() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    demoNum = 1
-                    routeFinder = RouteFinder(
-                        sourceId = 7,
-                        survey = llSurvey,
-                    )
-                    routeFinder.setRouteToNode(37)
+                    if (demoNum != 1){
+                        demoNum = 1
+                        routeFinder = RouteFinder(
+                            sourceId = 7,
+                            survey = llSurvey,
+                        )
+                        newRoute = true
+                    } else if (newRoute) {
+                        currentRoute = routeFinder.getRouteToNode(37)
+                        newRoute = false
+                    } else {
+                        currentRoute?.nextStage()
+                    }
+
                 }) {
-                    Text(text = "Demo 1", fontSize = 30.sp)
+                    Text(text = "Shortest Dist", fontSize = 30.sp)
                 }
                 Button(onClick = {
-                    demoNum = 2
-                    routeFinder = RouteFinder(
-                        sourceId = 7,
-                        survey = llSurvey,
-                        flags = Triple(true, false, false)
-                    )
-                    routeFinder.setRouteToNode(37)
+                    if (demoNum != 2) {
+                        demoNum = 2
+                        routeFinder = RouteFinder(
+                            sourceId = 7,
+                            survey = llSurvey,
+                            flags = Triple(true, false, false)
+                        )
+                        newRoute = true
+                    } else if (newRoute) {
+                        currentRoute = routeFinder.getRouteToNode(37)
+                        newRoute = false
+                    } else {
+                        currentRoute?.nextStage()
+                    }
                 }) {
-                    Text(text = "Demo 2", fontSize = 30.sp)
+                    Text(text = "No water", fontSize = 30.sp)
                 }
             }
         }
