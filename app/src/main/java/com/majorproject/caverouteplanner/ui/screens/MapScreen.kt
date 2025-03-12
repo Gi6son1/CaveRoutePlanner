@@ -1,6 +1,7 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -22,47 +24,90 @@ import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.llSurvey
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.requestFocus
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import com.majorproject.caverouteplanner.navigation.Route
 
 @Composable
 fun MapScreen() {
     Scaffold { innerPadding ->
+        val requester = remember { FocusRequester() }
+        var volumeKeyPressed by remember { mutableStateOf(false) }
+
+        var routeFinder by rememberSaveable {
+            mutableStateOf(
+                RouteFinder(
+                    sourceId = 7,
+                    survey = llSurvey,
+                )
+            )
+        }
+
+        var nodeNum by rememberSaveable { mutableIntStateOf(0) }
+
+        var currentRoute: Route? by rememberSaveable {
+            mutableStateOf(null)
+        }
+
+        var noWater by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+        var highAltitude by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+        var noHardTraverse by rememberSaveable {
+            mutableStateOf(false)
+        }
 
         ConstraintLayout(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .focusRequester(requester)
+                .focusable()
+                .onKeyEvent { keyEvent ->
+                    if (keyEvent.key == Key.VolumeUp
+                        && keyEvent.type == KeyEventType.KeyDown
+                        && !volumeKeyPressed
+                    ) {
+                        currentRoute?.nextStage()
+                        volumeKeyPressed = true
+                        true
+                    } else if (keyEvent.key == Key.VolumeDown
+                        && keyEvent.type == KeyEventType.KeyDown
+                        && !volumeKeyPressed
+                    ) {
+                        currentRoute?.previousStage()
+                        volumeKeyPressed = true
+                        true
+                    } else if ((keyEvent.key == Key.VolumeUp || keyEvent.key == Key.VolumeDown)
+                        && keyEvent.type == KeyEventType.KeyUp) {
+                        volumeKeyPressed = false
+                        false
+                    } else {
+                        false
+                    }
+                }
         ) {
+            LaunchedEffect(Unit) {
+                requester.requestFocus()
+            }
+
             val (surveyGraph, demoButtons, flagColumn, cancelButton) = createRefs()
-
-            var routeFinder by rememberSaveable {
-                mutableStateOf(
-                    RouteFinder(
-                        sourceId = 7,
-                        survey = llSurvey,
-                    )
-                )
-            }
-
-            var nodeNum by rememberSaveable { mutableIntStateOf(0) }
-
-            var currentRoute: Route? by rememberSaveable {
-                mutableStateOf(null)
-            }
-
-            var noWater by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            var highAltitude by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            var noHardTraverse by rememberSaveable {
-                mutableStateOf(false)
-            }
 
             ImageWithGraphOverlay(
                 survey = llSurvey,
@@ -88,7 +133,7 @@ fun MapScreen() {
                 currentRoute = null
                 nodeNum = 0
             },
-                modifier = Modifier.constrainAs(cancelButton){
+                modifier = Modifier.constrainAs(cancelButton) {
                     top.linkTo(parent.top, margin = 10.dp)
                     end.linkTo(parent.end, margin = 10.dp)
                 }
@@ -96,10 +141,10 @@ fun MapScreen() {
                 Text(text = "Reset", fontSize = 30.sp)
             }
 
-            Column(modifier = Modifier.constrainAs(flagColumn){
+            Column(modifier = Modifier.constrainAs(flagColumn) {
                 bottom.linkTo(demoButtons.top, margin = 10.dp)
                 start.linkTo(parent.start, margin = 50.dp)
-            }){
+            }) {
                 Row {
                     Switch(
                         checked = noWater,
@@ -110,7 +155,7 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (nodeNum != 0){
+                            if (nodeNum != 0) {
                                 currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
@@ -119,7 +164,7 @@ fun MapScreen() {
                     Text(text = "No Water", fontSize = 20.sp)
                 }
 
-                Row{
+                Row {
                     Switch(
                         checked = noHardTraverse,
                         onCheckedChange = {
@@ -129,7 +174,7 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (nodeNum != 0){
+                            if (nodeNum != 0) {
                                 currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
@@ -147,7 +192,7 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (nodeNum != 0){
+                            if (nodeNum != 0) {
                                 currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
@@ -180,7 +225,6 @@ fun MapScreen() {
                     Text(text = "Next", fontSize = 30.sp)
                 }
             }
-
 
         }
     }
