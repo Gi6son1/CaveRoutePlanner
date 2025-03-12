@@ -58,5 +58,13 @@ Progress Diary:
 
   I can continue to work on the demo tomorrow, although I may need to do some other prep first  i.e. do some more UI designs. Also, the next natural step now is to put my focus into the feature of touching a coordinate on the canvas and it finding the closest vertex to it, so that users can actually use the app.
 
+12/03/2025
+  We have more success! After my last entry, I couldn't sleep and proceeded to spend until 8am coding to find out how to detect taps on the survey along with coordinates. Safe to say that because I'm using jetpack compose, it means that I don't have to do matrix calculations at all, which makes my code both more readable and simpler to write. I also spent the rest of today (after getting a few hours of shut-eye) finishing the task, and now the result is the user can long press on the survey (even after rotating, scaling, panning) and a shortest path will be drawn from the entrance to the closest node that user touched (the dynamic requiremetn path changing still works). Legendary. 
+
+  Another task completed, is that I've made it so that the user can move the survey around on the screen, but there's now limitations on the movement i.e. cannot pan off screen (and can only pan when the survey has been zoomed in at least a bit), cannot zoom too far in or out. One thing I still haven't mastered yet was the centroid-based scaling (zooming on the location of the finger zoom gesture) and for the moment, it only zooms with the centre of the survey as the zoom point. I aim to fix this, but it's not that deep. I'm putting aside for now.
+
+  I have my demo ready. 
+
+  
   
   
