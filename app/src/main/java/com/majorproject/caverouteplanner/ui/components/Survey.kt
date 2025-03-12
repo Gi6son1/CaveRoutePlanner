@@ -2,29 +2,48 @@ package com.majorproject.caverouteplanner.ui.components
 
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import com.majorproject.caverouteplanner.R
 import kotlinx.parcelize.Parcelize
+import kotlin.math.pow
 
 @Parcelize
 data class Survey(
     var id: Int = 0,
     var caveName: String = "",
-    var imageReference: Int,
+    val imageReference: Int,
     var pathNodes: MutableList<SurveyNode>,
     var paths: MutableList<SurveyPath>,
-    var pixelsPerMeter: Float
-    //1991×1429
+    val pixelsPerMeter: Float,
+    val size: Pair<Int, Int>
 ) : Parcelable {
     @Composable
     fun imageBitmap(): ImageBitmap {
         return ImageBitmap.imageResource(imageReference)
     }
+
+    fun getNearestNode(pointCoordinates: Offset): Int? {
+        val convertedX = pointCoordinates.x * size.first
+        val convertedY = pointCoordinates.y * size.second
+        val nearestNode = pathNodes.minByOrNull { (it.coordinates.first - convertedX).pow(2) + (it.coordinates.second - convertedY).pow(2) }
+        return if (nearestNode != null) {
+            val distance = (nearestNode.coordinates.first - convertedX).pow(2) + (nearestNode.coordinates.second - convertedY).pow(2)
+            if (distance < (size.second.toFloat().pow(2) + (size.first.toFloat().pow(2)) /2) * 0.01)
+                nearestNode.id
+            else {
+                null
+            }
+        } else {
+            null
+        }
+    }
 }
 
 val llSurvey = Survey(
     caveName = "LL",
+    size = Pair(1991, 1429),
     pixelsPerMeter = 14.600609f,
     imageReference = R.drawable.llygadlchwr,
     pathNodes = mutableListOf(

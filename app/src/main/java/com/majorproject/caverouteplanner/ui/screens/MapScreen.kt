@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,7 +46,7 @@ fun MapScreen() {
                 )
             }
 
-            var demoNum by rememberSaveable { mutableIntStateOf(0) }
+            var nodeNum by rememberSaveable { mutableIntStateOf(0) }
 
             var currentRoute: Route? by rememberSaveable {
                 mutableStateOf(null)
@@ -76,7 +77,17 @@ fun MapScreen() {
                         bottom.linkTo(parent.bottom)
                     },
                 routeFinder = routeFinder,
-                currentRoute = currentRoute
+                currentRoute = currentRoute,
+                longPressPosition = { tapPosition ->
+                    val nearestNode = llSurvey.getNearestNode(tapPosition)
+                    Log.d("TAP", "onTap: $nearestNode")
+                    if (nearestNode != null) {
+                        currentRoute = routeFinder.getRouteToNode(nearestNode)
+                        nodeNum = nearestNode
+                        Log.d("TAP", "onTap: $nodeNum")
+                    }
+                }
+
             )
             Column(modifier = Modifier.constrainAs(flagColumn){
                 bottom.linkTo(demoButtons.top, margin = 10.dp)
@@ -92,10 +103,8 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (demoNum != 0) {
-                                val routeNum = if (demoNum == 2) 55 else 37
-                                currentRoute = routeFinder.getRouteToNode(routeNum)
-                                onlyFirstClick = false
+                            if (nodeNum != 0){
+                                currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
 
@@ -113,10 +122,8 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (demoNum != 0) {
-                                val routeNum = if (demoNum == 2) 55 else 37
-                                currentRoute = routeFinder.getRouteToNode(routeNum)
-                                onlyFirstClick = false
+                            if (nodeNum != 0){
+                                currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
                     )
@@ -133,10 +140,8 @@ fun MapScreen() {
                                 survey = llSurvey,
                                 flags = Triple(noWater, noHardTraverse, highAltitude)
                             )
-                            if (demoNum != 0){
-                                val routeNum = if (demoNum == 2) 55 else 37
-                                currentRoute = routeFinder.getRouteToNode(routeNum)
-                                onlyFirstClick = false
+                            if (nodeNum != 0){
+                                currentRoute = routeFinder.getRouteToNode(nodeNum)
                             }
                         }
                     )
@@ -156,24 +161,16 @@ fun MapScreen() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    if (demoNum != 1){
-                        demoNum = 1
-                        currentRoute = routeFinder.getRouteToNode(37)
-                    } else {
-                        currentRoute?.nextStage()
-                    }
-                }) {
-                    Text(text = "Demo 1", fontSize = 30.sp)
+                    currentRoute?.previousStage()
+                }
+                ) {
+                    Text(text = "Previous", fontSize = 30.sp)
                 }
                 Button(onClick = {
-                    if (demoNum != 2){
-                        demoNum = 2
-                        currentRoute = routeFinder.getRouteToNode(55)
-                    } else {
-                        currentRoute?.nextStage()
-                    }
-                }) {
-                    Text(text = "Demo 2", fontSize = 30.sp)
+                    currentRoute?.nextStage()
+                }
+                ) {
+                    Text(text = "Next", fontSize = 30.sp)
                 }
             }
         }

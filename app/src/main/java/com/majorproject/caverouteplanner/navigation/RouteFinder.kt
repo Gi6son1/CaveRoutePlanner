@@ -53,8 +53,8 @@ data class RouteFinder(
                 val neighbour = survey.pathNodes.find { it.id == neighbourId }
 
                 var weight = edge.distance
-                if (noWater && edge.hasWater) {weight *= 1.5f}
-                if (noHardTraverse && edge.isHardTraverse) {weight *= 1.5f}
+                if (noWater && edge.hasWater) {weight *= 2f}
+                if (noHardTraverse && edge.isHardTraverse) {weight *= 2f}
                 if (highAltitude){ weight *= 0.5f.pow(edge.altitude) }
 
 
