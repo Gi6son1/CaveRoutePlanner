@@ -99,6 +99,8 @@ fun ImageWithGraphOverlay(
                 .constrainAs(overlay) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 }
                 .graphicsLayer(
                     scaleX = zoom,
@@ -114,7 +116,6 @@ fun ImageWithGraphOverlay(
                     detectTapGestures(
                         onLongPress = { longPressLoc ->
                             val fractionalTapPosition = calculateFractionalOffset(longPressLoc, boxSize)
-                            Log.d("TAP", "onTap: ${fractionalTapPosition.x}, ${fractionalTapPosition.y}")
                             longPressPosition(fractionalTapPosition)
                         }
                     )

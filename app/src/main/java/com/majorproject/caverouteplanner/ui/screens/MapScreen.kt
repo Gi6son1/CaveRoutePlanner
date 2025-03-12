@@ -35,7 +35,7 @@ fun MapScreen() {
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            val (surveyGraph, demoButtons, flagColumn) = createRefs()
+            val (surveyGraph, demoButtons, flagColumn, cancelButton) = createRefs()
 
             var routeFinder by rememberSaveable {
                 mutableStateOf(
@@ -50,10 +50,6 @@ fun MapScreen() {
 
             var currentRoute: Route? by rememberSaveable {
                 mutableStateOf(null)
-            }
-
-            var onlyFirstClick by rememberSaveable {
-                mutableStateOf(true)
             }
 
             var noWater by rememberSaveable {
@@ -80,15 +76,26 @@ fun MapScreen() {
                 currentRoute = currentRoute,
                 longPressPosition = { tapPosition ->
                     val nearestNode = llSurvey.getNearestNode(tapPosition)
-                    Log.d("TAP", "onTap: $nearestNode")
                     if (nearestNode != null) {
                         currentRoute = routeFinder.getRouteToNode(nearestNode)
                         nodeNum = nearestNode
-                        Log.d("TAP", "onTap: $nodeNum")
                     }
                 }
 
             )
+
+            Button(onClick = {
+                currentRoute = null
+                nodeNum = 0
+            },
+                modifier = Modifier.constrainAs(cancelButton){
+                    top.linkTo(parent.top, margin = 10.dp)
+                    end.linkTo(parent.end, margin = 10.dp)
+                }
+            ) {
+                Text(text = "Reset", fontSize = 30.sp)
+            }
+
             Column(modifier = Modifier.constrainAs(flagColumn){
                 bottom.linkTo(demoButtons.top, margin = 10.dp)
                 start.linkTo(parent.start, margin = 50.dp)
@@ -173,6 +180,8 @@ fun MapScreen() {
                     Text(text = "Next", fontSize = 30.sp)
                 }
             }
+
+
         }
     }
 }
