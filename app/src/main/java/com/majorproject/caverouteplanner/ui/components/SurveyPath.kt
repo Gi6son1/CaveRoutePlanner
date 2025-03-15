@@ -12,4 +12,12 @@ data class SurveyPath(
     var hasWater: Boolean = false,
     var altitude: Int = 0,
     var isHardTraverse: Boolean = false
-) : Parcelable
+) : Parcelable {
+    fun next(currentId: Int) : Int {
+        return if (ends.first == currentId) {
+            ends.second
+        } else {
+            ends.first
+        }
+    }
+}

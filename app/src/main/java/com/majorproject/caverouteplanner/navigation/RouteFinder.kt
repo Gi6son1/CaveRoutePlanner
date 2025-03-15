@@ -48,8 +48,11 @@ data class RouteFinder(
                     continue
                 }
                 val edge = survey.paths.find { it.id == edgeId }
+                if (edge == null) {
+                    continue
+                }
 
-                val neighbourId = if (edge!!.ends.first == currentNode.id) edge.ends.second else edge.ends.first
+                val neighbourId = edge.next(currentNode.id)
                 val neighbour = survey.pathNodes.find { it.id == neighbourId }
 
                 var weight = edge.distance
@@ -83,17 +86,19 @@ data class RouteFinder(
             return Triple(foundEdge!!, neighbourNode, foundEdge.distance)
         }
 
-
         while (currentNode.id != sourceId) {
             val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode)
             totalDistance += newDistance
-            if (routeList.isEmpty() || currentNode.isJunction) {
-                routeList.add(mutableListOf(edge))
+            if (currentNode.isJunction) {
+                routeList.add(0, mutableListOf(edge))
             } else {
-                routeList.last().add(edge)
+                if (routeList.isEmpty()){
+                    routeList.add(mutableListOf())
+                }
+                routeList.first().add(0, edge)
             }
             currentNode = neighbour!!
         }
-        return Route(routeList = routeList.reversed(), totalDistance = totalDistance)
+        return Route(routeList = routeList, totalDistance = totalDistance, sourceNode = sourceId)
     }
 }
