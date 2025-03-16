@@ -28,6 +28,15 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
         var previousPathEnds = routeList.first().last().ends
 
         routeList.forEachIndexed { index, pathList ->
+            //pathList.forEach { path ->
+
+                /** TODO fix this method
+                 *
+                 * when an incomplete path is put in, the end of the path isn't detected properly
+                 * when you put in the initial path only, it skips over it, meaning that no end path is set
+                 */
+
+
             if (!pathList.isEmpty() && sourceNode != pathList.first().ends.first && sourceNode != pathList.first().ends.second){
                 var currentPathEnds = pathList.first().ends
 
@@ -53,6 +62,7 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
                         endingNodes.add(previousPathEnds.first)
                     }
                 }
+          //  }
             }
         }
     }

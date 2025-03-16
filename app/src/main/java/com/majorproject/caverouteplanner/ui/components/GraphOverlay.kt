@@ -66,7 +66,6 @@ fun ImageWithGraphOverlay(
     var focusedTranslation by remember { mutableStateOf(Offset.Zero) }
     var focusedZoom by remember { mutableFloatStateOf(1f) }
 
-
     val density = LocalDensity.current
     val currentConfiguration = LocalConfiguration.current
 
@@ -87,10 +86,9 @@ fun ImageWithGraphOverlay(
 
                 val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
                 val fractionalZoom = finalDistance / referenceDimension
-                //Log.d("metrics", "fractional zoom: $fractionalZoom")
 
                 zoom = 1f
-                //focusedZoom = (1f / fractionalZoom) * 0.9f
+                focusedZoom = (1f / fractionalZoom) * 0.8f
                 val rotate = -finalGradient + 270
 
                 rotation = 0f
@@ -101,8 +99,8 @@ fun ImageWithGraphOverlay(
 
                 if (centroid == null) return@performFocusedTransformation
 
-                val centroidX = (centroid.first / survey.size.first.toFloat()) * boxSize.width
-                val centroidY = (centroid.second / survey.size.second.toFloat()) * boxSize.height
+                val centroidX = (centroid.first.toFloat() / survey.size.first) * boxSize.width
+                val centroidY = (centroid.second.toFloat() / survey.size.second) * boxSize.height
 
                 var targetOffsetX = boxCenterX - centroidX
                 var targetOffsetY = boxCenterY - centroidY
@@ -235,11 +233,12 @@ fun performFocusedTransformation(
         var cumulativeCentroidX = 0f
         var cumulativeCentroidY = 0f
 
+
         for (path in currentStage) {
             val firstNode = nodes.find { it.id == path.ends.first } ?: return null
             val secondNode = nodes.find { it.id == path.ends.second } ?: return null
             cumulativeCentroidX += (firstNode.coordinates.first + secondNode.coordinates.first) / 2
-            cumulativeCentroidY += (firstNode.coordinates.first + secondNode.coordinates.first) / 2
+            cumulativeCentroidY += (firstNode.coordinates.second + secondNode.coordinates.second) / 2
         }
 
         return Pair(cumulativeCentroidX.toInt()/currentStage.size, cumulativeCentroidY.toInt()/currentStage.size)
