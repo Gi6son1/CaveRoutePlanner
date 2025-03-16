@@ -63,7 +63,6 @@ fun ImageWithGraphOverlay(
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
     var focusedRotation by remember { mutableFloatStateOf(0f) }
-    var focusedTranslation by remember { mutableStateOf(Offset.Zero) }
     var focusedZoom by remember { mutableFloatStateOf(1f) }
 
     val density = LocalDensity.current
@@ -110,9 +109,9 @@ fun ImageWithGraphOverlay(
                 val rotatedOffsetX = (targetOffsetX * cos(angleRad) - targetOffsetY * sin(angleRad))
                 val rotatedOffsetY = (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
 
-                offset = Offset.Zero
-                focusedTranslation = Offset(rotatedOffsetX * focusedZoom, rotatedOffsetY * focusedZoom)
+                val focusedTranslation = Offset(rotatedOffsetX * focusedZoom, rotatedOffsetY * focusedZoom)
 
+                offset = focusedTranslation
             }
         }
     }
@@ -150,7 +149,7 @@ fun ImageWithGraphOverlay(
                         rotation += newRotate
                         offset = adjustedOffset
 
-                        //Log.d("metrics", "offset: $offset")
+                        Log.d("offsetmetrics", "offset: $offset")
                     }
                 )
             }
@@ -168,8 +167,8 @@ fun ImageWithGraphOverlay(
                     scaleX = zoom * focusedZoom,
                     scaleY = zoom * focusedZoom,
                     rotationZ = rotation + focusedRotation,
-                    translationX = offset.x + focusedTranslation.x,
-                    translationY = offset.y + focusedTranslation.y
+                    translationX = offset.x,
+                    translationY = offset.y
                 )
                 .onGloballyPositioned { coordinates ->
                     boxSize = coordinates.size
