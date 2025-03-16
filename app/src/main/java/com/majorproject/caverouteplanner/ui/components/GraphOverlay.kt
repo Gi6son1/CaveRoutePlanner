@@ -90,7 +90,7 @@ fun ImageWithGraphOverlay(
                 //Log.d("metrics", "fractional zoom: $fractionalZoom")
 
                 zoom = 1f
-                //focusedZoom = 1f / fractionalZoom
+                //focusedZoom = (1f / fractionalZoom) * 0.9f
                 val rotate = -finalGradient + 270
 
                 rotation = 0f
@@ -104,8 +104,8 @@ fun ImageWithGraphOverlay(
                 val centroidX = (centroid.first / survey.size.first.toFloat()) * boxSize.width
                 val centroidY = (centroid.second / survey.size.second.toFloat()) * boxSize.height
 
-                val targetOffsetX = centroidX - boxCenterX
-                val targetOffsetY = centroidY - boxCenterY
+                var targetOffsetX = boxCenterX - centroidX
+                var targetOffsetY = boxCenterY - centroidY
 
                 val angleRad = Math.toRadians(focusedRotation.toDouble()).toFloat()
 
@@ -113,7 +113,7 @@ fun ImageWithGraphOverlay(
                 val rotatedOffsetY = (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
 
                 offset = Offset.Zero
-                focusedTranslation = Offset(-rotatedOffsetX / focusedZoom, -rotatedOffsetY / focusedZoom)
+                focusedTranslation = Offset(rotatedOffsetX * focusedZoom, rotatedOffsetY * focusedZoom)
 
             }
         }
