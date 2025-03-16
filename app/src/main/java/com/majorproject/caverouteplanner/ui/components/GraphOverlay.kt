@@ -42,8 +42,10 @@ import kotlin.compareTo
 import kotlin.div
 import kotlin.math.atan
 import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sign
+import kotlin.math.sin
 import kotlin.text.toFloat
 import kotlin.times
 
@@ -79,27 +81,39 @@ fun ImageWithGraphOverlay(
     LaunchedEffect(currentRoute?.currentStage) {
         if (currentRoute != null) {
             performFocusedTransformation(
-                currentRoute.getCurrentStage(),
+                currentRoute,
                 survey.pathNodes,
-                currentRoute.getCurrentStartingNode()
             ) { finalGradient, finalDistance, centroid ->
 
-                val rotate = finalGradient + 90
+                val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
+                val fractionalZoom = finalDistance / referenceDimension
+                //Log.d("metrics", "fractional zoom: $fractionalZoom")
+
+                zoom = 1f
+                //focusedZoom = 1f / fractionalZoom
+                val rotate = -finalGradient + 270
 
                 rotation = 0f
                 focusedRotation = rotate
 
-                val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
+                val boxCenterX = boxSize.width / 2f
+                val boxCenterY = boxSize.height / 2f
 
-                val fractionalZoom = finalDistance / referenceDimension
-                Log.d("metrics", "fractional zoom: $fractionalZoom")
+                if (centroid == null) return@performFocusedTransformation
 
-                zoom = 1f
-                focusedZoom = 1f / fractionalZoom
+                val centroidX = (centroid.first / survey.size.first.toFloat()) * boxSize.width
+                val centroidY = (centroid.second / survey.size.second.toFloat()) * boxSize.height
 
-                val centroidx = (centroid.first / survey.size.first.toFloat()) * boxSize.width
-                val centroidy = (centroid.second / survey.size.second.toFloat()) * boxSize.height
-                Log.d("metrics", "centroid: $centroidx, $centroidy")
+                val targetOffsetX = centroidX - boxCenterX
+                val targetOffsetY = centroidY - boxCenterY
+
+                val angleRad = Math.toRadians(focusedRotation.toDouble()).toFloat()
+
+                val rotatedOffsetX = (targetOffsetX * cos(angleRad) - targetOffsetY * sin(angleRad))
+                val rotatedOffsetY = (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
+
+                offset = Offset.Zero
+                focusedTranslation = Offset(-rotatedOffsetX / focusedZoom, -rotatedOffsetY / focusedZoom)
 
             }
         }
@@ -111,7 +125,8 @@ fun ImageWithGraphOverlay(
             .pointerInput(Unit) {
                 detectTransformGestures(
                     onGesture = { centroid, pan, newZoom, newRotate ->
-                        val adjustedScale = (zoom * newZoom).coerceIn(1f / focusedZoom, 20f / focusedZoom)
+                        val adjustedScale =
+                            (zoom * newZoom).coerceIn(1f / focusedZoom, 20f / focusedZoom)
 
                         val boxScaledWidth = boxSize.width * adjustedScale * focusedZoom
                         val boxScaledHeight = boxSize.height * adjustedScale * focusedZoom
@@ -137,7 +152,7 @@ fun ImageWithGraphOverlay(
                         rotation += newRotate
                         offset = adjustedOffset
 
-                        Log.d("metrics", "offset: $offset")
+                        //Log.d("metrics", "offset: $offset")
                     }
                 )
             }
@@ -198,10 +213,9 @@ fun ImageWithGraphOverlay(
 }
 
 fun performFocusedTransformation(
-    currentStage: List<SurveyPath>?,
+    currentRoute: Route,
     nodes: List<SurveyNode>,
-    startNode: Int,
-    calculatedTransformation: (Float, Float, Pair<Int, Int>) -> Unit
+    calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
     fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
         val angle = Math.toDegrees(
@@ -211,124 +225,73 @@ fun performFocusedTransformation(
             )
         )
 
-        return if (angle < 0) {
-            angle + 360
-        } else {
-            angle
-        }
+        return angle
     }
-
 
     fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
         kotlin.math.sqrt((coord2.second - coord1.second).toFloat() * (coord2.second - coord1.second).toFloat() + (coord2.first - coord1.first).toFloat() * (coord2.first - coord1.first).toFloat())
 
-    fun calculateCentroid(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
-        Pair((coord1.first + coord2.first) / 2, (coord1.second + coord2.second) / 2)
-
-    var combinedAngle = 0.0
-
-    if (!currentStage.isNullOrEmpty()) {
-        var startNode = nodes.find { it.id == startNode } ?: return
-        var endNode: SurveyNode? = null
-
-        var currentNode = startNode
+    fun calculateCentroid(currentStage: List<SurveyPath>): Pair<Int, Int>? {
+        var cumulativeCentroidX = 0f
+        var cumulativeCentroidY = 0f
 
         for (path in currentStage) {
-
-            endNode = nodes.find { it.id == path.next(currentNode.id) } ?: return
-
-            val angle = calculateAngle(startNode.coordinates, endNode.coordinates)
-            combinedAngle += angle
-
-            currentNode = endNode
+            val firstNode = nodes.find { it.id == path.ends.first } ?: return null
+            val secondNode = nodes.find { it.id == path.ends.second } ?: return null
+            cumulativeCentroidX += (firstNode.coordinates.first + secondNode.coordinates.first) / 2
+            cumulativeCentroidY += (firstNode.coordinates.first + secondNode.coordinates.first) / 2
         }
 
-        if (endNode != null) {
-            val finalGradient = combinedAngle / currentStage.size
-            Log.d("metrics", finalGradient.toString())
-
-            val finalDistance = calculateDistance(startNode.coordinates, endNode.coordinates)
-
-            val centroid = calculateCentroid(startNode.coordinates, endNode.coordinates)
-
-            calculatedTransformation(finalGradient.toFloat(), finalDistance, centroid)
-        }
+        return Pair(cumulativeCentroidX.toInt()/currentStage.size, cumulativeCentroidY.toInt()/currentStage.size)
     }
+
+    val currentStage = currentRoute.getCurrentStage()
+    val startNode = nodes.find { it.id == currentRoute.getCurrentStartingNode() }
+    val endNode = nodes.find { it.id == currentRoute.getCurrentEndingNode() }
+
+    if (startNode == null || endNode == null) return
+
+    val finalAngle = calculateAngle(startNode.coordinates, endNode.coordinates)
+
+    val centroid = calculateCentroid(currentStage)
+
+
+
+    val finalDistance = calculateDistance(startNode.coordinates, endNode.coordinates)
+
+    calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
+
+
 }
-    fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
-        return Offset(
-            x = (tapLoc.x / size.width.toFloat()),
-            y = (tapLoc.y / size.height.toFloat())
-        )
-    }
 
-    @Composable
-    fun GraphOverlay(
-        modifier: Modifier = Modifier,
-        nodes: List<SurveyNode>,
-        paths: List<SurveyPath>,
-        surveySize: IntSize,
-        routeFinder: RouteFinder? = null,
-        currentRoute: Route? = null,
-        displayWeights: Boolean = false,
-    ) {
-        val textRememberer = rememberTextMeasurer()
-        Canvas(modifier = modifier) {
-            if (currentRoute != null) {
-                currentRoute.routeList.forEachIndexed { index, pathList ->
-                    if (index == currentRoute.currentStage) {
-                        currentRoute.getCurrentStage().forEach { path ->
-                            val startNode = nodes.find { it.id == path.ends.first }!!
-                            val endNode = nodes.find { it.id == path.ends.second }!!
+fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
+    return Offset(
+        x = (tapLoc.x / size.width.toFloat()),
+        y = (tapLoc.y / size.height.toFloat())
+    )
+}
 
-                            drawLine(
-                                color = Color.Green,
-                                start = Offset(
-                                    (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                    (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                                ),
-                                end = Offset(
-                                    (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                    (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                                ),
-                                strokeWidth = 4f
-                            )
-                        }
-                    } else {
-                        pathList.forEach { path ->
-                            val startNode = nodes.find { it.id == path.ends.first }!!
-                            val endNode = nodes.find { it.id == path.ends.second }!!
-
-                            drawLine(
-                                color = if (path.hasWater) Color.Blue else Color.Red,
-                                start = Offset(
-                                    (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                    (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                                ),
-                                end = Offset(
-                                    (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                    (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                                ),
-                                strokeWidth = 4f
-                            )
-                        }
-                    }
-
-                }
-
-            } else if (routeFinder != null) {
-                if (displayWeights) {
-                    routeFinder.costMap.forEach { (path, weight) ->
-
+@Composable
+fun GraphOverlay(
+    modifier: Modifier = Modifier,
+    nodes: List<SurveyNode>,
+    paths: List<SurveyPath>,
+    surveySize: IntSize,
+    routeFinder: RouteFinder? = null,
+    currentRoute: Route? = null,
+    displayWeights: Boolean = false,
+) {
+    val textRememberer = rememberTextMeasurer()
+    Canvas(modifier = modifier) {
+        if (currentRoute != null) {
+            currentRoute.routeList.forEachIndexed { index, pathList ->
+                if (index == currentRoute.currentStage) {
+                    currentRoute.getCurrentStage().forEach { path ->
                         val startNode = nodes.find { it.id == path.ends.first }!!
                         val endNode = nodes.find { it.id == path.ends.second }!!
-                        val textResult = textRememberer.measure(
-                            String.format("%.2f", weight),
-                            style = TextStyle(fontSize = 6.sp)
-                        )
 
                         drawLine(
-                            color = Color.LightGray,
+                            color = Color.Green,
                             start = Offset(
                                 (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                                 (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -339,29 +302,42 @@ fun performFocusedTransformation(
                             ),
                             strokeWidth = 4f
                         )
+                    }
+                } else {
+                    pathList.forEach { path ->
+                        val startNode = nodes.find { it.id == path.ends.first }!!
+                        val endNode = nodes.find { it.id == path.ends.second }!!
 
-                        drawText(
-                            textLayoutResult = textResult,
-                            color = Color.Red,
-                            topLeft = Offset(
-                                ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
-                                ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
+                        drawLine(
+                            color = if (path.hasWater) Color.Blue else Color.Red,
+                            start = Offset(
+                                (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                                (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
                             ),
+                            end = Offset(
+                                (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                                (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            ),
+                            strokeWidth = 4f
                         )
                     }
-
                 }
-            } else {
-                paths.forEach { path ->
+
+            }
+
+        } else if (routeFinder != null) {
+            if (displayWeights) {
+                routeFinder.costMap.forEach { (path, weight) ->
+
                     val startNode = nodes.find { it.id == path.ends.first }!!
                     val endNode = nodes.find { it.id == path.ends.second }!!
                     val textResult = textRememberer.measure(
-                        "${path.id}",
-                        style = TextStyle(color = Color.Red, fontSize = 8.sp)
+                        String.format("%.2f", weight),
+                        style = TextStyle(fontSize = 6.sp)
                     )
 
                     drawLine(
-                        color = if (path.hasWater) Color.Blue else Color.LightGray,
+                        color = Color.LightGray,
                         start = Offset(
                             (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -373,71 +349,104 @@ fun performFocusedTransformation(
                         strokeWidth = 4f
                     )
 
-
                     drawText(
                         textLayoutResult = textResult,
-                        color = Color.Magenta,
+                        color = Color.Red,
                         topLeft = Offset(
                             ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
                             ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
                         ),
                     )
-
-
-                }
-
-
-                nodes.forEach { node ->
-
-                    val textResult = textRememberer.measure(
-                        "${node.id}",
-                        style = TextStyle(color = Color.Red, fontSize = 6.sp)
-                    )
-
-                    drawCircle(
-                        color = if (node.isEntrance) {
-                            Color.Green
-                        } else if (node.isJunction) {
-                            Color.Red
-                        } else {
-                            Color.LightGray
-                        },
-                        radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
-                        center = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
-                        )
-                    )
-
-                    drawText(
-                        textLayoutResult = textResult,
-                        color = Color.Blue,
-                        topLeft = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
-                        )
-                    )
                 }
 
             }
+        } else {
+            paths.forEach { path ->
+                val startNode = nodes.find { it.id == path.ends.first }!!
+                val endNode = nodes.find { it.id == path.ends.second }!!
+                val textResult = textRememberer.measure(
+                    "${path.id}",
+                    style = TextStyle(color = Color.Red, fontSize = 8.sp)
+                )
+
+                drawLine(
+                    color = if (path.hasWater) Color.Blue else Color.LightGray,
+                    start = Offset(
+                        (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                    ),
+                    end = Offset(
+                        (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                    ),
+                    strokeWidth = 4f
+                )
+
+
+                drawText(
+                    textLayoutResult = textResult,
+                    color = Color.Magenta,
+                    topLeft = Offset(
+                        ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
+                        ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
+                    ),
+                )
+
+
+            }
+
+
+            nodes.forEach { node ->
+
+                val textResult = textRememberer.measure(
+                    "${node.id}",
+                    style = TextStyle(color = Color.Red, fontSize = 6.sp)
+                )
+
+                drawCircle(
+                    color = if (node.isEntrance) {
+                        Color.Green
+                    } else if (node.isJunction) {
+                        Color.Red
+                    } else {
+                        Color.LightGray
+                    },
+                    radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
+                    center = Offset(
+                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                    )
+                )
+
+                drawText(
+                    textLayoutResult = textResult,
+                    color = Color.Blue,
+                    topLeft = Offset(
+                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                    )
+                )
+            }
+
         }
     }
+}
 
-    fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
-        val pixelsPerMeter = 14.600609f
-        val xDiff = (end.first - start.first).toFloat()
-        val yDiff = (end.second - start.second).toFloat()
-        return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
+fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
+    val pixelsPerMeter = 14.600609f
+    val xDiff = (end.first - start.first).toFloat()
+    val yDiff = (end.second - start.second).toFloat()
+    return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
+}
+
+
+@Preview
+@Composable
+fun GraphOverlayPreview() {
+    CaveRoutePlannerTheme {
+        ImageWithGraphOverlay(
+            survey = llSurvey,
+            modifier = Modifier
+        )
     }
-
-
-    @Preview
-    @Composable
-    fun GraphOverlayPreview() {
-        CaveRoutePlannerTheme {
-            ImageWithGraphOverlay(
-                survey = llSurvey,
-                modifier = Modifier
-            )
-        }
-    }
+}

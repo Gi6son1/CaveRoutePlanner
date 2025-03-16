@@ -18,6 +18,7 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
 
     @IgnoredOnParcel
     var startingNodes = mutableListOf<Int>(sourceNode)
+    @IgnoredOnParcel
     var endingNodes = mutableListOf<Int>()
 
     init {
@@ -26,26 +27,42 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
 
         var previousPathEnds = routeList.first().last().ends
 
-        for (pathList in routeList) {
-            if (pathList.isEmpty() || sourceNode == pathList.first().ends.first || sourceNode == pathList.first().ends.second){
-                continue
+        routeList.forEachIndexed { index, pathList ->
+            if (!pathList.isEmpty() && sourceNode != pathList.first().ends.first && sourceNode != pathList.first().ends.second){
+                var currentPathEnds = pathList.first().ends
+
+                if (previousPathEnds.first == currentPathEnds.first || previousPathEnds.first == currentPathEnds.second) {
+                    startingNodes.add(previousPathEnds.first)
+                    endingNodes.add(previousPathEnds.first)
+                } else {
+                    startingNodes.add(previousPathEnds.second)
+                    endingNodes.add(previousPathEnds.second)
+                }
+
+                previousPathEnds = pathList.last().ends
+
+                if (index == routeList.size - 1){
+                    var secondToLastPathEnds = if (pathList.size - 2 < 0) {
+                        routeList[index - 1 ].last().ends
+                    } else {
+                        pathList[pathList.size - 2].ends
+                    }
+                    if (previousPathEnds.first == secondToLastPathEnds.first || previousPathEnds.first == secondToLastPathEnds.second) {
+                        endingNodes.add(previousPathEnds.second)
+                    } else {
+                        endingNodes.add(previousPathEnds.first)
+                    }
+                }
             }
-
-            var currentPathEnds = pathList.first().ends
-
-            if (previousPathEnds.first == currentPathEnds.first || previousPathEnds.first == currentPathEnds.second) {
-                startingNodes.add(previousPathEnds.first)
-            } else {
-                startingNodes.add(previousPathEnds.second)
-            }
-
-            previousPathEnds = pathList.last().ends
-
         }
     }
 
     fun getCurrentStartingNode(): Int {
         return startingNodes[currentStage]
+    }
+
+    fun getCurrentEndingNode(): Int {
+        return endingNodes[currentStage]
     }
 
     fun getCurrentStage(): List<SurveyPath> {
