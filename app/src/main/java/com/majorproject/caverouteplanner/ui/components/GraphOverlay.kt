@@ -41,8 +41,10 @@ import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 import kotlin.compareTo
 import kotlin.div
 import kotlin.math.atan
+import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.sign
+import kotlin.text.toFloat
 import kotlin.times
 
 @Composable
@@ -81,9 +83,23 @@ fun ImageWithGraphOverlay(
                 survey.pathNodes,
                 currentRoute.getCurrentStartingNode()
             ) { finalGradient, finalDistance, centroid ->
-                val rotationRadians = atan(finalGradient)
-                var rotationDegrees = Math.toDegrees(rotationRadians.toDouble()).toFloat()
-                Log.d("rotation", rotationDegrees.toString())
+
+                val rotate = finalGradient + 90
+
+                rotation = 0f
+                focusedRotation = rotate
+
+                val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
+
+                val fractionalZoom = finalDistance / referenceDimension
+                Log.d("metrics", "fractional zoom: $fractionalZoom")
+
+                zoom = 1f
+                focusedZoom = 1f / fractionalZoom
+
+                val centroidx = (centroid.first / survey.size.first.toFloat()) * boxSize.width
+                val centroidy = (centroid.second / survey.size.second.toFloat()) * boxSize.height
+                Log.d("metrics", "centroid: $centroidx, $centroidy")
 
             }
         }
@@ -95,10 +111,10 @@ fun ImageWithGraphOverlay(
             .pointerInput(Unit) {
                 detectTransformGestures(
                     onGesture = { centroid, pan, newZoom, newRotate ->
-                        val adjustedScale = (zoom * newZoom).coerceIn(1f, 20f)
+                        val adjustedScale = (zoom * newZoom).coerceIn(1f / focusedZoom, 20f / focusedZoom)
 
-                        val boxScaledWidth = boxSize.width * adjustedScale
-                        val boxScaledHeight = boxSize.height * adjustedScale
+                        val boxScaledWidth = boxSize.width * adjustedScale * focusedZoom
+                        val boxScaledHeight = boxSize.height * adjustedScale * focusedZoom
 
                         //keep these above 0, otherwise randomly they could go below and cause error
                         val maxOffsetX = max(0f, (boxScaledWidth - screenWidth))
@@ -116,9 +132,12 @@ fun ImageWithGraphOverlay(
                                 Offset.Zero //otherwise no panning offset occurs
                             }
 
+
                         zoom = adjustedScale
                         rotation += newRotate
                         offset = adjustedOffset
+
+                        Log.d("metrics", "offset: $offset")
                     }
                 )
             }
@@ -184,15 +203,19 @@ fun performFocusedTransformation(
     startNode: Int,
     calculatedTransformation: (Float, Float, Pair<Int, Int>) -> Unit
 ) {
-    fun calculateGradient(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
-        val xDiff = (coord2.first - coord1.first).toFloat()
-        if (xDiff == 0f) {
-            return 0.0
+    fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
+        val angle = Math.toDegrees(
+            atan2(
+                (coord2.second - coord1.second).toDouble(),
+                (coord2.first - coord1.first).toDouble()
+            )
+        )
+
+        return if (angle < 0) {
+            angle + 360
+        } else {
+            angle
         }
-        val yDiff = (coord2.second - coord1.second).toFloat()
-        return yDiff/xDiff.toDouble()
-        val radians = atan(yDiff / xDiff)
-        return Math.toDegrees(radians.toDouble())
     }
 
 
@@ -202,7 +225,7 @@ fun performFocusedTransformation(
     fun calculateCentroid(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
         Pair((coord1.first + coord2.first) / 2, (coord1.second + coord2.second) / 2)
 
-    var combinedGradient = 0.0
+    var combinedAngle = 0.0
 
     if (!currentStage.isNullOrEmpty()) {
         var startNode = nodes.find { it.id == startNode } ?: return
@@ -214,21 +237,21 @@ fun performFocusedTransformation(
 
             endNode = nodes.find { it.id == path.next(currentNode.id) } ?: return
 
-            val gradient = calculateGradient(currentNode.coordinates, endNode.coordinates)
-            combinedGradient += gradient
+            val angle = calculateAngle(startNode.coordinates, endNode.coordinates)
+            combinedAngle += angle
 
             currentNode = endNode
         }
 
         if (endNode != null) {
-            val finalGradient = combinedGradient / currentStage.size
+            val finalGradient = combinedAngle / currentStage.size
             Log.d("metrics", finalGradient.toString())
 
             val finalDistance = calculateDistance(startNode.coordinates, endNode.coordinates)
 
             val centroid = calculateCentroid(startNode.coordinates, endNode.coordinates)
 
-            //calculatedTransformation(finalGradient, finalDistance, centroid)
+            calculatedTransformation(finalGradient.toFloat(), finalDistance, centroid)
         }
     }
 }

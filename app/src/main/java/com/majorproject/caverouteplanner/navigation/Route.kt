@@ -18,6 +18,7 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
 
     @IgnoredOnParcel
     var startingNodes = mutableListOf<Int>(sourceNode)
+    var endingNodes = mutableListOf<Int>()
 
     init {
         currentStage = 0
