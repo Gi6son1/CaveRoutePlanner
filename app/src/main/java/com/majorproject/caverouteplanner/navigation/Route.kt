@@ -27,7 +27,7 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
         var previousPathEnds = routeList.first().last().ends
 
         routeList.forEachIndexed { index, pathList ->
-            if (!pathList.isEmpty()){
+            if (pathList.isNotEmpty()){
                 var startNode: Int
 
                 var currentPathEnds = pathList.first().ends

@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,15 +28,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.requestFocus
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalFocusManager
 import com.majorproject.caverouteplanner.navigation.Route
 
 @Composable
@@ -80,26 +75,25 @@ fun MapScreen() {
                 .focusRequester(requester)
                 .focusable()
                 .onKeyEvent { keyEvent ->
-                    if (keyEvent.key == Key.VolumeUp
-                        && keyEvent.type == KeyEventType.KeyDown
-                        && !volumeKeyPressed
-                    ) {
-                        currentRoute?.nextStage()
-                        volumeKeyPressed = true
-                        true
-                    } else if (keyEvent.key == Key.VolumeDown
-                        && keyEvent.type == KeyEventType.KeyDown
-                        && !volumeKeyPressed
-                    ) {
-                        currentRoute?.previousStage()
-                        volumeKeyPressed = true
-                        true
-                    } else if ((keyEvent.key == Key.VolumeUp || keyEvent.key == Key.VolumeDown)
-                        && keyEvent.type == KeyEventType.KeyUp) {
-                        volumeKeyPressed = false
-                        false
-                    } else {
-                        false
+                    when {
+                        keyEvent.key == Key.VolumeUp && keyEvent.type == KeyEventType.KeyDown && !volumeKeyPressed -> {
+                            currentRoute?.nextStage()
+                            volumeKeyPressed = true
+                            true
+                        }
+
+                        keyEvent.key == Key.VolumeDown && keyEvent.type == KeyEventType.KeyDown && !volumeKeyPressed -> {
+                            currentRoute?.previousStage()
+                            volumeKeyPressed = true
+                            true
+                        }
+
+                        (keyEvent.key == Key.VolumeUp || keyEvent.key == Key.VolumeDown) && keyEvent.type == KeyEventType.KeyUp -> {
+                            volumeKeyPressed = false
+                            false
+                        }
+
+                        else -> false
                     }
                 }
         ) {

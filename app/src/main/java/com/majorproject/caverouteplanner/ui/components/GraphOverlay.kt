@@ -7,8 +7,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -36,18 +35,11 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
-import com.majorproject.caverouteplanner.ui.components.performFocusedTransformation
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
-import kotlin.compareTo
-import kotlin.div
-import kotlin.math.atan
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.sign
 import kotlin.math.sin
-import kotlin.text.toFloat
-import kotlin.times
 
 @Composable
 fun ImageWithGraphOverlay(
@@ -116,7 +108,7 @@ fun ImageWithGraphOverlay(
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures(
-                    onGesture = { centroid, pan, newZoom, newRotate ->
+                    onGesture = {_, pan, newZoom, newRotate ->
                         val adjustedScale =
                             (zoom * newZoom).coerceIn(1f, 20f)
 

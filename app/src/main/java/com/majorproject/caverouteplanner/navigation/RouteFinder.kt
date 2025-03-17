@@ -18,11 +18,13 @@ data class RouteFinder(
 ) : Parcelable {
     @IgnoredOnParcel //may be because it can be recreated in init everytime
     var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf()
+
     @IgnoredOnParcel
     var costMap: MutableMap<SurveyPath, Float> = mutableMapOf()
 
     init {
-        val sourceNode = survey.pathNodes.find { it.id == sourceId} ?: throw Exception("Source node not found")
+        val sourceNode =
+            survey.pathNodes.find { it.id == sourceId } ?: throw Exception("Source node not found")
 
         val (noWater, noHardTraverse, highAltitude) = flags
 
@@ -48,6 +50,7 @@ data class RouteFinder(
                     continue
                 }
                 val edge = survey.paths.find { it.id == edgeId }
+
                 if (edge == null) {
                     continue
                 }
@@ -55,18 +58,35 @@ data class RouteFinder(
                 val neighbourId = edge.next(currentNode.id)
                 val neighbour = survey.pathNodes.find { it.id == neighbourId }
 
+                if (neighbour == null) {
+                    continue
+                }
+
                 var weight = edge.distance
-                if (noWater && edge.hasWater) {weight *= 2f}
-                if (noHardTraverse && edge.isHardTraverse) {weight *= 2f}
-                if (highAltitude){ weight *= 0.5f.pow(edge.altitude) }
+                if (noWater && edge.hasWater) {
+                    weight *= 2f
+                }
+                if (noHardTraverse && edge.isHardTraverse) {
+                    weight *= 2f
+                }
+                if (highAltitude) {
+                    weight *= 0.5f.pow(edge.altitude)
+                }
 
+                val currentNodeRoute = routes[currentNode]
+                val neighbourRoute = routes[neighbour]
 
-                if (routes[currentNode]!!.first + weight < (routes[neighbour]?.first ?: Float.MAX_VALUE)) {
-                    routes.put(neighbour, Pair(routes[currentNode]!!.first + weight, edge))
+                if (currentNodeRoute != null &&
+                    currentNodeRoute.first + weight < (neighbourRoute?.first ?: Float.MAX_VALUE)
+                ) {
+                    val neighbourRoutePair = Pair(currentNodeRoute.first + weight, edge)
+
+                    routes.put(neighbour, neighbourRoutePair)
                     costMap.put(edge, weight)
 
-                    priorityQueue.add(Pair(routes[neighbour]!!.first.toInt(), neighbour!!))
+                    priorityQueue.add(Pair(neighbourRoutePair.first.toInt(), neighbour))
                 }
+
             }
         }
         routeMap = routes.mapValues { it.value.second }.toMutableMap()
@@ -80,7 +100,8 @@ data class RouteFinder(
 
         fun getEdgeFromNode(id: SurveyNode): Triple<SurveyPath, SurveyNode?, Float> {
             val foundEdge = routeMap[id]
-            val neighbour = if (foundEdge?.ends?.first == id.id) foundEdge.ends.second else foundEdge?.ends?.first
+            val neighbour =
+                if (foundEdge?.ends?.first == id.id) foundEdge.ends.second else foundEdge?.ends?.first
             val neighbourNode = survey.pathNodes.find { it.id == neighbour }
 
             return Triple(foundEdge!!, neighbourNode, foundEdge.distance)
@@ -92,7 +113,7 @@ data class RouteFinder(
             if (currentNode.isJunction) {
                 routeList.add(0, mutableListOf(edge))
             } else {
-                if (routeList.isEmpty()){
+                if (routeList.isEmpty()) {
                     routeList.add(mutableListOf())
                 }
                 routeList.first().add(0, edge)
