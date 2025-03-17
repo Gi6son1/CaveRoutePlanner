@@ -17,52 +17,44 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
     var currentStage by mutableIntStateOf(0)
 
     @IgnoredOnParcel
-    var startingNodes = mutableListOf<Int>(sourceNode)
+    var startingNodes = mutableListOf<Int>()
     @IgnoredOnParcel
     var endingNodes = mutableListOf<Int>()
 
     init {
         currentStage = 0
-        startingNodes = mutableListOf<Int>(sourceNode)
 
         var previousPathEnds = routeList.first().last().ends
 
         routeList.forEachIndexed { index, pathList ->
-            //pathList.forEach { path ->
+            if (!pathList.isEmpty()){
+                var startNode: Int
 
-                /** TODO fix this method
-                 *
-                 * when an incomplete path is put in, the end of the path isn't detected properly
-                 * when you put in the initial path only, it skips over it, meaning that no end path is set
-                 */
-
-
-            if (!pathList.isEmpty() && sourceNode != pathList.first().ends.first && sourceNode != pathList.first().ends.second){
                 var currentPathEnds = pathList.first().ends
 
-                if (previousPathEnds.first == currentPathEnds.first || previousPathEnds.first == currentPathEnds.second) {
-                    startingNodes.add(previousPathEnds.first)
-                    endingNodes.add(previousPathEnds.first)
+                if (index == 0) {
+                    startNode = sourceNode
+                    startingNodes.add(startNode)
                 } else {
-                    startingNodes.add(previousPathEnds.second)
-                    endingNodes.add(previousPathEnds.second)
+                    startNode = if (previousPathEnds.first == currentPathEnds.first || previousPathEnds.first == currentPathEnds.second) {
+                        previousPathEnds.first
+                    } else {
+                        previousPathEnds.second
+                    }
+
+                    startingNodes.add(startNode)
+                    endingNodes.add(startNode)
+                }
+
+                if (index == routeList.size - 1) {
+                    var currentNode = startNode
+                    for (path in pathList) {
+                        currentNode = path.next(currentNode)
+                    }
+                    endingNodes.add(currentNode)
                 }
 
                 previousPathEnds = pathList.last().ends
-
-                if (index == routeList.size - 1){
-                    var secondToLastPathEnds = if (pathList.size - 2 < 0) {
-                        routeList[index - 1 ].last().ends
-                    } else {
-                        pathList[pathList.size - 2].ends
-                    }
-                    if (previousPathEnds.first == secondToLastPathEnds.first || previousPathEnds.first == secondToLastPathEnds.second) {
-                        endingNodes.add(previousPathEnds.second)
-                    } else {
-                        endingNodes.add(previousPathEnds.first)
-                    }
-                }
-          //  }
             }
         }
     }
