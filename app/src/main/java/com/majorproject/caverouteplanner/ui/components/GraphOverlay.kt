@@ -62,9 +62,6 @@ fun ImageWithGraphOverlay(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
-    var focusedRotation by remember { mutableFloatStateOf(0f) }
-    var focusedZoom by remember { mutableFloatStateOf(1f) }
-
     val density = LocalDensity.current
     val currentConfiguration = LocalConfiguration.current
 
@@ -81,17 +78,15 @@ fun ImageWithGraphOverlay(
             performFocusedTransformation(
                 currentRoute,
                 survey.pathNodes,
-            ) { finalGradient, finalDistance, centroid ->
+            ) { angle, distance, centroid ->
 
                 val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
-                val fractionalZoom = finalDistance / referenceDimension
+                val fractionalZoom = distance / referenceDimension
 
-                zoom = 1f
-                focusedZoom = (1f / fractionalZoom) * 0.8f
-                val rotate = -finalGradient + 270
+                zoom = (1f / fractionalZoom) * 0.8f
 
-                rotation = 0f
-                focusedRotation = rotate
+                val rotate = -angle + 270
+                rotation = rotate
 
                 val boxCenterX = boxSize.width / 2f
                 val boxCenterY = boxSize.height / 2f
@@ -104,12 +99,12 @@ fun ImageWithGraphOverlay(
                 var targetOffsetX = boxCenterX - centroidX
                 var targetOffsetY = boxCenterY - centroidY
 
-                val angleRad = Math.toRadians(focusedRotation.toDouble()).toFloat()
+                val angleRad = Math.toRadians(rotation.toDouble()).toFloat()
 
                 val rotatedOffsetX = (targetOffsetX * cos(angleRad) - targetOffsetY * sin(angleRad))
                 val rotatedOffsetY = (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
 
-                val focusedTranslation = Offset(rotatedOffsetX * focusedZoom, rotatedOffsetY * focusedZoom)
+                val focusedTranslation = Offset(rotatedOffsetX * zoom, rotatedOffsetY * zoom)
 
                 offset = focusedTranslation
             }
@@ -123,10 +118,10 @@ fun ImageWithGraphOverlay(
                 detectTransformGestures(
                     onGesture = { centroid, pan, newZoom, newRotate ->
                         val adjustedScale =
-                            (zoom * newZoom).coerceIn(1f / focusedZoom, 20f / focusedZoom)
+                            (zoom * newZoom).coerceIn(1f, 20f)
 
-                        val boxScaledWidth = boxSize.width * adjustedScale * focusedZoom
-                        val boxScaledHeight = boxSize.height * adjustedScale * focusedZoom
+                        val boxScaledWidth = boxSize.width * adjustedScale
+                        val boxScaledHeight = boxSize.height * adjustedScale
 
                         //keep these above 0, otherwise randomly they could go below and cause error
                         val maxOffsetX = max(0f, (boxScaledWidth - screenWidth))
@@ -164,9 +159,9 @@ fun ImageWithGraphOverlay(
                     end.linkTo(parent.end)
                 }
                 .graphicsLayer(
-                    scaleX = zoom * focusedZoom,
-                    scaleY = zoom * focusedZoom,
-                    rotationZ = rotation + focusedRotation,
+                    scaleX = zoom,
+                    scaleY = zoom,
+                    rotationZ = rotation,
                     translationX = offset.x,
                     translationY = offset.y
                 )
@@ -205,8 +200,6 @@ fun ImageWithGraphOverlay(
             )
         }
     }
-
-
 }
 
 fun performFocusedTransformation(
@@ -253,13 +246,9 @@ fun performFocusedTransformation(
 
     val centroid = calculateCentroid(currentStage)
 
-
-
     val finalDistance = calculateDistance(startNode.coordinates, endNode.coordinates)
 
     calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
-
-
 }
 
 fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
