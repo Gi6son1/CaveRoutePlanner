@@ -77,5 +77,7 @@ Progress Diary:
 
   My next task now is to focus on some frontend (using my figma designs), because I have a good amount of backend functionality, and before I work on other features, I have to make my work look pretty...
 
+  I've also decided that since I want my work to be as close to business standards as possible, I'll start using SonarLint https://medium.com/@mohibshaikh19/sonarlint-integration-with-android-studio-75c20b5cbd16 , an extension that I used when I wrote software for VISA. This means that any code that I write is checked for vulnerabilities or potential errors or just better practice. This will increase my learning of the business standards for kotlin, which is great. 
+
   
   
