@@ -69,5 +69,13 @@ Progress Diary:
   I did it again. I've added another feature now, being a user can progress the current path bar by using the volume buttons on the phone. I used this for assistence: https://stackoverflow.com/questions/68861171/onkeyevent-modifier-doesnt-work-in-jetpack-compose/68863985#68863985
 
   I need sleep, may God have mercy on my soul
+
+  16/03/2025
+  Some good work was completed today. After many hours of problem solving, once a user select a point and the first waypoint route in the section has been identified, the view focuses in on that point only. This was pretty tricky to figure out, due to my reluctance to try and matrix transformations (sorry Maxim, I'm grateful for the suggestion, but my secondary school days are behind me, and I don't want to revisit those years again), but I caved in and decided to try it out. I decdied to focus on one thing at a time for this. I started with rotation, determining the angle that the first point in the waypoint made with the last point, before adding some extra specific angles to get the orientation I want, then setting that as the new rotation. The same applies for zoom. 
+  
+  For offset, this is where it gets tricky because for that I had to do some rotation matrix work. I specifically used this formula https://en.wikipedia.org/wiki/Rotation_matrix for 2D work. I first calculated the centroid of the specific path section as a whole with respect to the box composable, then I found what this offset is compared to the centre point of the box (because we want to translate it from the middle for easier understanding). Then use the rotation matrix to find out, after the new angle calculated, what position this offset would be in now, before then applying the calculated zoom. Now the offset has been completed.
+
+  My next task now is to focus on some frontend (using my figma designs), because I have a good amount of backend functionality, and before I work on other features, I have to make my work look pretty...
+
   
   
