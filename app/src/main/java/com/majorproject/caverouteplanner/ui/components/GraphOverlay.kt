@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,13 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -33,6 +38,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
@@ -47,7 +53,8 @@ fun ImageWithGraphOverlay(
     modifier: Modifier = Modifier,
     routeFinder: RouteFinder? = null,
     currentRoute: Route? = null,
-    longPressPosition: (Offset) -> Unit = {}
+    longPressPosition: (Offset) -> Unit = {},
+    pinpointNode: Int? = null
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -108,7 +115,7 @@ fun ImageWithGraphOverlay(
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures(
-                    onGesture = {_, pan, newZoom, newRotate ->
+                    onGesture = { _, pan, newZoom, newRotate ->
                         val adjustedScale =
                             (zoom * newZoom).coerceIn(1f, 20f)
 
@@ -188,7 +195,8 @@ fun ImageWithGraphOverlay(
                 ),
                 routeFinder = routeFinder,
                 displayWeights = true,
-                currentRoute = currentRoute
+                currentRoute = currentRoute,
+                pinpointNode = pinpointNode
             )
         }
     }
@@ -225,7 +233,10 @@ fun performFocusedTransformation(
             cumulativeCentroidY += (firstNode.coordinates.second + secondNode.coordinates.second) / 2
         }
 
-        return Pair(cumulativeCentroidX.toInt()/currentStage.size, cumulativeCentroidY.toInt()/currentStage.size)
+        return Pair(
+            cumulativeCentroidX.toInt() / currentStage.size,
+            cumulativeCentroidY.toInt() / currentStage.size
+        )
     }
 
     val currentStage = currentRoute.getCurrentStage()
@@ -259,8 +270,12 @@ fun GraphOverlay(
     routeFinder: RouteFinder? = null,
     currentRoute: Route? = null,
     displayWeights: Boolean = false,
+    pinpointNode: Int? = null
 ) {
     val textRememberer = rememberTextMeasurer()
+
+    val pinpointIcon = ImageBitmap.imageResource(id = R.drawable.location_icon)
+
     Canvas(modifier = modifier) {
         if (currentRoute != null) {
             currentRoute.routeList.forEachIndexed { index, pathList ->
@@ -339,74 +354,60 @@ fun GraphOverlay(
                 }
 
             }
-        } else {
-            paths.forEach { path ->
-                val startNode = nodes.find { it.id == path.ends.first }!!
-                val endNode = nodes.find { it.id == path.ends.second }!!
-                val textResult = textRememberer.measure(
-                    "${path.id}",
-                    style = TextStyle(color = Color.Red, fontSize = 8.sp)
-                )
+        }
+        if (pinpointNode != null) {
+            val node = nodes.find { it.id == pinpointNode }
+            if (node == null) return@Canvas
 
-                drawLine(
-                    color = if (path.hasWater) Color.Blue else Color.LightGray,
-                    start = Offset(
-                        (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                        (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                    ),
-                    end = Offset(
-                        (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                        (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                    ),
-                    strokeWidth = 4f
-                )
+            val iconOffsetX = pinpointIcon.width
+            val iconOffsetY = pinpointIcon.height.toFloat() * 2
+            Log.d("pinpoint", "pinpointOffset: $iconOffsetX, $iconOffsetY")
 
+            val pinPointCoodsX = (node.coordinates.first - iconOffsetX).toFloat()
+            val pinPointCoodsY = (node.coordinates.second - iconOffsetY).toFloat()
 
-                drawText(
-                    textLayoutResult = textResult,
-                    color = Color.Magenta,
-                    topLeft = Offset(
-                        ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
-                        ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
-                    ),
-                )
+            withTransform(
+                {
 
-
-            }
-
-
-            nodes.forEach { node ->
-
-                val textResult = textRememberer.measure(
-                    "${node.id}",
-                    style = TextStyle(color = Color.Red, fontSize = 6.sp)
-                )
-
-                drawCircle(
-                    color = if (node.isEntrance) {
-                        Color.Green
-                    } else if (node.isJunction) {
-                        Color.Red
-                    } else {
-                        Color.LightGray
-                    },
-                    radius = if (!node.isEntrance && !node.isJunction) 2f else 4f,
-                    center = Offset(
-                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                    translate(
+                        left = 2f,
+                        top = 2f
                     )
-                )
-
-                drawText(
-                    textLayoutResult = textResult,
-                    color = Color.Blue,
+                    scale(
+                        scaleX = 0.5f,
+                        scaleY = 0.5f,
+                        pivot = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                }
+            ){
+                drawImage(
+                    image = pinpointIcon,
                     topLeft = Offset(
-                        (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                        (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        (pinPointCoodsX / surveySize.width.toFloat()) * size.width,
+                        (pinPointCoodsY / surveySize.height.toFloat()) * size.height
                     )
                 )
             }
 
+            drawCircle(
+                color = if (node.isEntrance) {
+                    Color.Green
+                } else if (node.isJunction) {
+                    Color.Red
+                } else {
+                    Color.LightGray
+                },
+                radius = 2f,
+                center = Offset(
+                    (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                    (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                )
+            )
+
+            Log.d("pinpoint", "pinpoint: $pinpointNode")
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,7 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -33,11 +43,14 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.tooling.preview.Preview
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.ui.BackGroundScaffold
+import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
-fun MapScreen() {
-    Scaffold { innerPadding ->
+fun DemoMapScreen() {
+    BackGroundScaffold {innerPadding ->
         val requester = remember { FocusRequester() }
         var volumeKeyPressed by remember { mutableStateOf(false) }
 
@@ -221,5 +234,85 @@ fun MapScreen() {
             }
 
         }
+    }
+}
+
+//@Preview
+//@Composable
+//fun DemoMapScreenPreview() {
+//    CaveRoutePlannerTheme {
+//        DemoMapScreen()
+//    }
+//}
+
+@Composable
+fun MapScreen() {
+    BackGroundScaffold { innerPadding ->
+        ConstraintLayout(
+            modifier = Modifier.padding(innerPadding).fillMaxSize()
+        ) {
+
+            var routeFinder: RouteFinder? by rememberSaveable {
+                mutableStateOf(null)
+            }
+
+            var pinPointNode: Int? by rememberSaveable {
+                mutableStateOf(null)
+            }
+
+
+
+
+            val (homeButton, surveyGraph) = createRefs()
+
+
+
+            ImageWithGraphOverlay(
+                survey = llSurvey,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .constrainAs(surveyGraph) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    },
+                routeFinder = routeFinder,
+                longPressPosition = { tapPosition ->
+                    val nearestNode = llSurvey.getNearestNode(tapPosition)
+                    if (nearestNode != null) {
+                        pinPointNode = nearestNode
+                    }
+                },
+                pinpointNode = pinPointNode
+
+            )
+
+            FilledIconButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.constrainAs(homeButton){
+                    top.linkTo(parent.top, margin = 20.dp)
+                    start.linkTo(parent.start, margin = 20.dp)
+                }
+                    .size(60.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(60.dp),
+                    tint = MaterialTheme.colorScheme.primaryContainer
+                )
+            }
+
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MapScreenPreview(){
+    CaveRoutePlannerTheme {
+        MapScreen()
     }
 }
