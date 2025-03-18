@@ -3,6 +3,7 @@ package com.majorproject.caverouteplanner.navigation
 import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import kotlinx.parcelize.IgnoredOnParcel
@@ -14,7 +15,10 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
     ////TODO make funciton that gets distance in current stage
 
     @IgnoredOnParcel
-    var currentStage by mutableIntStateOf(0)
+    var currentStage by mutableIntStateOf(-1)
+
+    @IgnoredOnParcel
+    var routeStarted: Boolean by mutableStateOf(false)
 
     @IgnoredOnParcel
     var startingNodes = mutableListOf<Int>()
@@ -22,7 +26,8 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
     var endingNodes = mutableListOf<Int>()
 
     init {
-        currentStage = 0
+        currentStage = -1
+        routeStarted = false
 
         var previousPathEnds = routeList.first().last().ends
 
@@ -57,6 +62,11 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
                 previousPathEnds = pathList.last().ends
             }
         }
+    }
+
+    fun beginJourney(){
+        routeStarted = true
+        nextStage()
     }
 
     fun getCurrentStartingNode(): Int {

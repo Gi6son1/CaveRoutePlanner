@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -54,7 +52,7 @@ fun ImageWithGraphOverlay(
     routeFinder: RouteFinder? = null,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
-    pinpointNode: Int? = null
+    pinpointNode: Int? = null,
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -73,7 +71,7 @@ fun ImageWithGraphOverlay(
     }
 
     LaunchedEffect(currentRoute?.currentStage) {
-        if (currentRoute != null) {
+        if (currentRoute != null && currentRoute.currentStage != -1) {
             performFocusedTransformation(
                 currentRoute,
                 survey.pathNodes,
@@ -187,16 +185,13 @@ fun ImageWithGraphOverlay(
 
             GraphOverlay(
                 nodes = survey.pathNodes,
-                paths = survey.paths,
                 modifier = Modifier.matchParentSize(),
                 surveySize = IntSize(
                     width = survey.size.first,
                     height = survey.size.second
                 ),
-                routeFinder = routeFinder,
-                displayWeights = true,
                 currentRoute = currentRoute,
-                pinpointNode = pinpointNode
+                pinpointNode = pinpointNode,
             )
         }
     }
@@ -265,21 +260,16 @@ fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
 fun GraphOverlay(
     modifier: Modifier = Modifier,
     nodes: List<SurveyNode>,
-    paths: List<SurveyPath>,
     surveySize: IntSize,
-    routeFinder: RouteFinder? = null,
     currentRoute: Route? = null,
-    displayWeights: Boolean = false,
     pinpointNode: Int? = null
 ) {
-    val textRememberer = rememberTextMeasurer()
-
     val pinpointIcon = ImageBitmap.imageResource(id = R.drawable.location_icon)
 
     Canvas(modifier = modifier) {
         if (currentRoute != null) {
             currentRoute.routeList.forEachIndexed { index, pathList ->
-                if (index == currentRoute.currentStage) {
+                if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
                     currentRoute.getCurrentStage().forEach { path ->
                         val startNode = nodes.find { it.id == path.ends.first }!!
                         val endNode = nodes.find { it.id == path.ends.second }!!
@@ -318,44 +308,8 @@ fun GraphOverlay(
                 }
 
             }
-
-        } else if (routeFinder != null) {
-            if (displayWeights) {
-                routeFinder.costMap.forEach { (path, weight) ->
-
-                    val startNode = nodes.find { it.id == path.ends.first }!!
-                    val endNode = nodes.find { it.id == path.ends.second }!!
-                    val textResult = textRememberer.measure(
-                        String.format("%.2f", weight),
-                        style = TextStyle(fontSize = 6.sp)
-                    )
-
-                    drawLine(
-                        color = Color.LightGray,
-                        start = Offset(
-                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                        ),
-                        end = Offset(
-                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                        ),
-                        strokeWidth = 4f
-                    )
-
-                    drawText(
-                        textLayoutResult = textResult,
-                        color = Color.Red,
-                        topLeft = Offset(
-                            ((startNode.coordinates.first + endNode.coordinates.first) / surveySize.width.toFloat()) / 2 * size.width - textResult.size.width / 2,
-                            ((startNode.coordinates.second + endNode.coordinates.second) / surveySize.height.toFloat()) / 2 * size.height - textResult.size.height / 2
-                        ),
-                    )
-                }
-
-            }
         }
-        if (pinpointNode != null) {
+        if (pinpointNode != null && currentRoute?.routeStarted == false) {
             val node = nodes.find { it.id == pinpointNode }
             if (node == null) return@Canvas
 
@@ -391,23 +345,6 @@ fun GraphOverlay(
                     )
                 )
             }
-
-            drawCircle(
-                color = if (node.isEntrance) {
-                    Color.Green
-                } else if (node.isJunction) {
-                    Color.Red
-                } else {
-                    Color.LightGray
-                },
-                radius = 2f,
-                center = Offset(
-                    (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                    (node.coordinates.second / surveySize.height.toFloat()) * size.height
-                )
-            )
-
-            Log.d("pinpoint", "pinpoint: $pinpointNode")
         }
     }
 }
@@ -426,7 +363,7 @@ fun GraphOverlayPreview() {
     CaveRoutePlannerTheme {
         ImageWithGraphOverlay(
             survey = llSurvey,
-            modifier = Modifier
+            modifier = Modifier,
         )
     }
 }

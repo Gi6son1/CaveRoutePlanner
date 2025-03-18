@@ -133,7 +133,6 @@ fun DemoMapScreen() {
                         nodeNum = nearestNode
                     }
                 }
-
             )
 
             Button(onClick = {
@@ -248,24 +247,59 @@ fun DemoMapScreen() {
 @Composable
 fun MapScreen() {
     BackGroundScaffold { innerPadding ->
+        val requester = remember { FocusRequester() }
+        var volumeKeyPressed by remember { mutableStateOf(false) }
+
+        var routeFinder: RouteFinder? by rememberSaveable {
+            mutableStateOf(null)
+        }
+
+        var pinPointNode: Int? by rememberSaveable {
+            mutableStateOf(null)
+        }
+
+        var currentRoute: Route? by rememberSaveable {
+            mutableStateOf(null)
+        }
+
+        var beginJourney: Boolean by rememberSaveable {
+            mutableStateOf(false)
+        }
+
         ConstraintLayout(
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .focusRequester(requester)
+                .focusable()
+                .onKeyEvent { keyEvent ->
+                    when {
+                        keyEvent.key == Key.VolumeUp && keyEvent.type == KeyEventType.KeyDown && !volumeKeyPressed -> {
+                            currentRoute?.nextStage()
+                            volumeKeyPressed = true
+                            true
+                        }
+
+                        keyEvent.key == Key.VolumeDown && keyEvent.type == KeyEventType.KeyDown && !volumeKeyPressed -> {
+                            currentRoute?.previousStage()
+                            volumeKeyPressed = true
+                            true
+                        }
+
+                        (keyEvent.key == Key.VolumeUp || keyEvent.key == Key.VolumeDown) && keyEvent.type == KeyEventType.KeyUp -> {
+                            volumeKeyPressed = false
+                            false
+                        }
+
+                        else -> false
+                    }
+                }
         ) {
-
-            var routeFinder: RouteFinder? by rememberSaveable {
-                mutableStateOf(null)
+            LaunchedEffect(Unit) {
+                requester.requestFocus()
             }
 
-            var pinPointNode: Int? by rememberSaveable {
-                mutableStateOf(null)
-            }
-
-
-
-
-            val (homeButton, surveyGraph) = createRefs()
-
-
+            val (homeButton, surveyGraph, goButton) = createRefs()
 
             ImageWithGraphOverlay(
                 survey = llSurvey,
@@ -277,13 +311,19 @@ fun MapScreen() {
                     },
                 routeFinder = routeFinder,
                 longPressPosition = { tapPosition ->
+                    routeFinder = RouteFinder(
+                        sourceId = 7,
+                        survey = llSurvey,
+                    )
                     val nearestNode = llSurvey.getNearestNode(tapPosition)
+
                     if (nearestNode != null) {
                         pinPointNode = nearestNode
+                        currentRoute = routeFinder?.getRouteToNode(nearestNode)
                     }
                 },
-                pinpointNode = pinPointNode
-
+                pinpointNode = pinPointNode,
+                currentRoute = currentRoute
             )
 
             FilledIconButton(
@@ -305,6 +345,20 @@ fun MapScreen() {
                 )
             }
 
+            if (currentRoute != null && currentRoute?.routeStarted == false) {
+                Button(
+                    onClick = {
+                        currentRoute?.beginJourney()
+                              },
+                    modifier = Modifier.constrainAs(goButton) {
+                        bottom.linkTo(parent.bottom, 30.dp)
+                        start.linkTo(parent.start, 20.dp)
+                        end.linkTo(parent.end, 20.dp)
+                    }
+                ) {
+                    Text(text = "Go", fontSize = 30.sp)
+                }
+            }
         }
     }
 }
