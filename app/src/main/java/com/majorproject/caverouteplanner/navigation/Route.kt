@@ -82,11 +82,11 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
     }
 
     fun previousStage(){
-        if (currentStage > 0) currentStage--
+        if (currentStage > 0 && routeStarted) currentStage--
     }
 
     fun nextStage(){
-        if (currentStage < routeList.size - 1) currentStage++
+        if (currentStage < routeList.size - 1 && routeStarted) currentStage++
     }
 
     fun resetStage() {

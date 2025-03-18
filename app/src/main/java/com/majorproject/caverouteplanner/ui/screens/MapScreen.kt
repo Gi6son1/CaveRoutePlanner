@@ -3,6 +3,7 @@ package com.majorproject.caverouteplanner.ui.screens
 import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -262,11 +263,7 @@ fun MapScreen() {
             mutableStateOf(null)
         }
 
-        var beginJourney: Boolean by rememberSaveable {
-            mutableStateOf(false)
-        }
-
-        ConstraintLayout(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
@@ -299,16 +296,10 @@ fun MapScreen() {
                 requester.requestFocus()
             }
 
-            val (homeButton, surveyGraph, goButton) = createRefs()
-
             ImageWithGraphOverlay(
                 survey = llSurvey,
                 modifier = Modifier
-                    .padding(innerPadding)
-                    .constrainAs(surveyGraph) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    },
+                    .fillMaxSize(),
                 routeFinder = routeFinder,
                 longPressPosition = { tapPosition ->
                     routeFinder = RouteFinder(
@@ -325,25 +316,37 @@ fun MapScreen() {
                 pinpointNode = pinPointNode,
                 currentRoute = currentRoute
             )
+        }
 
-            FilledIconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.constrainAs(homeButton){
-                    top.linkTo(parent.top, margin = 20.dp)
-                    start.linkTo(parent.start, margin = 20.dp)
+        ConstraintLayout(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+
+            val (homeButton, goButton) = createRefs()
+
+            if (currentRoute == null || currentRoute?.routeStarted == false){
+                FilledIconButton(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.constrainAs(homeButton){
+                        top.linkTo(parent.top, margin = 20.dp)
+                        start.linkTo(parent.start, margin = 20.dp)
+                    }
+                        .size(60.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Home,
+                        contentDescription = "Home",
+                        modifier = Modifier.size(60.dp),
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
                 }
-                    .size(60.dp),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(60.dp),
-                    tint = MaterialTheme.colorScheme.primaryContainer
-                )
             }
+
 
             if (currentRoute != null && currentRoute?.routeStarted == false) {
                 Button(
