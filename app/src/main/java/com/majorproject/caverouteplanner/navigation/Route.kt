@@ -21,6 +21,9 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
     var routeStarted: Boolean by mutableStateOf(false)
 
     @IgnoredOnParcel
+    var pathDistances = mutableListOf<Float>()
+
+    @IgnoredOnParcel
     var startingNodes = mutableListOf<Int>()
     @IgnoredOnParcel
     var endingNodes = mutableListOf<Int>()
@@ -51,6 +54,14 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
                     endingNodes.add(startNode)
                 }
 
+                var currentNode = startNode
+                val totalPathDistance = pathList.sumOf { path ->
+                    currentNode = path.next(currentNode)
+                    path.distance.toDouble()
+                }.toFloat()
+
+                pathDistances.add(totalPathDistance)
+
                 if (index == routeList.size - 1) {
                     var currentNode = startNode
                     for (path in pathList) {
@@ -75,6 +86,13 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
 
     fun getCurrentEndingNode(): Int {
         return endingNodes[currentStage]
+    }
+
+    fun getCurrentPathDistance(): Float {
+        if (currentStage > 0) {
+            return pathDistances[currentStage]
+        }
+        return 0f
     }
 
     fun getCurrentStage(): List<SurveyPath> {
