@@ -20,14 +20,18 @@ import com.majorproject.caverouteplanner.navigation.Route
 
 @Composable
 fun PreJourneyLayout(
-    currentRoute: Route?
+    currentRoute: Route?,
+    setSource: () -> Unit = {},
+    removePin: () -> Unit = {},
+    changeConditions: (Boolean, Boolean, Boolean) -> Unit = {_, _, _ ->},
+    caveExit: () -> Unit = {}
 ){
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
     ) {
 
-        val (homeButton, goButton) = createRefs()
+        val (homeButton, goButton, setSource, cancel , changeConditions, caveExit) = createRefs()
 
         FilledIconButton(
             onClick = { /*TODO*/ },
@@ -48,6 +52,16 @@ fun PreJourneyLayout(
             )
         }
 
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.constrainAs(changeConditions) {
+                top.linkTo(parent.top, margin = 20.dp)
+                end.linkTo(parent.end, margin = 20.dp)
+            } ){
+            Text(text = "Change Conditions", fontSize = 30.sp)
+        }
+
+
         if (currentRoute != null && currentRoute.routeStarted == false) {
             Button(
                 onClick = {
@@ -61,6 +75,39 @@ fun PreJourneyLayout(
             ) {
                 Text(text = "Go", fontSize = 30.sp)
             }
+
+            Button(
+                onClick = { setSource() },
+                modifier = Modifier.constrainAs(setSource) {
+                    bottom.linkTo(goButton.top, 20.dp)
+                    start.linkTo(parent.start, 20.dp)
+                    end.linkTo(parent.end, 20.dp)
+                }
+            ) {
+                Text(text = "Set Source", fontSize = 30.sp)
+            }
+
+            Button(
+                onClick = { removePin() },
+                modifier = Modifier.constrainAs(cancel){
+                    bottom.linkTo(setSource.top, 20.dp)
+                }
+
+            ) {
+                Text(text = "Cancel", fontSize = 30.sp)
+            }
+
+            Button(
+                onClick = { caveExit() },
+                modifier = Modifier.constrainAs(caveExit){
+                    top.linkTo(changeConditions.bottom, 20.dp)
+                    end.linkTo(parent.end, 20.dp)
+                }
+            ) {
+                Text(text = "Cave Exit", fontSize = 30.sp)
+            }
+
+
         }
     }
 }

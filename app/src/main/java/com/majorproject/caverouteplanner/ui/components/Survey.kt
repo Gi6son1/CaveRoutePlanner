@@ -39,6 +39,10 @@ data class Survey(
             null
         }
     }
+
+    fun caveExits(): List<Int> {
+        return pathNodes.filter { it.isEntrance }.map { it.id }
+    }
 }
 
 val llSurvey = Survey(

@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.llSurvey
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -44,6 +46,17 @@ fun MapScreen() {
 
         var currentRoute: Route? by rememberSaveable {
             mutableStateOf(null)
+        }
+
+        var sourceId: Int by rememberSaveable {
+            mutableIntStateOf(7)
+        }
+
+        LaunchedEffect(sourceId) {
+            routeFinder = RouteFinder(
+                sourceId = sourceId,
+                survey = llSurvey,
+            )
         }
 
         Box(
@@ -86,7 +99,7 @@ fun MapScreen() {
                 routeFinder = routeFinder,
                 longPressPosition = { tapPosition ->
                     routeFinder = RouteFinder(
-                        sourceId = 7,
+                        sourceId = sourceId,
                         survey = llSurvey,
                     )
                     val nearestNode = llSurvey.getNearestNode(tapPosition)
@@ -102,10 +115,39 @@ fun MapScreen() {
         }
 
         if (currentRoute == null || currentRoute?.routeStarted == false) {
-            PreJourneyLayout(currentRoute)
+            PreJourneyLayout(
+                currentRoute = currentRoute,
+                setSource = {
+                    sourceId = pinPointNode!!
+                    pinPointNode = null
+                    currentRoute = null
+                    Log.d("pinpoint", sourceId.toString())
+                },
+                removePin = {
+                    pinPointNode = null
+                    currentRoute = null
+                },
+                changeConditions = { hasWater, hasHardTraversal, highAltitude ->
+
+                },
+                caveExit = {
+                    sourceId = pinPointNode!!
+
+                    routeFinder = RouteFinder(
+                        sourceId = sourceId,
+                        survey = llSurvey,
+                    )
+
+                    val nearestExit = routeFinder?.findNearestExit()
+
+                    currentRoute = routeFinder?.getRouteToNode(nearestExit!!)
+                }
+            )
         }
     }
 }
+
+
 
 @Preview
 @Composable

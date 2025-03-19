@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -267,46 +268,45 @@ fun GraphOverlay(
     val pinpointIcon = ImageBitmap.imageResource(id = R.drawable.location_icon)
 
     Canvas(modifier = modifier) {
-        if (currentRoute != null) {
-            currentRoute.routeList.forEachIndexed { index, pathList ->
-                if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
-                    currentRoute.getCurrentStage().forEach { path ->
-                        val startNode = nodes.find { it.id == path.ends.first }!!
-                        val endNode = nodes.find { it.id == path.ends.second }!!
+        currentRoute?.routeList?.forEachIndexed { index, pathList ->
+            if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
+                currentRoute.getCurrentStage().forEach { path ->
+                    val startNode = nodes.find { it.id == path.ends.first }!!
+                    val endNode = nodes.find { it.id == path.ends.second }!!
 
-                        drawLine(
-                            color = Color.Green,
-                            start = Offset(
-                                (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            end = Offset(
-                                (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            strokeWidth = 4f
-                        )
-                    }
-                } else {
-                    pathList.forEach { path ->
-                        val startNode = nodes.find { it.id == path.ends.first }!!
-                        val endNode = nodes.find { it.id == path.ends.second }!!
-
-                        drawLine(
-                            color = if (path.hasWater) Color.Blue else Color.Red,
-                            start = Offset(
-                                (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            end = Offset(
-                                (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                                (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
-                            ),
-                            strokeWidth = 4f
-                        )
-                    }
+                    drawLine(
+                        color = Color.Green,
+                        start = Offset(
+                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        end = Offset(
+                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        strokeWidth = 4f,
+                        cap = StrokeCap.Round
+                    )
                 }
+            } else {
+                pathList.forEach { path ->
+                    val startNode = nodes.find { it.id == path.ends.first }!!
+                    val endNode = nodes.find { it.id == path.ends.second }!!
 
+                    drawLine(
+                        color = if (path.hasWater) Color.Blue else Color.Red,
+                        start = Offset(
+                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        end = Offset(
+                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        ),
+                        strokeWidth = 4f,
+                        cap = StrokeCap.Round
+                    )
+                }
             }
         }
         if (pinpointNode != null && currentRoute?.routeStarted == false) {
@@ -315,7 +315,6 @@ fun GraphOverlay(
 
             val iconOffsetX = pinpointIcon.width
             val iconOffsetY = pinpointIcon.height.toFloat() * 2
-            Log.d("pinpoint", "pinpointOffset: $iconOffsetX, $iconOffsetY")
 
             val pinPointCoodsX = (node.coordinates.first - iconOffsetX).toFloat()
             val pinPointCoodsY = (node.coordinates.second - iconOffsetY).toFloat()
