@@ -50,7 +50,6 @@ import kotlin.math.sin
 fun ImageWithGraphOverlay(
     survey: Survey,
     modifier: Modifier = Modifier,
-    routeFinder: RouteFinder? = null,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
     pinpointNode: Int? = null,
@@ -106,6 +105,10 @@ fun ImageWithGraphOverlay(
 
                 offset = focusedTranslation
             }
+        } else {
+            offset = Offset.Zero
+            rotation = 0f
+            zoom = 1f
         }
     }
 

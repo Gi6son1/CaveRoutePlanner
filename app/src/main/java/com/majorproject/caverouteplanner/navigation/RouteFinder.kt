@@ -120,13 +120,16 @@ data class RouteFinder(
             }
             currentNode = neighbour!!
         }
+        if (routeList.isEmpty()) {
+            return null
+        }
         return Route(routeList = routeList, totalDistance = totalDistance, sourceNode = sourceId)
     }
 
-    fun findNearestExit(): Int {
+    fun findNearestExit(): Int? {
         val exitNodes = survey.caveExits()
         var nearestExitDistance: Float = Float.MAX_VALUE
-        var nearestExit: Int = 0
+        var nearestExit: Int? = null
 
         for (exit in exitNodes) {
             if (getRouteToNode(exit) != null) {

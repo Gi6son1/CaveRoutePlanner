@@ -27,6 +27,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Preview
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
+import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
@@ -96,7 +97,6 @@ fun MapScreen() {
                 survey = llSurvey,
                 modifier = Modifier
                     .fillMaxSize(),
-                routeFinder = routeFinder,
                 longPressPosition = { tapPosition ->
                     routeFinder = RouteFinder(
                         sourceId = sourceId,
@@ -139,9 +139,29 @@ fun MapScreen() {
                     )
 
                     val nearestExit = routeFinder?.findNearestExit()
-
-                    currentRoute = routeFinder?.getRouteToNode(nearestExit!!)
+                    if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
                 }
+            )
+        } else if (currentRoute != null){
+            InJourneyLayout(
+                currentRoute = currentRoute!!,
+                cancelRoute = {
+                    currentRoute = null
+                    pinPointNode = null
+                },
+                caveExit = { currentLocation ->
+                    routeFinder = RouteFinder(
+                        sourceId = currentLocation,
+                        survey = llSurvey,
+                    )
+
+                    val nearestExit = routeFinder?.findNearestExit()
+
+                    if (nearestExit != null) {
+                        pinPointNode = nearestExit
+                        currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                    }
+                },
             )
         }
     }
