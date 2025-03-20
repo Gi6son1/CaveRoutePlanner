@@ -79,5 +79,10 @@ Progress Diary:
 
   I've also decided that since I want my work to be as close to business standards as possible, I'll start using SonarLint https://medium.com/@mohibshaikh19/sonarlint-integration-with-android-studio-75c20b5cbd16 , an extension that I used when I wrote software for VISA. This means that any code that I write is checked for vulnerabilities or potential errors or just better practice. This will increase my learning of the business standards for kotlin, which is great. 
 
-  
+19/03/2025
+Both today and yesterday, I started work on the UI, in this case when a user chooses a location on the map, a little pinpoint shows up, with a path from the source to the destination. I added a button to start the journey, which changes the layout and also buttons for setting the pinpoint as the new source, changing travel details, the hoke button, and also a cave exit button which takes you to the nearest exit.
+
+I split up the UI layouts into a pre journey layout (as described) and an in journey layout. The in journey layout allows the user to cancel the trip, do a cave exit from current location, move to next or previous stage, cancel trip, and see details about current route and path.
+
+The UI is very basic (mainly just getting the functionality working first) and I'll properly develop it later when I have time. I'll make sure to add action check dialogs snd also little action confirmation messages for some things as well.
   
