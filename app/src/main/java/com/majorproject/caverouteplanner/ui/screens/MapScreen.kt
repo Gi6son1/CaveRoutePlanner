@@ -161,6 +161,7 @@ fun MapScreen() {
 
                     if (nearestExit != null) {
                         pinPointNode = nearestExit
+                        sourceId = currentLocation
                         currentRoute = routeFinder?.getRouteToNode(nearestExit)
                     }
                 },

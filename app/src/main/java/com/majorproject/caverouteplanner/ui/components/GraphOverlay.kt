@@ -388,8 +388,8 @@ fun GraphOverlay(
             withTransform(
                 {
                     translate(
-                        left = -0.5f,
-                        top = -0.5f
+                        left = -2f / adjustedZoom,
+                        top = -2f / adjustedZoom
                     )
                     scale(
                         scaleX = 0.2f,
@@ -438,8 +438,8 @@ fun GraphOverlay(
             withTransform(
                 {
                     translate(
-                        left = -0.5f,
-                        top = -0.5f
+                        left = -2f / adjustedZoom,
+                        top = -2f / adjustedZoom
                     )
                     scale(
                         scaleX = 0.15f,
