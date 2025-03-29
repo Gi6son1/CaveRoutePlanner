@@ -53,13 +53,6 @@ fun MapScreen() {
             mutableIntStateOf(7)
         }
 
-        LaunchedEffect(sourceId) {
-            routeFinder = RouteFinder(
-                sourceId = sourceId,
-                survey = llSurvey,
-            )
-        }
-
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -122,7 +115,6 @@ fun MapScreen() {
                     sourceId = pinPointNode!!
                     pinPointNode = null
                     currentRoute = null
-                    Log.d("pinpoint", sourceId.toString())
                 },
                 removePin = {
                     pinPointNode = null

@@ -319,7 +319,7 @@ fun GraphOverlay(
                 }
             }
         }
-        if (pinpointNode != null && currentRoute?.routeStarted == false) {
+        if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) {
             val node = nodes.find { it.id == pinpointNode }
             if (node == null) return@Canvas
 
@@ -388,12 +388,12 @@ fun GraphOverlay(
             withTransform(
                 {
                     translate(
-                        left = -2f / adjustedZoom,
-                        top = -2f / adjustedZoom
+                        left = -4f / adjustedZoom,
+                        top = -4f / adjustedZoom
                     )
                     scale(
-                        scaleX = 0.2f,
-                        scaleY = 0.2f,
+                        scaleX = 0.15f,
+                        scaleY = 0.15f,
                         pivot = Offset(
                             (currentStartNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (currentStartNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -430,7 +430,7 @@ fun GraphOverlay(
             val adjustedEndAngle = currentEndAngle + 90
 
             val arrowIconOffsetX = arrowHead.width.toFloat()
-            val arrowIconOffsetY = arrowHead.height.toFloat()
+            val arrowIconOffsetY = arrowHead.height.toFloat() * 0.5
 
             val arrowPointCoodsX = (currentEndNode.coordinates.first - arrowIconOffsetX).toFloat()
             val arrowPointCoodsY = (currentEndNode.coordinates.second - arrowIconOffsetY).toFloat()
@@ -442,8 +442,8 @@ fun GraphOverlay(
                         top = -2f / adjustedZoom
                     )
                     scale(
-                        scaleX = 0.15f,
-                        scaleY = 0.15f,
+                        scaleX = 0.125f,
+                        scaleY = 0.125f,
                         pivot = Offset(
                             (currentEndNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (currentEndNode.coordinates.second / surveySize.height.toFloat()) * size.height

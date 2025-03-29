@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconButton
@@ -17,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 
 @Composable
 fun PreJourneyLayout(
@@ -33,33 +36,27 @@ fun PreJourneyLayout(
 
         val (homeButton, goButton, setSource, cancel , changeConditions, caveExit) = createRefs()
 
-        FilledIconButton(
+
+        CustomIconButton(
             onClick = { /*TODO*/ },
             modifier = Modifier.constrainAs(homeButton) {
                 top.linkTo(parent.top, margin = 20.dp)
-                start.linkTo(parent.start, margin = 20.dp)
-            }
-                .size(60.dp),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Home,
-                contentDescription = "Home",
-                modifier = Modifier.size(60.dp),
-                tint = MaterialTheme.colorScheme.primaryContainer
-            )
-        }
+                start.linkTo(parent.start, margin = 10.dp)
+            },
+            icon = Icons.Outlined.Home,
+            contentDescription = "Home"
+        )
 
-        Button(
+        CustomTextButton(
             onClick = { /*TODO*/ },
             modifier = Modifier.constrainAs(changeConditions) {
-                top.linkTo(parent.top, margin = 20.dp)
-                end.linkTo(parent.end, margin = 20.dp)
-            } ){
-            Text(text = "Change Conditions", fontSize = 30.sp)
-        }
+                top.linkTo(homeButton.bottom, margin = 20.dp)
+                end.linkTo(parent.end, margin = 10.dp)
+            },
+            text = "Travel Conditions",
+            icon = Icons.Outlined.Edit,
+            contentDescription = "Edit"
+        )
 
 
         if (currentRoute != null && currentRoute.routeStarted == false) {
@@ -68,43 +65,45 @@ fun PreJourneyLayout(
                     currentRoute.beginJourney()
                 },
                 modifier = Modifier.constrainAs(goButton) {
-                    bottom.linkTo(parent.bottom, 30.dp)
-                    start.linkTo(parent.start, 20.dp)
-                    end.linkTo(parent.end, 20.dp)
+                    bottom.linkTo(setSource.top, 30.dp)
+                    start.linkTo(parent.start, 10.dp)
+                    end.linkTo(parent.end, 10.dp)
                 }
             ) {
                 Text(text = "Go", fontSize = 30.sp)
             }
 
-            Button(
+            CustomTextButton(
                 onClick = { setSource() },
                 modifier = Modifier.constrainAs(setSource) {
-                    bottom.linkTo(goButton.top, 20.dp)
-                    start.linkTo(parent.start, 20.dp)
-                    end.linkTo(parent.end, 20.dp)
-                }
-            ) {
-                Text(text = "Set Source", fontSize = 30.sp)
-            }
+                    bottom.linkTo(parent.bottom, 20.dp)
+                    start.linkTo(cancel.end)
+                    end.linkTo(parent.end, 10.dp)
+                },
+                text = "Set As Source",
+                icon = Icons.Outlined.Edit,
+                contentDescription = "Edit"
+            )
 
             Button(
                 onClick = { removePin() },
                 modifier = Modifier.constrainAs(cancel){
-                    bottom.linkTo(setSource.top, 20.dp)
+                    bottom.linkTo(parent.bottom, 20.dp)
+                    end.linkTo(setSource.start, 10.dp)
+                    start.linkTo(parent.start, 10.dp)
                 }
-
             ) {
-                Text(text = "Cancel", fontSize = 30.sp)
+                Text(text = "Remove Pin", fontSize = 20.sp)
             }
 
             Button(
                 onClick = { caveExit() },
                 modifier = Modifier.constrainAs(caveExit){
                     top.linkTo(changeConditions.bottom, 20.dp)
-                    end.linkTo(parent.end, 20.dp)
+                    end.linkTo(parent.end, 10.dp)
                 }
             ) {
-                Text(text = "Cave Exit", fontSize = 30.sp)
+                Text(text = "Cave Exit From Destination", fontSize = 20.sp)
             }
 
 
