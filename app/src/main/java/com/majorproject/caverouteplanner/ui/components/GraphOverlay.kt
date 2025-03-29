@@ -28,18 +28,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
-import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -52,7 +46,8 @@ fun ImageWithGraphOverlay(
     modifier: Modifier = Modifier,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
-    pinpointNode: Int? = null,
+    pinpointSourceNode: Int? = null,
+    pinpointDestinationNode: Int? = null
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -105,7 +100,7 @@ fun ImageWithGraphOverlay(
 
                 offset = focusedTranslation
             }
-        } else {
+        } else if (currentRoute != null) {
             offset = Offset.Zero
             rotation = 0f
             zoom = 1f
@@ -117,6 +112,7 @@ fun ImageWithGraphOverlay(
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures(
+                    panZoomLock = true,
                     onGesture = { _, pan, newZoom, newRotate ->
                         val adjustedScale =
                             (zoom * newZoom).coerceIn(1f, 20f)
@@ -145,7 +141,6 @@ fun ImageWithGraphOverlay(
                         rotation += newRotate
                         offset = adjustedOffset
 
-                        Log.d("offsetmetrics", "offset: $offset")
                     }
                 )
             }
@@ -195,10 +190,24 @@ fun ImageWithGraphOverlay(
                     height = survey.size.second
                 ),
                 currentRoute = currentRoute,
-                pinpointNode = pinpointNode,
+                destinationNode = pinpointDestinationNode,
+                pinpointNode = pinpointSourceNode,
+                currentRotation = rotation,
+                currentZoom = zoom
             )
         }
     }
+}
+
+fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
+    val angle = Math.toDegrees(
+        atan2(
+            (coord2.second - coord1.second).toDouble(),
+            (coord2.first - coord1.first).toDouble()
+        )
+    )
+
+    return angle
 }
 
 fun performFocusedTransformation(
@@ -206,17 +215,6 @@ fun performFocusedTransformation(
     nodes: List<SurveyNode>,
     calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
-    fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
-        val angle = Math.toDegrees(
-            atan2(
-                (coord2.second - coord1.second).toDouble(),
-                (coord2.first - coord1.first).toDouble()
-            )
-        )
-
-        return angle
-    }
-
     fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
         kotlin.math.sqrt((coord2.second - coord1.second).toFloat() * (coord2.second - coord1.second).toFloat() + (coord2.first - coord1.first).toFloat() * (coord2.first - coord1.first).toFloat())
 
@@ -236,6 +234,7 @@ fun performFocusedTransformation(
             cumulativeCentroidX.toInt() / currentStage.size,
             cumulativeCentroidY.toInt() / currentStage.size
         )
+
     }
 
     val currentStage = currentRoute.getCurrentStage()
@@ -266,9 +265,17 @@ fun GraphOverlay(
     nodes: List<SurveyNode>,
     surveySize: IntSize,
     currentRoute: Route? = null,
-    pinpointNode: Int? = null
+    pinpointNode: Int? = null,
+    destinationNode: Int? = null,
+    currentRotation: Float,
+    currentZoom: Float
 ) {
     val pinpointIcon = ImageBitmap.imageResource(id = R.drawable.location_icon)
+    val destinationIcon = ImageBitmap.imageResource(id = R.drawable.destination_icon)
+    val currentDirectionIcon = ImageBitmap.imageResource(id = R.drawable.direction_icon)
+    val arrowHead = ImageBitmap.imageResource(id = R.drawable.arrow_head)
+
+    val adjustedZoom = if (currentZoom == 0f) 0.000001f else currentZoom
 
     Canvas(modifier = modifier) {
         currentRoute?.routeList?.forEachIndexed { index, pathList ->
@@ -278,7 +285,7 @@ fun GraphOverlay(
                     val endNode = nodes.find { it.id == path.ends.second }!!
 
                     drawLine(
-                        color = Color.Green,
+                        color = Color(0xFF00B126),
                         start = Offset(
                             (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -297,7 +304,7 @@ fun GraphOverlay(
                     val endNode = nodes.find { it.id == path.ends.second }!!
 
                     drawLine(
-                        color = if (path.hasWater) Color.Blue else Color.Red,
+                        color = if (path.hasWater) Color(0xFF007ADD) else Color(0xFFA3A3A3),
                         start = Offset(
                             (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -330,8 +337,15 @@ fun GraphOverlay(
                         top = 2f
                     )
                     scale(
-                        scaleX = 0.5f,
-                        scaleY = 0.5f,
+                        scaleX = 0.75f / adjustedZoom,
+                        scaleY = 0.75f / adjustedZoom,
+                        pivot = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                    rotate(
+                        degrees = -currentRotation,
                         pivot = Offset(
                             (node.coordinates.first / surveySize.width.toFloat()) * size.width,
                             (node.coordinates.second / surveySize.height.toFloat()) * size.height
@@ -341,6 +355,153 @@ fun GraphOverlay(
             ){
                 drawImage(
                     image = pinpointIcon,
+                    topLeft = Offset(
+                        (pinPointCoodsX / surveySize.width.toFloat()) * size.width,
+                        (pinPointCoodsY / surveySize.height.toFloat()) * size.height
+                    )
+                )
+            }
+
+
+        }
+
+        if (currentRoute?.routeStarted == true){
+            val currentStartNode = nodes.find { it.id == currentRoute.getCurrentStartingNode() }
+            if (currentStartNode == null){
+                return@Canvas
+            }
+            val currentPathEndNode = currentRoute.getCurrentStage().first().next(currentStartNode.id)
+
+            val currentStartAngle = calculateAngle(
+                currentStartNode.coordinates,
+                nodes.find { it.id == currentPathEndNode}!!.coordinates
+            ).toFloat()
+
+            val adjustedAngle = currentStartAngle + 90
+
+            val iconOffsetX = currentDirectionIcon.width.toFloat()
+            val iconOffsetY = currentDirectionIcon.height.toFloat()
+
+            val pinPointCoodsX = (currentStartNode.coordinates.first - iconOffsetX).toFloat()
+            val pinPointCoodsY = (currentStartNode.coordinates.second - iconOffsetY).toFloat()
+
+            withTransform(
+                {
+                    translate(
+                        left = -0.5f,
+                        top = -0.5f
+                    )
+                    scale(
+                        scaleX = 0.2f,
+                        scaleY = 0.2f,
+                        pivot = Offset(
+                            (currentStartNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (currentStartNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+
+                    rotate(
+                        degrees = adjustedAngle,
+                        pivot = Offset(
+                            (currentStartNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (currentStartNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                }
+            ){
+                drawImage(
+                    image = currentDirectionIcon,
+                    topLeft = Offset(
+                        (pinPointCoodsX / surveySize.width.toFloat()) * size.width,
+                        (pinPointCoodsY / surveySize.height.toFloat()) * size.height
+                    )
+                )
+            }
+
+            val currentEndNode = nodes.find { it.id == currentRoute.getCurrentEndingNode() }
+            if (currentEndNode == null) return@Canvas
+            val currentEndPathStartNode = currentRoute.getCurrentStage().last().next(currentEndNode.id)
+
+            val currentEndAngle = calculateAngle(
+                nodes.find { it.id == currentEndPathStartNode}!!.coordinates,
+                currentEndNode.coordinates
+            ).toFloat()
+
+            val adjustedEndAngle = currentEndAngle + 90
+
+            val arrowIconOffsetX = arrowHead.width.toFloat()
+            val arrowIconOffsetY = arrowHead.height.toFloat()
+
+            val arrowPointCoodsX = (currentEndNode.coordinates.first - arrowIconOffsetX).toFloat()
+            val arrowPointCoodsY = (currentEndNode.coordinates.second - arrowIconOffsetY).toFloat()
+
+            withTransform(
+                {
+                    translate(
+                        left = -0.5f,
+                        top = -0.5f
+                    )
+                    scale(
+                        scaleX = 0.15f,
+                        scaleY = 0.15f,
+                        pivot = Offset(
+                            (currentEndNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (currentEndNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+
+                    rotate(
+                        degrees = adjustedEndAngle,
+                        pivot = Offset(
+                            (currentEndNode.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (currentEndNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                }
+            ){
+                drawImage(
+                    image = arrowHead,
+                    topLeft = Offset(
+                        (arrowPointCoodsX / surveySize.width.toFloat()) * size.width,
+                        (arrowPointCoodsY / surveySize.height.toFloat()) * size.height
+                    )
+                )
+            }
+
+        }
+
+
+        if (destinationNode != null) {
+            val node = nodes.find { it.id == destinationNode }
+            if (node == null) return@Canvas
+
+            val iconOffsetX = 0
+            val iconOffsetY = destinationIcon.height.toFloat() * 2
+
+            val pinPointCoodsX = (node.coordinates.first - iconOffsetX).toFloat()
+            val pinPointCoodsY = (node.coordinates.second - iconOffsetY).toFloat()
+
+            withTransform(
+                {
+                    scale(
+                        scaleX = 0.75f / adjustedZoom,
+                        scaleY = 0.75f / adjustedZoom,
+                        pivot = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                    rotate(
+                        degrees = -currentRotation,
+                        pivot = Offset(
+                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
+                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                        )
+                    )
+                }
+            ){
+                drawImage(
+                    image = destinationIcon,
                     topLeft = Offset(
                         (pinPointCoodsX / surveySize.width.toFloat()) * size.width,
                         (pinPointCoodsY / surveySize.height.toFloat()) * size.height

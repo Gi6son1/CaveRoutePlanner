@@ -109,8 +109,9 @@ fun MapScreen() {
                         currentRoute = routeFinder?.getRouteToNode(nearestNode)
                     }
                 },
-                pinpointNode = pinPointNode,
-                currentRoute = currentRoute
+                pinpointDestinationNode = pinPointNode,
+                currentRoute = currentRoute,
+                pinpointSourceNode = sourceId
             )
         }
 
@@ -139,6 +140,7 @@ fun MapScreen() {
                     )
 
                     val nearestExit = routeFinder?.findNearestExit()
+                    pinPointNode = nearestExit
                     if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
                 }
             )

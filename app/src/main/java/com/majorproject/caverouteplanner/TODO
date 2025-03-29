@@ -12,6 +12,15 @@ three tickboxes for flags
 two buttons for changing destination
 path changes depending on flags
 
+source has its own icon
+toggle cave route lines on map
+specific path distance area details has same colour as route colour
+
+when chagne source or cancel route, do not reset transformations
+
+left handled vs right handed layout
+icon buttons and text buttons aren't mixed they have separate areas
+
 
 Make landing page i.e. list of surveys to select
 Make room database
