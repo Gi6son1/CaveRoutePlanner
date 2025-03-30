@@ -9,6 +9,8 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.majorproject.caverouteplanner.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,13 +19,20 @@ import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveExitDialog
 
 @Composable
 fun InJourneyLayout(
     currentRoute: Route,
     cancelRoute: () -> Unit = {},
-    caveExit: (Int) -> Unit = {}
+    caveExit: (Int, Boolean) -> Unit = {_, _ ->}
 ) {
+    var openActionCheckDialog by rememberSaveable { mutableStateOf(false) }
+    var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }
+
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (routeDetails,
             pathDetails,
@@ -75,7 +84,7 @@ fun InJourneyLayout(
         )
 
         CustomIconButton(
-            onClick = { cancelRoute() },
+            onClick = { openActionCheckDialog = true },
             modifier = Modifier.constrainAs(cancel) {
                 top.linkTo(caveExit.bottom, 20.dp)
                 end.linkTo(parent.end, 20.dp)
@@ -85,13 +94,28 @@ fun InJourneyLayout(
         )
 
         CustomIconButton(
-            onClick = { caveExit(currentRoute.getCurrentEndingNode()) },
+            onClick = { openCaveExitDialog = true },
             modifier = Modifier.constrainAs(caveExit) {
                 top.linkTo(parent.top, 40.dp)
                 end.linkTo(parent.end, 20.dp)
             },
             iconImage = R.drawable.exit_icon,
             invertedColour = true
+        )
+
+
+        ActionCheckDialog(
+            dialogIsOpen = openActionCheckDialog,
+            dialogOpen = { openActionCheckDialog = it },
+            confirmAction = { cancelRoute() },
+            message = "Are you sure you want to cancel this route? You'll lose your progress if you do."
+        )
+
+        CaveExitDialog(
+            dialogIsOpen = openCaveExitDialog,
+            dialogOpen = { openCaveExitDialog = it },
+            highAltitudeExit = { caveExit(currentRoute.getCurrentEndingNode(), true) },
+            normalExit = { caveExit(currentRoute.getCurrentEndingNode(), false) }
         )
     }
 

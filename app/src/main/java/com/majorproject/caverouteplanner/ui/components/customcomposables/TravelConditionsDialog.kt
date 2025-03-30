@@ -38,9 +38,8 @@ fun TravelConditionsDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open
     dialogOpen: (Boolean) -> Unit = {}, //method used for closing the dialog
     currentConditions: Triple<Boolean, Boolean, Boolean>,
-    updatedConditions: (Boolean, Boolean, Boolean) -> Unit = {_, _, _ ->},
+    updatedConditions: (Boolean, Boolean, Boolean, Int) -> Unit = {_, _, _, _ ->},
     currentNumberOfTravellers: Int,
-    updateNumberOfTravellers: (Int) -> Unit = {}
 ){
     if (dialogIsOpen) {
         Dialog(
@@ -86,7 +85,7 @@ fun TravelConditionsDialog(
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Row(
-                        modifier = Modifier //the switch for showing the progress bar
+                        modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .height(50.dp)
                     ) {
@@ -130,7 +129,7 @@ fun TravelConditionsDialog(
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(15.dp))
                     Row(
-                        modifier = Modifier //the switch for showing the progress bar
+                        modifier = Modifier
                             .padding(start = 10.dp)
                             .height(50.dp)
                     ){
@@ -147,9 +146,9 @@ fun TravelConditionsDialog(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                    Row {
+                    Row(modifier = Modifier.padding(10.dp)) {
                         CustomTextButton(
                             onClick = { dialogOpen(false) },
                             text = "Cancel",
@@ -162,8 +161,7 @@ fun TravelConditionsDialog(
                         CustomTextButton(
                             onClick = {
                                 dialogOpen(false)
-                                updatedConditions(noWater, noHardTraverse, highAltitude)
-                                updateNumberOfTravellers(numberOfTravellers)
+                                updatedConditions(noWater, noHardTraverse, highAltitude, numberOfTravellers)
                             },
                             text = "Confirm Choices",
                             iconVector = Icons.Outlined.Check,

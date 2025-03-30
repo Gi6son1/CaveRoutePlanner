@@ -26,11 +26,10 @@ fun PreJourneyLayout(
     currentRoute: Route?,
     setSource: () -> Unit = {},
     removePin: () -> Unit = {},
-    changeConditions: (Boolean, Boolean, Boolean) -> Unit = {_, _, _ ->},
+    changeConditions: (Boolean, Boolean, Boolean, Int) -> Unit = {_, _, _, _ ->},
     caveExit: () -> Unit = {},
     currentTravelConditions: Triple<Boolean, Boolean, Boolean>,
     numberOfTravellers: Int,
-    changeNumberOfTravellers: (Int) -> Unit = {}
 ){
     ConstraintLayout(
         modifier = Modifier
@@ -120,11 +119,8 @@ fun PreJourneyLayout(
             dialogOpen = { openConditionsDialog = it },
             currentConditions = currentTravelConditions,
             currentNumberOfTravellers = numberOfTravellers,
-            updatedConditions = { noWater, noHardTraverse, highAltitude ->
-                changeConditions(noWater, noHardTraverse, highAltitude)
-            },
-            updateNumberOfTravellers = { numberOfTravellers ->
-                changeNumberOfTravellers(numberOfTravellers)
+            updatedConditions = { noWater, noHardTraverse, highAltitude, numberOfTravellers ->
+                changeConditions(noWater, noHardTraverse, highAltitude, numberOfTravellers)
             }
         )
     }

@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,8 +56,17 @@ fun MapScreen() {
             mutableStateOf(Triple(false, false, false))
         }
 
-        var numberOfTravellers: Int by rememberSaveable {
+        var currentNumberOfTravellers: Int by rememberSaveable {
             mutableIntStateOf(1)
+        }
+
+        fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null){
+            routeFinder = RouteFinder(
+                sourceId = sourceId,
+                survey = llSurvey,
+                flags = if (tempFlags != null) tempFlags else currentTravelConditions,
+                numberOfTravellers = currentNumberOfTravellers
+            )
         }
 
 
@@ -100,12 +108,7 @@ fun MapScreen() {
                 modifier = Modifier
                     .fillMaxSize(),
                 longPressPosition = { tapPosition ->
-                    routeFinder = RouteFinder(
-                        sourceId = sourceId,
-                        survey = llSurvey,
-                        flags = currentTravelConditions,
-                        numberOfTravellers = numberOfTravellers
-                    )
+                    resetRouteFinder()
                     val nearestNode = llSurvey.getNearestNode(tapPosition)
 
                     if (nearestNode != null) {
@@ -131,28 +134,25 @@ fun MapScreen() {
                     pinPointNode = null
                     currentRoute = null
                 },
-                changeConditions = { hasWater, hasHardTraversal, highAltitude ->
+                changeConditions = { hasWater, hasHardTraversal, highAltitude, numberOfTravellers ->
                     currentTravelConditions = Triple(hasWater, hasHardTraversal, highAltitude)
-                },
-                changeNumberOfTravellers = {
-                    numberOfTravellers = it
+                    currentNumberOfTravellers = numberOfTravellers
+                    resetRouteFinder()
+                    if (pinPointNode != null){
+                        currentRoute = routeFinder?.getRouteToNode(pinPointNode!!)
+                    }
                 },
                 caveExit = {
                     sourceId = pinPointNode!!
 
-                    routeFinder = RouteFinder(
-                        sourceId = sourceId,
-                        survey = llSurvey,
-                        flags = currentTravelConditions,
-                        numberOfTravellers = numberOfTravellers
-                    )
+                    resetRouteFinder()
 
                     val nearestExit = routeFinder?.findNearestExit()
                     pinPointNode = nearestExit
                     if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
                 },
                 currentTravelConditions = currentTravelConditions,
-                numberOfTravellers = numberOfTravellers
+                numberOfTravellers = currentNumberOfTravellers
             )
         } else if (currentRoute != null){
             InJourneyLayout(
@@ -161,19 +161,15 @@ fun MapScreen() {
                     currentRoute = null
                     pinPointNode = null
                 },
-                caveExit = { currentLocation ->
-                    routeFinder = RouteFinder(
-                        sourceId = currentLocation,
-                        survey = llSurvey,
-                        flags = currentTravelConditions,
-                        numberOfTravellers = numberOfTravellers
-                    )
+                caveExit = { currentLocation, emergencyExit ->
+                    sourceId = currentLocation
+                    resetRouteFinder(if (emergencyExit) Triple(false, false, true) else null)
 
                     val nearestExit = routeFinder?.findNearestExit()
 
                     if (nearestExit != null) {
                         pinPointNode = nearestExit
-                        sourceId = currentLocation
+
                         currentRoute = routeFinder?.getRouteToNode(nearestExit)
                     }
                 },

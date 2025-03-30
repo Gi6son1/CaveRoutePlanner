@@ -53,7 +53,7 @@ fun CustomTextButton(
         modifier = modifier
             .border(1.dp, MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.medium)
             .width(187.dp)
-            .height(58.dp),
+            .height(59.dp),
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(10.dp),
         elevation = ButtonDefaults.buttonElevation(10.dp),
