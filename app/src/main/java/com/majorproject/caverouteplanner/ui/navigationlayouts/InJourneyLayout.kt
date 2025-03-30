@@ -2,13 +2,21 @@ package com.majorproject.caverouteplanner.ui.navigationlayouts
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.majorproject.caverouteplanner.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.navigation.Route
-import androidx.compose.material3.Button
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
 
 @Composable
 fun InJourneyLayout(
@@ -24,55 +32,67 @@ fun InJourneyLayout(
             nextStage,
             prevStage) = createRefs()
 
-        Row(modifier = Modifier.constrainAs(routeDetails) {
-            top.linkTo(parent.top, 20.dp)
-            start.linkTo(parent.start, 20.dp)
-        }
+        CustomTripInfoBox(
+            onClick = { },
+            modifier = Modifier.constrainAs(routeDetails) {
+                top.linkTo(parent.top, 40.dp)
+                start.linkTo(parent.start, 20.dp)
+            },
+            distance = currentRoute.totalDistance,
+            time = currentRoute.getTotalPathTravelTime()
         )
-        {
-            Text(text = currentRoute.totalDistance.toString())
-        }
 
-        Row(modifier = Modifier.constrainAs(pathDetails) {
-            top.linkTo(routeDetails.bottom, 20.dp)
-            start.linkTo(parent.start, 20.dp)
-        }
-        ) {
-            Text(text = currentRoute.getCurrentPathDistance().toString())
-        }
+        CustomTripInfoBox(
+            onClick = { },
+            modifier = Modifier.constrainAs(pathDetails) {
+                top.linkTo(routeDetails.bottom, 20.dp)
+                start.linkTo(parent.start, 20.dp)
+            },
+            pathNotDest = true,
+            distance = currentRoute.getCurrentPathDistance(),
+            time = currentRoute.getCurrentPathTravelTime()
+        )
 
-        Button(onClick = { currentRoute.nextStage() }, modifier = Modifier.constrainAs(nextStage){
-            bottom.linkTo(parent.bottom, 20.dp)
-            start.linkTo(parent.start, 20.dp)
-        }) {
-            Text(text = "Next Stage")
-        }
+        CustomTextButton(
+            onClick = { currentRoute.nextStage() },
+            text = "Next Stage",
+            modifier = Modifier.constrainAs(nextStage) {
+                bottom.linkTo(parent.bottom, 40.dp)
+                end.linkTo(parent.end, 10.dp)
+            },
+            iconVector = Icons.AutoMirrored.Outlined.ArrowForward
+        )
 
-        Button(onClick = { currentRoute.previousStage() }, modifier = Modifier.constrainAs(prevStage){
-            bottom.linkTo(parent.bottom, 20.dp)
-            end.linkTo(parent.end, 20.dp)
-        }) {
-            Text(text = "Previous Stage")
-        }
+        CustomTextButton(
+            onClick = { currentRoute.previousStage() },
+            text = "Previous Stage",
+            modifier = Modifier.constrainAs(prevStage) {
+                bottom.linkTo(parent.bottom, 40.dp)
+                start.linkTo(parent.start, 10.dp)
+            },
+            iconVector = Icons.AutoMirrored.Outlined.ArrowBack,
+            flipped = true
+        )
 
-        Button(onClick = { cancelRoute() }, modifier = Modifier.constrainAs(cancel){
-            top.linkTo(caveExit.bottom, 20.dp)
-            end.linkTo(parent.end, 20.dp)
-        } )
-        {
-            Text(text = "Cancel")
-        }
+        CustomIconButton(
+            onClick = { cancelRoute() },
+            modifier = Modifier.constrainAs(cancel) {
+                top.linkTo(caveExit.bottom, 20.dp)
+                end.linkTo(parent.end, 20.dp)
+            },
+            iconVector = Icons.Outlined.Cancel,
+            contentDescription = "Cancel"
+        )
 
-        Button(onClick = {
-            //val
-            caveExit(currentRoute.getCurrentEndingNode())
-                         }
-            , modifier = Modifier.constrainAs(caveExit){
-            top.linkTo(routeDetails.bottom, 20.dp)
-            end.linkTo(parent.end, 20.dp)
-        }) {
-            Text(text = "Cave Exit")
-        }
+        CustomIconButton(
+            onClick = { caveExit(currentRoute.getCurrentEndingNode()) },
+            modifier = Modifier.constrainAs(caveExit) {
+                top.linkTo(parent.top, 40.dp)
+                end.linkTo(parent.end, 20.dp)
+            },
+            iconImage = R.drawable.exit_icon,
+            invertedColour = true
+        )
     }
 
 }

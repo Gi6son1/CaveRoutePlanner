@@ -10,9 +10,11 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float, val sourceNode: Int) : Parcelable {
-
-    ////TODO make funciton that gets distance in current stage
+data class Route(val routeList: List<List<SurveyPath>>,
+                 val totalDistance: Float,
+                 val sourceNode: Int,
+                 val numberOfTravellers: Int = 1)
+    : Parcelable {
 
     @IgnoredOnParcel
     var currentStage by mutableIntStateOf(-1)
@@ -22,6 +24,9 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
 
     @IgnoredOnParcel
     var pathDistances = mutableListOf<Float>()
+
+    @IgnoredOnParcel
+    var pathTravelTimes = mutableListOf<Int>()
 
     @IgnoredOnParcel
     var startingNodes = mutableListOf<Int>()
@@ -55,12 +60,30 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
                 }
 
                 var currentNode = startNode
-                val totalPathDistance = pathList.sumOf { path ->
+                var totalPathDistance = 0f
+                var totalPathTime = 0f
+
+                pathList.forEach { path ->
                     currentNode = path.next(currentNode)
-                    path.distance.toDouble()
-                }.toFloat()
+                    totalPathDistance += path.distance
+
+                    var timeForPath = (path.distance * 1.8) + (path.distance * (numberOfTravellers - 1) * 1.1f).toDouble()
+                    if (path.hasWater) {
+                        timeForPath *= 1.5
+                    }
+                    if (path.isHardTraverse) {
+                        timeForPath *= 3
+                        timeForPath += (numberOfTravellers - 1) * 5 // 5 mins per additional person
+                    }
+                    totalPathTime += timeForPath.toFloat()
+                }
 
                 pathDistances.add(totalPathDistance)
+
+
+
+                pathTravelTimes.add(totalPathTime.toInt())
+
 
                 if (index == routeList.size - 1) {
                     var currentNode = startNode
@@ -84,12 +107,24 @@ data class Route(val routeList: List<List<SurveyPath>>, val totalDistance: Float
         return startingNodes[currentStage]
     }
 
+    fun getCurrentPathTravelTime(): Int {
+        return pathTravelTimes[currentStage]
+    }
+
+    fun getTotalPathTravelTime(): Int {
+        var totalTime = 0
+        pathTravelTimes.forEach { time ->
+            totalTime += time
+        }
+        return totalTime
+    }
+
     fun getCurrentEndingNode(): Int {
         return endingNodes[currentStage]
     }
 
     fun getCurrentPathDistance(): Float {
-        if (currentStage > 0) {
+        if (currentStage >= 0) {
             return pathDistances[currentStage]
         }
         return 0f

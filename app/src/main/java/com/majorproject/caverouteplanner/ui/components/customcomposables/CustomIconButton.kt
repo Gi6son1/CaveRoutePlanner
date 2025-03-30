@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -17,7 +18,8 @@ fun CustomIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     invertedColour: Boolean = false,
-    icon: ImageVector,
+    iconVector: ImageVector? = null,
+    iconImage: Int? = null,
     contentDescription: String? = null
 ){
     FilledIconButton(
@@ -29,11 +31,21 @@ fun CustomIconButton(
             containerColor = if (invertedColour) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
         ),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            modifier = Modifier.size(60.dp),
-            tint = if (invertedColour) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primaryContainer
-        )
+        if (iconVector != null){
+            Icon(
+                imageVector = iconVector,
+                contentDescription = contentDescription,
+                modifier = Modifier.size(60.dp),
+                tint = if (invertedColour) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primaryContainer
+            )
+        } else if (iconImage != null){
+            Icon(
+                painter = painterResource(id = iconImage),
+                contentDescription = contentDescription,
+                modifier = Modifier.size(60.dp),
+                tint = if (invertedColour) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primaryContainer
+            )
+        }
+
     }
 }

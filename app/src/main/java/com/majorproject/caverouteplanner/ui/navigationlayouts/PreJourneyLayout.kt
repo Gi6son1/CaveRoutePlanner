@@ -1,25 +1,20 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material3.Button
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.LocationOn
+import com.majorproject.caverouteplanner.R
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
 
 @Composable
 fun PreJourneyLayout(
@@ -43,7 +38,7 @@ fun PreJourneyLayout(
                 top.linkTo(parent.top, margin = 20.dp)
                 start.linkTo(parent.start, margin = 10.dp)
             },
-            icon = Icons.Outlined.Home,
+            iconVector = Icons.Outlined.Home,
             contentDescription = "Home"
         )
 
@@ -54,59 +49,58 @@ fun PreJourneyLayout(
                 end.linkTo(parent.end, margin = 10.dp)
             },
             text = "Travel Conditions",
-            icon = Icons.Outlined.Edit,
+            iconVector = Icons.Outlined.Edit,
             contentDescription = "Edit"
         )
 
 
         if (currentRoute != null && currentRoute.routeStarted == false) {
-            Button(
-                onClick = {
-                    currentRoute.beginJourney()
-                },
+            CustomTripInfoBox(
+                onClick = { currentRoute.beginJourney() },
+                isGoButton = true,
                 modifier = Modifier.constrainAs(goButton) {
                     bottom.linkTo(setSource.top, 30.dp)
                     start.linkTo(parent.start, 10.dp)
                     end.linkTo(parent.end, 10.dp)
-                }
-            ) {
-                Text(text = "Go", fontSize = 30.sp)
-            }
+                },
+                distance = currentRoute.totalDistance,
+                time = currentRoute.getTotalPathTravelTime()
+            )
 
             CustomTextButton(
                 onClick = { setSource() },
                 modifier = Modifier.constrainAs(setSource) {
-                    bottom.linkTo(parent.bottom, 20.dp)
+                    bottom.linkTo(parent.bottom, 40.dp)
                     start.linkTo(cancel.end)
                     end.linkTo(parent.end, 10.dp)
                 },
                 text = "Set As Source",
-                icon = Icons.Outlined.Edit,
-                contentDescription = "Edit"
+                iconVector = Icons.Outlined.LocationOn,
+                contentDescription = "Set as source"
             )
 
-            Button(
+            CustomTextButton(
                 onClick = { removePin() },
                 modifier = Modifier.constrainAs(cancel){
-                    bottom.linkTo(parent.bottom, 20.dp)
+                    bottom.linkTo(parent.bottom, 40.dp)
                     end.linkTo(setSource.start, 10.dp)
                     start.linkTo(parent.start, 10.dp)
-                }
-            ) {
-                Text(text = "Remove Pin", fontSize = 20.sp)
-            }
+                },
+                text = "Remove Flag Pin",
+                iconVector = Icons.Outlined.Flag,
+                contentDescription = "Remove Pin"
+            )
 
-            Button(
+            CustomTextButton(
                 onClick = { caveExit() },
                 modifier = Modifier.constrainAs(caveExit){
                     top.linkTo(changeConditions.bottom, 20.dp)
                     end.linkTo(parent.end, 10.dp)
-                }
-            ) {
-                Text(text = "Cave Exit From Destination", fontSize = 20.sp)
-            }
-
-
+                },
+                text = "Exit Cave From Flag",
+                iconImage = R.drawable.exit_icon,
+                contentDescription = "Exit Cave From Flag"
+            )
         }
     }
 }

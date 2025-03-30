@@ -29,6 +29,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 zoomable = {group = "com.github.Tlaster", name = "Zoomable", version.ref = "zoomable"}
 androidx-constraint-layout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintLayout"}
+androidx-material-icons = { group = "androidx.compose.material", name = "material-icons-extended", version = "materialIcons"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
