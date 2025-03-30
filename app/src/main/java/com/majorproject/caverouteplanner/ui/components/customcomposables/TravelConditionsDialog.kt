@@ -63,11 +63,13 @@ fun TravelConditionsDialog(
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Row(
-                        modifier = Modifier //the switch for showing the progress bar
+                        modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .height(50.dp)
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
+                        ) {
                             Text(text = "No water preferred")
                             Text(text = "Paths with water will be avoided", fontSize = 12.sp)
                         }
@@ -76,7 +78,7 @@ fun TravelConditionsDialog(
                         Switch(
                             checked = noWater,
                             onCheckedChange = { noWater = it },
-                            colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.primary)
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
@@ -88,14 +90,17 @@ fun TravelConditionsDialog(
                             .padding(horizontal = 10.dp)
                             .height(50.dp)
                     ) {
-                        Column(){
+                        Column(
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
+                        ){
                             Text(text = "No hard traverse preferred")
                             Text(text = "Paths with hard traverses will be avoided", fontSize = 12.sp)
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Switch(
                             checked = noHardTraverse,
-                            onCheckedChange = { noHardTraverse = it }
+                            onCheckedChange = { noHardTraverse = it },
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
@@ -103,11 +108,13 @@ fun TravelConditionsDialog(
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Row(
-                        modifier = Modifier //the switch for showing the progress bar
+                        modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .height(50.dp)
                     ) {
-                        Column(){
+                        Column(
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
+                        ){
                             Text(text = "High altitude preferred")
                             Text(text = "Lower altitude paths will be avoided", fontSize = 12.sp)
                         }
@@ -115,7 +122,8 @@ fun TravelConditionsDialog(
                         Spacer(modifier = Modifier.weight(1f))
                         Switch(
                             checked = highAltitude,
-                            onCheckedChange = { highAltitude = it }
+                            onCheckedChange = { highAltitude = it },
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
@@ -123,16 +131,19 @@ fun TravelConditionsDialog(
                     Spacer(modifier = Modifier.height(15.dp))
                     Row(
                         modifier = Modifier //the switch for showing the progress bar
-                            .padding(horizontal = 10.dp)
+                            .padding(start = 10.dp)
                             .height(50.dp)
                     ){
-                        Text(text = "How many cavers?")
+                        Text(text = "How many cavers?",
+                            modifier = Modifier.fillMaxHeight().wrapContentHeight()
+                        )
                         Spacer(modifier = Modifier.weight(1f))
                         HorizontalNumberPicker(
                             min = 1,
                             max = 10,
                             default = numberOfTravellers,
-                            onValueChange = { numberOfTravellers = it }
+                            onValueChange = { numberOfTravellers = it },
+                            modifier = Modifier
                         )
                     }
 
