@@ -8,6 +8,8 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
 import com.majorproject.caverouteplanner.R
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -15,6 +17,9 @@ import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
+import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelConditionsDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @Composable
 fun PreJourneyLayout(
@@ -22,7 +27,10 @@ fun PreJourneyLayout(
     setSource: () -> Unit = {},
     removePin: () -> Unit = {},
     changeConditions: (Boolean, Boolean, Boolean) -> Unit = {_, _, _ ->},
-    caveExit: () -> Unit = {}
+    caveExit: () -> Unit = {},
+    currentTravelConditions: Triple<Boolean, Boolean, Boolean>,
+    numberOfTravellers: Int,
+    changeNumberOfTravellers: (Int) -> Unit = {}
 ){
     ConstraintLayout(
         modifier = Modifier
@@ -30,6 +38,10 @@ fun PreJourneyLayout(
     ) {
 
         val (homeButton, goButton, setSource, cancel , changeConditions, caveExit) = createRefs()
+
+        var openConditionsDialog by rememberSaveable {
+            mutableStateOf(false)
+        }
 
 
         CustomIconButton(
@@ -43,7 +55,7 @@ fun PreJourneyLayout(
         )
 
         CustomTextButton(
-            onClick = { /*TODO*/ },
+            onClick = { openConditionsDialog = true },
             modifier = Modifier.constrainAs(changeConditions) {
                 top.linkTo(homeButton.bottom, margin = 20.dp)
                 end.linkTo(parent.end, margin = 10.dp)
@@ -102,5 +114,18 @@ fun PreJourneyLayout(
                 contentDescription = "Exit Cave From Flag"
             )
         }
+
+        TravelConditionsDialog(
+            dialogIsOpen = openConditionsDialog,
+            dialogOpen = { openConditionsDialog = it },
+            currentConditions = currentTravelConditions,
+            currentNumberOfTravellers = numberOfTravellers,
+            updatedConditions = { noWater, noHardTraverse, highAltitude ->
+                changeConditions(noWater, noHardTraverse, highAltitude)
+            },
+            updateNumberOfTravellers = { numberOfTravellers ->
+                changeNumberOfTravellers(numberOfTravellers)
+            }
+        )
     }
 }

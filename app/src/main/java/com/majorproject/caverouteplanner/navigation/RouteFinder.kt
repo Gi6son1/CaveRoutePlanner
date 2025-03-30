@@ -13,8 +13,9 @@ import kotlin.math.pow
 data class RouteFinder(
     val sourceId: Int,
     val survey: Survey,
-    val flags: Triple<Boolean, Boolean, Boolean> = Triple(false, false, false),
-    val avoidEdges: List<Int> = listOf()
+    val flags: Triple<Boolean, Boolean, Boolean>,
+    val avoidEdges: List<Int> = listOf(),
+    val numberOfTravellers: Int
 ) : Parcelable {
     @IgnoredOnParcel //may be because it can be recreated in init everytime
     var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf()
@@ -123,7 +124,7 @@ data class RouteFinder(
         if (routeList.isEmpty()) {
             return null
         }
-        return Route(routeList = routeList, totalDistance = totalDistance, sourceNode = sourceId)
+        return Route(routeList = routeList, totalDistance = totalDistance, sourceNode = sourceId, numberOfTravellers = numberOfTravellers)
     }
 
     fun findNearestExit(): Int? {

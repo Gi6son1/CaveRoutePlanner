@@ -13,7 +13,7 @@ import kotlinx.parcelize.Parcelize
 data class Route(val routeList: List<List<SurveyPath>>,
                  val totalDistance: Float,
                  val sourceNode: Int,
-                 val numberOfTravellers: Int = 1)
+                 val numberOfTravellers: Int)
     : Parcelable {
 
     @IgnoredOnParcel

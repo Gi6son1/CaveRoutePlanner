@@ -53,6 +53,15 @@ fun MapScreen() {
             mutableIntStateOf(7)
         }
 
+        var currentTravelConditions: Triple<Boolean, Boolean, Boolean> by rememberSaveable {
+            mutableStateOf(Triple(false, false, false))
+        }
+
+        var numberOfTravellers: Int by rememberSaveable {
+            mutableIntStateOf(1)
+        }
+
+
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -94,6 +103,8 @@ fun MapScreen() {
                     routeFinder = RouteFinder(
                         sourceId = sourceId,
                         survey = llSurvey,
+                        flags = currentTravelConditions,
+                        numberOfTravellers = numberOfTravellers
                     )
                     val nearestNode = llSurvey.getNearestNode(tapPosition)
 
@@ -121,7 +132,10 @@ fun MapScreen() {
                     currentRoute = null
                 },
                 changeConditions = { hasWater, hasHardTraversal, highAltitude ->
-
+                    currentTravelConditions = Triple(hasWater, hasHardTraversal, highAltitude)
+                },
+                changeNumberOfTravellers = {
+                    numberOfTravellers = it
                 },
                 caveExit = {
                     sourceId = pinPointNode!!
@@ -129,12 +143,16 @@ fun MapScreen() {
                     routeFinder = RouteFinder(
                         sourceId = sourceId,
                         survey = llSurvey,
+                        flags = currentTravelConditions,
+                        numberOfTravellers = numberOfTravellers
                     )
 
                     val nearestExit = routeFinder?.findNearestExit()
                     pinPointNode = nearestExit
                     if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
-                }
+                },
+                currentTravelConditions = currentTravelConditions,
+                numberOfTravellers = numberOfTravellers
             )
         } else if (currentRoute != null){
             InJourneyLayout(
@@ -147,6 +165,8 @@ fun MapScreen() {
                     routeFinder = RouteFinder(
                         sourceId = currentLocation,
                         survey = llSurvey,
+                        flags = currentTravelConditions,
+                        numberOfTravellers = numberOfTravellers
                     )
 
                     val nearestExit = routeFinder?.findNearestExit()

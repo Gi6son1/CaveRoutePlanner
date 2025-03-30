@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
+import kotlin.math.ceil
 
 @Composable
 fun CustomTextButton(
@@ -130,7 +131,7 @@ fun CustomTripInfoBox(
     if (time < 60){
         timeString = "${time.toInt()}s"
     } else {
-        val newTime = time / 60
+        val newTime = ceil(time / 60f).toInt()
         timeString = "${newTime}min"
     }
 
@@ -139,7 +140,7 @@ fun CustomTripInfoBox(
         modifier = modifier
             .width(if (isGoButton) 386.dp else 286.dp)
             .shadow(if (isGoButton) 0.dp else 10.dp, shape = MaterialTheme.shapes.medium)
-            .border(1.dp, MaterialTheme.colorScheme.outline, shape = MaterialTheme.shapes.medium)
+            .border(1.dp, MaterialTheme.colorScheme.scrim, shape = MaterialTheme.shapes.medium)
             .height(if (isGoButton) 68.dp else 58.dp),
         elevation = ButtonDefaults.buttonElevation(10.dp),
         shape = MaterialTheme.shapes.medium,
