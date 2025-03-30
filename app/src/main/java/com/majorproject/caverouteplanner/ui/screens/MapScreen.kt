@@ -108,12 +108,14 @@ fun MapScreen() {
                 modifier = Modifier
                     .fillMaxSize(),
                 longPressPosition = { tapPosition ->
-                    resetRouteFinder()
-                    val nearestNode = llSurvey.getNearestNode(tapPosition)
+                    if (currentRoute == null || currentRoute?.routeStarted == false){
+                        resetRouteFinder()
+                        val nearestNode = llSurvey.getNearestNode(tapPosition)
 
-                    if (nearestNode != null) {
-                        pinPointNode = nearestNode
-                        currentRoute = routeFinder?.getRouteToNode(nearestNode)
+                        if (nearestNode != null) {
+                            pinPointNode = nearestNode
+                            currentRoute = routeFinder?.getRouteToNode(nearestNode)
+                        }
                     }
                 },
                 pinpointDestinationNode = pinPointNode,
