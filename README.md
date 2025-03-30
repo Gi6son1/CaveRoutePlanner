@@ -85,4 +85,14 @@ Both today and yesterday, I started work on the UI, in this case when a user cho
 I split up the UI layouts into a pre journey layout (as described) and an in journey layout. The in journey layout allows the user to cancel the trip, do a cave exit from current location, move to next or previous stage, cancel trip, and see details about current route and path.
 
 The UI is very basic (mainly just getting the functionality working first) and I'll properly develop it later when I have time. I'll make sure to add action check dialogs snd also little action confirmation messages for some things as well.
+
+29/03/2025
+Summarising my work today, I added custom composables for UI elements, like Icon and Text buttons, and implemented them into the UI, I also added proper navigation icons into the route once started, so the user has a arrow Icon, and the current path has a green arrow at the end to show direction. I also added a source icon in addition to the destination icon (as per Maxim's suggestion) and it looks pretty good!
+
+30/03/2025
+Bigger strides today.  I fully completed the UI for the navigation and survey screen, fitting with my UI design. I implemented time estimation for route and paths and this is outputted in the journey data. I implemented the emergency exit feature and all the action check dialogs required for this, as well as the travel conditions dialog. For increasing the number of cavers, I used a pretty good library: https://github.com/marcauberer/compose-number-picker which gives a basic number picker, just what I need.
+
+Essentially, this section is completed. The next thing I'll need to work on will be the database, where the survey will be saved and read in an appropriate way. From there, I can create the home screen which displays these surveys, and then can work on the implemetnation that allows a new navigatable survey to be created.
+
+
   
