@@ -1,34 +1,31 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.majorproject.caverouteplanner.R
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveExitDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
-import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveExitDialog
 
 @Composable
 fun InJourneyLayout(
     currentRoute: Route,
     cancelRoute: () -> Unit = {},
-    caveExit: (Int, Boolean) -> Unit = {_, _ ->}
+    caveExit: (Int, Boolean) -> Unit = { _, _ -> }
 ) {
     var openActionCheckDialog by rememberSaveable { mutableStateOf(false) }
     var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }

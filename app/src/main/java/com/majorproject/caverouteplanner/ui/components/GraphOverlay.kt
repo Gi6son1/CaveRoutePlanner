@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -352,7 +351,7 @@ fun GraphOverlay(
                         )
                     )
                 }
-            ){
+            ) {
                 drawImage(
                     image = pinpointIcon,
                     topLeft = Offset(
@@ -365,16 +364,17 @@ fun GraphOverlay(
 
         }
 
-        if (currentRoute?.routeStarted == true){
+        if (currentRoute?.routeStarted == true) {
             val currentStartNode = nodes.find { it.id == currentRoute.getCurrentStartingNode() }
-            if (currentStartNode == null){
+            if (currentStartNode == null) {
                 return@Canvas
             }
-            val currentPathEndNode = currentRoute.getCurrentStage().first().next(currentStartNode.id)
+            val currentPathEndNode =
+                currentRoute.getCurrentStage().first().next(currentStartNode.id)
 
             val currentStartAngle = calculateAngle(
                 currentStartNode.coordinates,
-                nodes.find { it.id == currentPathEndNode}!!.coordinates
+                nodes.find { it.id == currentPathEndNode }!!.coordinates
             ).toFloat()
 
             val adjustedAngle = currentStartAngle + 90
@@ -408,7 +408,7 @@ fun GraphOverlay(
                         )
                     )
                 }
-            ){
+            ) {
                 drawImage(
                     image = currentDirectionIcon,
                     topLeft = Offset(
@@ -420,10 +420,11 @@ fun GraphOverlay(
 
             val currentEndNode = nodes.find { it.id == currentRoute.getCurrentEndingNode() }
             if (currentEndNode == null) return@Canvas
-            val currentEndPathStartNode = currentRoute.getCurrentStage().last().next(currentEndNode.id)
+            val currentEndPathStartNode =
+                currentRoute.getCurrentStage().last().next(currentEndNode.id)
 
             val currentEndAngle = calculateAngle(
-                nodes.find { it.id == currentEndPathStartNode}!!.coordinates,
+                nodes.find { it.id == currentEndPathStartNode }!!.coordinates,
                 currentEndNode.coordinates
             ).toFloat()
 
@@ -458,7 +459,7 @@ fun GraphOverlay(
                         )
                     )
                 }
-            ){
+            ) {
                 drawImage(
                     image = arrowHead,
                     topLeft = Offset(
@@ -499,7 +500,7 @@ fun GraphOverlay(
                         )
                     )
                 }
-            ){
+            ) {
                 drawImage(
                     image = destinationIcon,
                     topLeft = Offset(

@@ -124,7 +124,12 @@ data class RouteFinder(
         if (routeList.isEmpty()) {
             return null
         }
-        return Route(routeList = routeList, totalDistance = totalDistance, sourceNode = sourceId, numberOfTravellers = numberOfTravellers)
+        return Route(
+            routeList = routeList,
+            totalDistance = totalDistance,
+            sourceNode = sourceId,
+            numberOfTravellers = numberOfTravellers
+        )
     }
 
     fun findNearestExit(): Int? {

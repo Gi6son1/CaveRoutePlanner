@@ -141,8 +141,4 @@ data class Route(val routeList: List<List<SurveyPath>>,
     fun nextStage(){
         if (currentStage < routeList.size - 1 && routeStarted) currentStage++
     }
-
-    fun resetStage() {
-        currentStage = 0
-    }
 }

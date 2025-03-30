@@ -1,31 +1,23 @@
 package com.majorproject.caverouteplanner.ui.components.customcomposables
 
-import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.outlined.ArrowUpward
-import androidx.compose.material.icons.outlined.DirectionsWalk
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -47,11 +39,15 @@ fun CustomTextButton(
     iconImage: Int? = null,
     contentDescription: String? = null,
     flipped: Boolean = false
-){
+) {
     Button(
         onClick = { onClick() },
         modifier = modifier
-            .border(1.dp, MaterialTheme.colorScheme.primaryContainer, shape = MaterialTheme.shapes.medium)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.medium
+            )
             .width(187.dp)
             .height(59.dp),
         shape = MaterialTheme.shapes.medium,
@@ -60,11 +56,15 @@ fun CustomTextButton(
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inverseSurface)
     )
     {
-        Row(modifier = Modifier.fillMaxSize().wrapContentSize()){
-            if (!flipped){
-                Text(text = text,
+        Row(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize()) {
+            if (!flipped) {
+                Text(
+                    text = text,
                     fontSize = 15.sp,
-                    modifier = Modifier.weight(0.75f)
+                    modifier = Modifier
+                        .weight(0.75f)
                         .fillMaxSize()
                         .wrapContentSize(),
                     fontWeight = FontWeight.Bold,
@@ -72,7 +72,7 @@ fun CustomTextButton(
                 )
                 Spacer(modifier = Modifier.width(1.dp))
             }
-            if (iconVector != null){
+            if (iconVector != null) {
                 Icon(
                     imageVector = iconVector,
                     contentDescription = contentDescription,
@@ -82,8 +82,7 @@ fun CustomTextButton(
                         .wrapContentSize()
                         .size(30.dp)
                 )
-            }
-            else if (iconImage != null){
+            } else if (iconImage != null) {
                 Icon(
                     painter = painterResource(id = iconImage),
                     contentDescription = contentDescription,
@@ -94,11 +93,13 @@ fun CustomTextButton(
                         .size(30.dp)
                 )
             }
-            if (flipped){
+            if (flipped) {
                 Spacer(modifier = Modifier.width(1.dp))
-                Text(text = text,
+                Text(
+                    text = text,
                     fontSize = 15.sp,
-                    modifier = Modifier.weight(0.75f)
+                    modifier = Modifier
+                        .weight(0.75f)
                         .fillMaxSize()
                         .wrapContentSize(),
                     fontWeight = FontWeight.Bold,
@@ -117,9 +118,9 @@ fun CustomTripInfoBox(
     distance: Float,
     time: Int,
     pathNotDest: Boolean = false,
-){
+) {
     var distanceString: String
-    if (distance < 200){
+    if (distance < 200) {
         val newDistance = (distance * 1.094).toInt()
         distanceString = "${newDistance}yd"
     } else {
@@ -128,7 +129,7 @@ fun CustomTripInfoBox(
     }
 
     val timeString: String
-    if (time < 60){
+    if (time < 60) {
         timeString = "${time.toInt()}s"
     } else {
         val newTime = ceil(time / 60f).toInt()
@@ -150,10 +151,13 @@ fun CustomTripInfoBox(
             disabledContainerColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 1f),
             disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface
         )
-    ){
-        Row(modifier = Modifier.fillMaxSize().wrapContentSize()) {
-            if (isGoButton){
-                Text(text = "GO",
+    ) {
+        Row(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize()) {
+            if (isGoButton) {
+                Text(
+                    text = "GO",
                     fontSize = 25.sp,
                     modifier = Modifier
                         .fillMaxSize()
@@ -161,11 +165,13 @@ fun CustomTripInfoBox(
                         .wrapContentSize(),
                 )
             }
-            Text(text = distanceString, modifier = Modifier
-                .fillMaxSize()
-                .weight(0.5f)
-                .wrapContentSize(),
-                fontSize = 25.sp)
+            Text(
+                text = distanceString, modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.5f)
+                    .wrapContentSize(),
+                fontSize = 25.sp
+            )
             Icon(
                 imageVector = if (pathNotDest) Icons.Outlined.ArrowUpward else Icons.Outlined.Flag,
                 contentDescription = "Distance to point",
@@ -176,12 +182,14 @@ fun CustomTripInfoBox(
                     .size(40.dp),
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = timeString,
+            Text(
+                text = timeString,
                 modifier = Modifier
                     .weight(0.5f)
-                .fillMaxSize()
-                .wrapContentSize(),
-                fontSize = 25.sp,)
+                    .fillMaxSize()
+                    .wrapContentSize(),
+                fontSize = 25.sp,
+            )
             Icon(
                 imageVector = Icons.AutoMirrored.Outlined.DirectionsWalk,
                 contentDescription = "Walk",

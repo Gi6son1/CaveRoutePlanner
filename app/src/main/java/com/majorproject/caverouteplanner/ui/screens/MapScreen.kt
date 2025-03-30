@@ -6,16 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
-import com.majorproject.caverouteplanner.navigation.RouteFinder
-import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
-import com.majorproject.caverouteplanner.ui.components.llSurvey
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
@@ -25,7 +22,10 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.tooling.preview.Preview
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
+import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
+import com.majorproject.caverouteplanner.ui.components.llSurvey
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
@@ -60,7 +60,7 @@ fun MapScreen() {
             mutableIntStateOf(1)
         }
 
-        fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null){
+        fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null) {
             routeFinder = RouteFinder(
                 sourceId = sourceId,
                 survey = llSurvey,
@@ -108,7 +108,7 @@ fun MapScreen() {
                 modifier = Modifier
                     .fillMaxSize(),
                 longPressPosition = { tapPosition ->
-                    if (currentRoute == null || currentRoute?.routeStarted == false){
+                    if (currentRoute == null || currentRoute?.routeStarted == false) {
                         resetRouteFinder()
                         val nearestNode = llSurvey.getNearestNode(tapPosition)
 
@@ -140,7 +140,7 @@ fun MapScreen() {
                     currentTravelConditions = Triple(hasWater, hasHardTraversal, highAltitude)
                     currentNumberOfTravellers = numberOfTravellers
                     resetRouteFinder()
-                    if (pinPointNode != null){
+                    if (pinPointNode != null) {
                         currentRoute = routeFinder?.getRouteToNode(pinPointNode!!)
                     }
                 },
@@ -156,7 +156,7 @@ fun MapScreen() {
                 currentTravelConditions = currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers
             )
-        } else if (currentRoute != null){
+        } else if (currentRoute != null) {
             InJourneyLayout(
                 currentRoute = currentRoute!!,
                 cancelRoute = {
@@ -181,10 +181,9 @@ fun MapScreen() {
 }
 
 
-
 @Preview
 @Composable
-fun MapScreenPreview(){
+fun MapScreenPreview() {
     CaveRoutePlannerTheme {
         MapScreen()
     }

@@ -6,37 +6,37 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
-import com.majorproject.caverouteplanner.R
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
 import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelConditionsDialog
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 
 @Composable
 fun PreJourneyLayout(
     currentRoute: Route?,
     setSource: () -> Unit = {},
     removePin: () -> Unit = {},
-    changeConditions: (Boolean, Boolean, Boolean, Int) -> Unit = {_, _, _, _ ->},
+    changeConditions: (Boolean, Boolean, Boolean, Int) -> Unit = { _, _, _, _ -> },
     caveExit: () -> Unit = {},
     currentTravelConditions: Triple<Boolean, Boolean, Boolean>,
     numberOfTravellers: Int,
-){
+) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
     ) {
 
-        val (homeButton, goButton, setSource, cancel , changeConditions, caveExit) = createRefs()
+        val (homeButton, goButton, setSource, cancel, changeConditions, caveExit) = createRefs()
 
         var openConditionsDialog by rememberSaveable {
             mutableStateOf(false)
@@ -92,7 +92,7 @@ fun PreJourneyLayout(
 
             CustomTextButton(
                 onClick = { removePin() },
-                modifier = Modifier.constrainAs(cancel){
+                modifier = Modifier.constrainAs(cancel) {
                     bottom.linkTo(parent.bottom, 40.dp)
                     end.linkTo(setSource.start, 10.dp)
                     start.linkTo(parent.start, 10.dp)
@@ -104,7 +104,7 @@ fun PreJourneyLayout(
 
             CustomTextButton(
                 onClick = { caveExit() },
-                modifier = Modifier.constrainAs(caveExit){
+                modifier = Modifier.constrainAs(caveExit) {
                     top.linkTo(changeConditions.bottom, 20.dp)
                     end.linkTo(parent.end, 10.dp)
                 },

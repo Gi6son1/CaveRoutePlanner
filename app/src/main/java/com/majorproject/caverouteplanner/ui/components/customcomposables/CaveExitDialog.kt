@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.DoubleArrow
 import androidx.compose.material3.Card
@@ -65,7 +64,10 @@ fun CaveExitDialog(
                                 .weight(6f)
                         ) {
                             Text(text = "Standard")
-                            Text(text = "Takes the best path given current travel conditions", fontSize = 12.sp)
+                            Text(
+                                text = "Takes the best path given current travel conditions",
+                                fontSize = 12.sp
+                            )
                         }
 
                         Spacer(modifier = Modifier.weight(0.5f))
@@ -76,7 +78,10 @@ fun CaveExitDialog(
                             },
                             text = "This One",
                             iconVector = Icons.Outlined.DoubleArrow,
-                            modifier = Modifier.weight(4f).fillMaxHeight().wrapContentHeight()
+                            modifier = Modifier
+                                .weight(4f)
+                                .fillMaxHeight()
+                                .wrapContentHeight()
                         )
                     }
                     Spacer(modifier = Modifier.height(15.dp))
@@ -108,7 +113,10 @@ fun CaveExitDialog(
                             },
                             text = "This One",
                             iconVector = Icons.Outlined.DoubleArrow,
-                            modifier = Modifier.weight(4f).fillMaxHeight().wrapContentHeight()
+                            modifier = Modifier
+                                .weight(4f)
+                                .fillMaxHeight()
+                                .wrapContentHeight()
                         )
                     }
 
@@ -118,7 +126,10 @@ fun CaveExitDialog(
                         onClick = { dialogOpen(false) },
                         text = "Cancel",
                         iconVector = Icons.Outlined.Close,
-                        modifier = Modifier.fillMaxWidth().wrapContentWidth().padding(10.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth()
+                            .padding(10.dp)
                     )
                 }
             }

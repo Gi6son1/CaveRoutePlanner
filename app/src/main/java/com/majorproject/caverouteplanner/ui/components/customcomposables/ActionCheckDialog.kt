@@ -53,7 +53,8 @@ fun ActionCheckDialog(
                         text = message,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .wrapContentSize().padding(horizontal = 10.dp,),
+                            .wrapContentSize()
+                            .padding(horizontal = 10.dp),
                         textAlign = TextAlign.Center
                     )
 
