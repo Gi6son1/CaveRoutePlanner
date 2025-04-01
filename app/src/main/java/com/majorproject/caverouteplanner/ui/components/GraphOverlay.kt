@@ -225,7 +225,7 @@ fun performFocusedTransformation(
         for (path in currentStage) {
             val firstNode = nodes.find { it.getNodeId() == path.getPathEnds().first } ?: return null
             val secondNode = nodes.find { it.getNodeId() == path.getPathEnds().second } ?: return null
-            cumulativeCentroidX += (firstNode.x + secondNode.y) / 2
+            cumulativeCentroidX += (firstNode.x + secondNode.x) / 2
             cumulativeCentroidY += (firstNode.y + secondNode.y) / 2
         }
 
