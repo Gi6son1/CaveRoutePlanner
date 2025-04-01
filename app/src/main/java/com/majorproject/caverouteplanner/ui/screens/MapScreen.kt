@@ -1,5 +1,7 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +22,9 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
@@ -32,6 +36,9 @@ import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
 fun MapScreen() {
+
+    val context = LocalContext.current.applicationContext
+
     BackGroundScaffold { innerPadding ->
         val requester = remember { FocusRequester() }
         var volumeKeyPressed by remember { mutableStateOf(false) }
@@ -101,6 +108,8 @@ fun MapScreen() {
         ) {
             LaunchedEffect(Unit) {
                 requester.requestFocus()
+                val repository = CaveRoutePlannerRepository(context as Application)
+                Log.d("Taken info", repository.getAllCaves().toString())
             }
 
             ImageWithGraphOverlay(
