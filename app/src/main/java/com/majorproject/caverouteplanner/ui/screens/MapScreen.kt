@@ -29,15 +29,26 @@ import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
+import com.majorproject.caverouteplanner.ui.components.SurveyWithNodesAndEdges
 import com.majorproject.caverouteplanner.ui.components.llSurvey
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
-fun MapScreen() {
+fun MapScreenTopLevel(
 
+){
     val context = LocalContext.current.applicationContext
+    val repository = CaveRoutePlannerRepository(context as Application)
+
+    val survey = repository.getSurveyWithNodesAndEdges(1)
+
+    MapScreen(survey!!)
+}
+
+@Composable
+fun MapScreen(survey: SurveyWithNodesAndEdges) {
 
     BackGroundScaffold { innerPadding ->
         val requester = remember { FocusRequester() }
@@ -56,7 +67,7 @@ fun MapScreen() {
         }
 
         var sourceId: Int by rememberSaveable {
-            mutableIntStateOf(7)
+            mutableIntStateOf(0)
         }
 
         var currentTravelConditions: Triple<Boolean, Boolean, Boolean> by rememberSaveable {
@@ -70,7 +81,7 @@ fun MapScreen() {
         fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null) {
             routeFinder = RouteFinder(
                 sourceId = sourceId,
-                survey = llSurvey,
+                survey = survey,
                 flags = if (tempFlags != null) tempFlags else currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers
             )
@@ -108,18 +119,16 @@ fun MapScreen() {
         ) {
             LaunchedEffect(Unit) {
                 requester.requestFocus()
-                val repository = CaveRoutePlannerRepository(context as Application)
-                Log.d("Taken info", repository.getAllSurveysWithData().toString())
             }
 
             ImageWithGraphOverlay(
-                survey = llSurvey,
+                survey = survey,
                 modifier = Modifier
                     .fillMaxSize(),
                 longPressPosition = { tapPosition ->
                     if (currentRoute == null || currentRoute?.routeStarted == false) {
                         resetRouteFinder()
-                        val nearestNode = llSurvey.getNearestNode(tapPosition)
+                        val nearestNode = survey.getNearestNode(tapPosition)
 
                         if (nearestNode != null) {
                             pinPointNode = nearestNode
@@ -186,14 +195,5 @@ fun MapScreen() {
                 },
             )
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun MapScreenPreview() {
-    CaveRoutePlannerTheme {
-        MapScreen()
     }
 }

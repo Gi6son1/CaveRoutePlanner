@@ -41,7 +41,7 @@ import kotlin.math.sin
 
 @Composable
 fun ImageWithGraphOverlay(
-    survey: Survey,
+    survey: SurveyWithNodesAndEdges,
     modifier: Modifier = Modifier,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
@@ -68,10 +68,10 @@ fun ImageWithGraphOverlay(
         if (currentRoute != null && currentRoute.currentStage != -1) {
             performFocusedTransformation(
                 currentRoute,
-                survey.pathNodes,
+                survey.nodes,
             ) { angle, distance, centroid ->
 
-                val referenceDimension = maxOf(survey.size.first, survey.size.second).toFloat()
+                val referenceDimension = maxOf(survey.survey.width, survey.survey.height).toFloat()
                 val fractionalZoom = distance / referenceDimension
 
                 zoom = (1f / fractionalZoom) * 0.8f
@@ -84,8 +84,8 @@ fun ImageWithGraphOverlay(
 
                 if (centroid == null) return@performFocusedTransformation
 
-                val centroidX = (centroid.first.toFloat() / survey.size.first) * boxSize.width
-                val centroidY = (centroid.second.toFloat() / survey.size.second) * boxSize.height
+                val centroidX = (centroid.first.toFloat() / survey.survey.width) * boxSize.width
+                val centroidY = (centroid.second.toFloat() / survey.survey.height) * boxSize.height
 
                 var targetOffsetX = boxCenterX - centroidX
                 var targetOffsetY = boxCenterY - centroidY
@@ -176,17 +176,17 @@ fun ImageWithGraphOverlay(
         ) {
             Image(
                 bitmap = survey.imageBitmap(),
-                contentDescription = survey.caveName,
+                contentDescription = "survey",
                 modifier = Modifier,
                 contentScale = ContentScale.Fit
             )
 
             GraphOverlay(
-                nodes = survey.pathNodes,
+                nodes = survey.nodes,
                 modifier = Modifier.matchParentSize(),
                 surveySize = IntSize(
-                    width = survey.size.first,
-                    height = survey.size.second
+                    width = survey.survey.width,
+                    height = survey.survey.height
                 ),
                 currentRoute = currentRoute,
                 destinationNode = pinpointDestinationNode,
@@ -211,22 +211,22 @@ fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
 
 fun performFocusedTransformation(
     currentRoute: Route,
-    nodes: List<SurveyNode>,
+    nodes: List<SurveyNodeEntity>,
     calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
     fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
         kotlin.math.sqrt((coord2.second - coord1.second).toFloat() * (coord2.second - coord1.second).toFloat() + (coord2.first - coord1.first).toFloat() * (coord2.first - coord1.first).toFloat())
 
-    fun calculateCentroid(currentStage: List<SurveyPath>): Pair<Int, Int>? {
+    fun calculateCentroid(currentStage: List<SurveyPathEntity>): Pair<Int, Int>? {
         var cumulativeCentroidX = 0f
         var cumulativeCentroidY = 0f
 
 
         for (path in currentStage) {
-            val firstNode = nodes.find { it.id == path.ends.first } ?: return null
-            val secondNode = nodes.find { it.id == path.ends.second } ?: return null
-            cumulativeCentroidX += (firstNode.coordinates.first + secondNode.coordinates.first) / 2
-            cumulativeCentroidY += (firstNode.coordinates.second + secondNode.coordinates.second) / 2
+            val firstNode = nodes.find { it.getNodeId() == path.getPathEnds().first } ?: return null
+            val secondNode = nodes.find { it.getNodeId() == path.getPathEnds().second } ?: return null
+            cumulativeCentroidX += (firstNode.x + secondNode.y) / 2
+            cumulativeCentroidY += (firstNode.y + secondNode.y) / 2
         }
 
         return Pair(
@@ -237,16 +237,16 @@ fun performFocusedTransformation(
     }
 
     val currentStage = currentRoute.getCurrentStage()
-    val startNode = nodes.find { it.id == currentRoute.getCurrentStartingNode() }
-    val endNode = nodes.find { it.id == currentRoute.getCurrentEndingNode() }
+    val startNode = nodes.find { it.getNodeId() == currentRoute.getCurrentStartingNode() }
+    val endNode = nodes.find { it.getNodeId() == currentRoute.getCurrentEndingNode() }
 
     if (startNode == null || endNode == null) return
 
-    val finalAngle = calculateAngle(startNode.coordinates, endNode.coordinates)
+    val finalAngle = calculateAngle(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
 
     val centroid = calculateCentroid(currentStage)
 
-    val finalDistance = calculateDistance(startNode.coordinates, endNode.coordinates)
+    val finalDistance = calculateDistance(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
 
     calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
 }
@@ -261,7 +261,7 @@ fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
 @Composable
 fun GraphOverlay(
     modifier: Modifier = Modifier,
-    nodes: List<SurveyNode>,
+    nodes: List<SurveyNodeEntity>,
     surveySize: IntSize,
     currentRoute: Route? = null,
     pinpointNode: Int? = null,
@@ -280,18 +280,18 @@ fun GraphOverlay(
         currentRoute?.routeList?.forEachIndexed { index, pathList ->
             if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
                 currentRoute.getCurrentStage().forEach { path ->
-                    val startNode = nodes.find { it.id == path.ends.first }!!
-                    val endNode = nodes.find { it.id == path.ends.second }!!
+                    val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                    val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
                     drawLine(
                         color = Color(0xFF00B126),
                         start = Offset(
-                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (startNode.x / surveySize.width.toFloat()) * size.width,
+                            (startNode.y / surveySize.height.toFloat()) * size.height
                         ),
                         end = Offset(
-                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (endNode.x / surveySize.width.toFloat()) * size.width,
+                            (endNode.y / surveySize.height.toFloat()) * size.height
                         ),
                         strokeWidth = 4f,
                         cap = StrokeCap.Round
@@ -299,18 +299,18 @@ fun GraphOverlay(
                 }
             } else {
                 pathList.forEach { path ->
-                    val startNode = nodes.find { it.id == path.ends.first }!!
-                    val endNode = nodes.find { it.id == path.ends.second }!!
+                    val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                    val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
                     drawLine(
                         color = if (path.hasWater) Color(0xFF007ADD) else Color(0xFFA3A3A3),
                         start = Offset(
-                            (startNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (startNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (startNode.x / surveySize.width.toFloat()) * size.width,
+                            (startNode.y / surveySize.height.toFloat()) * size.height
                         ),
                         end = Offset(
-                            (endNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (endNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (endNode.x / surveySize.width.toFloat()) * size.width,
+                            (endNode.y / surveySize.height.toFloat()) * size.height
                         ),
                         strokeWidth = 4f,
                         cap = StrokeCap.Round
@@ -319,14 +319,14 @@ fun GraphOverlay(
             }
         }
         if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) {
-            val node = nodes.find { it.id == pinpointNode }
+            val node = nodes.find { it.getNodeId() == pinpointNode }
             if (node == null) return@Canvas
 
             val iconOffsetX = pinpointIcon.width
             val iconOffsetY = pinpointIcon.height.toFloat() * 2
 
-            val pinPointCoodsX = (node.coordinates.first - iconOffsetX).toFloat()
-            val pinPointCoodsY = (node.coordinates.second - iconOffsetY).toFloat()
+            val pinPointCoodsX = (node.x - iconOffsetX).toFloat()
+            val pinPointCoodsY = (node.y - iconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -339,15 +339,15 @@ fun GraphOverlay(
                         scaleX = 0.75f / adjustedZoom,
                         scaleY = 0.75f / adjustedZoom,
                         pivot = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (node.x / surveySize.width.toFloat()) * size.width,
+                            (node.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                     rotate(
                         degrees = -currentRotation,
                         pivot = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (node.x / surveySize.width.toFloat()) * size.width,
+                            (node.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }
@@ -365,16 +365,16 @@ fun GraphOverlay(
         }
 
         if (currentRoute?.routeStarted == true) {
-            val currentStartNode = nodes.find { it.id == currentRoute.getCurrentStartingNode() }
+            val currentStartNode = nodes.find { it.getNodeId() == currentRoute.getCurrentStartingNode() }
             if (currentStartNode == null) {
                 return@Canvas
             }
             val currentPathEndNode =
-                currentRoute.getCurrentStage().first().next(currentStartNode.id)
+                nodes.find{it.getNodeId() == currentRoute.getCurrentStage().first().next(currentStartNode.getNodeId())}
 
             val currentStartAngle = calculateAngle(
-                currentStartNode.coordinates,
-                nodes.find { it.id == currentPathEndNode }!!.coordinates
+                Pair(currentStartNode.x, currentStartNode.y),
+                Pair(currentPathEndNode!!.x, currentPathEndNode.y)
             ).toFloat()
 
             val adjustedAngle = currentStartAngle + 90
@@ -382,8 +382,8 @@ fun GraphOverlay(
             val iconOffsetX = currentDirectionIcon.width.toFloat()
             val iconOffsetY = currentDirectionIcon.height.toFloat()
 
-            val pinPointCoodsX = (currentStartNode.coordinates.first - iconOffsetX).toFloat()
-            val pinPointCoodsY = (currentStartNode.coordinates.second - iconOffsetY).toFloat()
+            val pinPointCoodsX = (currentStartNode.x - iconOffsetX).toFloat()
+            val pinPointCoodsY = (currentStartNode.y - iconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -395,16 +395,16 @@ fun GraphOverlay(
                         scaleX = 0.15f,
                         scaleY = 0.15f,
                         pivot = Offset(
-                            (currentStartNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (currentStartNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (currentStartNode.x / surveySize.width.toFloat()) * size.width,
+                            (currentStartNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
 
                     rotate(
                         degrees = adjustedAngle,
                         pivot = Offset(
-                            (currentStartNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (currentStartNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (currentStartNode.x / surveySize.width.toFloat()) * size.width,
+                            (currentStartNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }
@@ -418,14 +418,14 @@ fun GraphOverlay(
                 )
             }
 
-            val currentEndNode = nodes.find { it.id == currentRoute.getCurrentEndingNode() }
+            val currentEndNode = nodes.find { it.getNodeId() == currentRoute.getCurrentEndingNode() }
             if (currentEndNode == null) return@Canvas
             val currentEndPathStartNode =
-                currentRoute.getCurrentStage().last().next(currentEndNode.id)
+                nodes.find { it.getNodeId() == currentRoute.getCurrentStage().last().next(currentEndNode.getNodeId())}
 
             val currentEndAngle = calculateAngle(
-                nodes.find { it.id == currentEndPathStartNode }!!.coordinates,
-                currentEndNode.coordinates
+                Pair(currentEndPathStartNode!!.x, currentEndPathStartNode.y),
+                Pair(currentEndNode.x, currentEndNode.y)
             ).toFloat()
 
             val adjustedEndAngle = currentEndAngle + 90
@@ -433,8 +433,8 @@ fun GraphOverlay(
             val arrowIconOffsetX = arrowHead.width.toFloat()
             val arrowIconOffsetY = arrowHead.height.toFloat() * 0.5
 
-            val arrowPointCoodsX = (currentEndNode.coordinates.first - arrowIconOffsetX).toFloat()
-            val arrowPointCoodsY = (currentEndNode.coordinates.second - arrowIconOffsetY).toFloat()
+            val arrowPointCoodsX = (currentEndNode.x - arrowIconOffsetX).toFloat()
+            val arrowPointCoodsY = (currentEndNode.y - arrowIconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -446,16 +446,16 @@ fun GraphOverlay(
                         scaleX = 0.125f,
                         scaleY = 0.125f,
                         pivot = Offset(
-                            (currentEndNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (currentEndNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (currentEndNode.x / surveySize.width.toFloat()) * size.width,
+                            (currentEndNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
 
                     rotate(
                         degrees = adjustedEndAngle,
                         pivot = Offset(
-                            (currentEndNode.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (currentEndNode.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (currentEndNode.x / surveySize.width.toFloat()) * size.width,
+                            (currentEndNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }
@@ -473,14 +473,14 @@ fun GraphOverlay(
 
 
         if (destinationNode != null) {
-            val node = nodes.find { it.id == destinationNode }
+            val node = nodes.find { it.getNodeId() == destinationNode }
             if (node == null) return@Canvas
 
             val iconOffsetX = 0
             val iconOffsetY = destinationIcon.height.toFloat() * 2
 
-            val pinPointCoodsX = (node.coordinates.first - iconOffsetX).toFloat()
-            val pinPointCoodsY = (node.coordinates.second - iconOffsetY).toFloat()
+            val pinPointCoodsX = (node.x - iconOffsetX).toFloat()
+            val pinPointCoodsY = (node.y - iconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -488,15 +488,15 @@ fun GraphOverlay(
                         scaleX = 0.75f / adjustedZoom,
                         scaleY = 0.75f / adjustedZoom,
                         pivot = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (node.x / surveySize.width.toFloat()) * size.width,
+                            (node.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                     rotate(
                         degrees = -currentRotation,
                         pivot = Offset(
-                            (node.coordinates.first / surveySize.width.toFloat()) * size.width,
-                            (node.coordinates.second / surveySize.height.toFloat()) * size.height
+                            (node.x / surveySize.width.toFloat()) * size.width,
+                            (node.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }
@@ -518,16 +518,4 @@ fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
     val xDiff = (end.first - start.first).toFloat()
     val yDiff = (end.second - start.second).toFloat()
     return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
-}
-
-
-@Preview
-@Composable
-fun GraphOverlayPreview() {
-    CaveRoutePlannerTheme {
-        ImageWithGraphOverlay(
-            survey = llSurvey,
-            modifier = Modifier,
-        )
-    }
 }

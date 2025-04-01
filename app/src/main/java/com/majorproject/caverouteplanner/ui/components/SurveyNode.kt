@@ -5,8 +5,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.majorproject.caverouteplanner.datasource.util.ListConverter
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -18,11 +16,12 @@ data class SurveyNode(
     var edges: MutableList<Int>
 ) : Parcelable
 
+@Parcelize
 @Entity(
     tableName = "surveynodes",
     foreignKeys = [
         ForeignKey(
-            entity = SurveyEntity::class,
+            entity = SurveyProperties::class,
             parentColumns = ["id"],
             childColumns = ["surveyId"],
             onDelete = ForeignKey.CASCADE
@@ -37,7 +36,7 @@ data class SurveyNodeEntity(
     val isJunction: Boolean = false,
     val x: Int,
     val y: Int,
-    @TypeConverters(ListConverter::class)
-    val edges: List<Int>,
     val surveyId: Int
-)
+) : Parcelable {
+    fun getNodeId() = id - 1
+}

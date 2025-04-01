@@ -5,19 +5,19 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.majorproject.caverouteplanner.ui.components.SurveyEntity
+import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyWithNodesAndEdges
 
 @Dao
 interface SurveyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSurvey(cave: SurveyEntity): Long
+    fun insertSurvey(cave: SurveyProperties): Long
 
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
-    fun getSurveyById(surveyId: Int): SurveyEntity?
+    fun getSurveyById(surveyId: Int): SurveyProperties?
 
     @Query("SELECT * FROM surveys")
-    fun getAllSurveys(): List<SurveyEntity>
+    fun getAllSurveys(): List<SurveyProperties>
 
     @Transaction
     @Query("SELECT * FROM surveys WHERE id = :surveyId")

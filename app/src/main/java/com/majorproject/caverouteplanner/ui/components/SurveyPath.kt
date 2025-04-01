@@ -28,11 +28,12 @@ data class SurveyPath(
     }
 }
 
+@Parcelize
 @Entity(
     tableName = "surveypaths",
     foreignKeys = [
         ForeignKey(
-            entity = SurveyEntity::class,
+            entity = SurveyProperties::class,
             parentColumns = ["id"],
             childColumns = ["surveyId"],
             onDelete = ForeignKey.CASCADE
@@ -50,4 +51,16 @@ data class SurveyPathEntity(
     val altitude: Int = 0,
     val isHardTraverse: Boolean = false,
     val surveyId: Int
-)
+): Parcelable {
+    fun next(currentId: Int) : Int {
+        return if (ends.first - 1  == currentId) {
+            ends.second - 1
+        } else {
+            ends.first - 1
+        }
+    }
+
+    fun getPathEnds() = Pair(ends.first - 1, ends.second - 1)
+
+    fun getPathId() = id - 1
+}

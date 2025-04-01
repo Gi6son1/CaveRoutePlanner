@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.majorproject.caverouteplanner.ui.screens.MapScreen
+import com.majorproject.caverouteplanner.ui.screens.MapScreenTopLevel
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CaveRoutePlannerTheme {
-                MapScreen()
+                MapScreenTopLevel()
             }
         }
     }

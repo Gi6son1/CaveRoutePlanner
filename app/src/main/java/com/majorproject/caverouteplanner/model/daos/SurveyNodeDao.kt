@@ -9,7 +9,7 @@ import com.majorproject.caverouteplanner.ui.components.SurveyNodeEntity
 @Dao
 interface SurveyNodeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSurveyNode(surveyNode: SurveyNodeEntity)
+    fun insertSurveyNode(surveyNode: SurveyNodeEntity): Long
 
     @Query("SELECT * FROM surveyNodes WHERE surveyId = :surveyId")
     fun getSurveyNodesBySurveyId(surveyId: Int): List<SurveyNodeEntity>

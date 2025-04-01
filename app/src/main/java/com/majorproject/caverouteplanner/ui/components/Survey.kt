@@ -6,9 +6,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.majorproject.caverouteplanner.R
 import kotlinx.parcelize.Parcelize
 import kotlin.math.pow
 
@@ -48,12 +46,13 @@ data class Survey(
     }
 }
 
+@Parcelize
 @Entity(tableName = "surveys")
-data class SurveyEntity(
+data class SurveyProperties(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val imageReference: String,
     val pixelsPerMeter: Float,
     val width: Int,
     val height: Int
-)
+) : Parcelable

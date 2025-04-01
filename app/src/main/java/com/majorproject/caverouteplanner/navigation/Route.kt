@@ -6,11 +6,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
+import com.majorproject.caverouteplanner.ui.components.SurveyPathEntity
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Route(val routeList: List<List<SurveyPath>>,
+data class Route(val routeList: List<List<SurveyPathEntity>>,
                  val totalDistance: Float,
                  val sourceNode: Int,
                  val numberOfTravellers: Int)
@@ -37,13 +38,13 @@ data class Route(val routeList: List<List<SurveyPath>>,
         currentStage = -1
         routeStarted = false
 
-        var previousPathEnds = routeList.first().last().ends
+        var previousPathEnds = routeList.first().last().getPathEnds()
 
         routeList.forEachIndexed { index, pathList ->
             if (pathList.isNotEmpty()){
                 var startNode: Int
 
-                var currentPathEnds = pathList.first().ends
+                var currentPathEnds = pathList.first().getPathEnds()
 
                 if (index == 0) {
                     startNode = sourceNode
@@ -93,7 +94,7 @@ data class Route(val routeList: List<List<SurveyPath>>,
                     endingNodes.add(currentNode)
                 }
 
-                previousPathEnds = pathList.last().ends
+                previousPathEnds = pathList.last().getPathEnds()
             }
         }
     }
@@ -130,7 +131,7 @@ data class Route(val routeList: List<List<SurveyPath>>,
         return 0f
     }
 
-    fun getCurrentStage(): List<SurveyPath> {
+    fun getCurrentStage(): List<SurveyPathEntity> {
         return routeList[currentStage]
     }
 

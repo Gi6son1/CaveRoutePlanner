@@ -7,25 +7,25 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.majorproject.caverouteplanner.datasource.util.ListConverter
 import com.majorproject.caverouteplanner.datasource.util.PairConverter
 import com.majorproject.caverouteplanner.model.daos.CaveDao
 import com.majorproject.caverouteplanner.model.daos.SurveyDao
 import com.majorproject.caverouteplanner.model.daos.SurveyNodeDao
 import com.majorproject.caverouteplanner.model.daos.SurveyPathDao
-import com.majorproject.caverouteplanner.ui.components.Cave
-import com.majorproject.caverouteplanner.ui.components.SurveyEntity
+import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyNodeEntity
 import com.majorproject.caverouteplanner.ui.components.SurveyPathEntity
+import com.majorproject.caverouteplanner.ui.components.SurveyProperties
+import com.majorproject.caverouteplanner.ui.components.llSurvey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [SurveyEntity::class, SurveyNodeEntity::class, SurveyPathEntity::class, Cave::class],
+    entities = [SurveyProperties::class, SurveyNodeEntity::class, SurveyPathEntity::class, CaveProperties::class],
     version = 1
 )
-@TypeConverters(ListConverter::class, PairConverter::class)
+@TypeConverters(PairConverter::class)
 abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
     abstract fun surveyDao(): SurveyDao
     abstract fun surveyNodeDao(): SurveyNodeDao
@@ -72,48 +72,57 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             val surveyPathDao = db.surveyPathDao()
             val caveDao = db.caveDao()
 
-            val survey = SurveyEntity(
+            val llSurveyProps = SurveyProperties(
                 width = 1991,
                 height = 1429,
                 pixelsPerMeter = 14.600609f,
-                imageReference = "R.drawable.llygadlchwr"
+                imageReference = "llygadlchwr.jpg"
             )
 
-            val surveyId = surveyDao.insertSurvey(survey)
+            val llSurveyReference = llSurvey
 
-            val cave = Cave(
+            val llSurveyId = surveyDao.insertSurvey(llSurveyProps)
+
+            val llCaveProperties = CaveProperties(
                 name = "Llygadlchwr",
-                description = "cool",
-                difficulty = "easy",
-                location = "Llygadlchwr",
-                surveyId = surveyId.toInt()
+                description = "Contains dry high level and an active river level, separated by sumps.",
+                difficulty = "Novice",
+                location = "South Wales",
+                length = 1.2f,
+                surveyId = llSurveyId.toInt()
             )
 
+            caveDao.insertCave(llCaveProperties)
 
-            val surveyNode = SurveyNodeEntity(
-                isEntrance = true,
-                isJunction = true,
-                x = 368,
-                y = 85,
-                edges = listOf(0),
-                surveyId = surveyId.toInt()
-            )
+            var nodesList: MutableList<Int> =
+                MutableList(llSurveyReference.pathNodes.size) { _ -> 0 }
 
-            val surveyPath = SurveyPathEntity(
-                ends = Pair(368, 85),
-                distance = 0.0f,
-                hasWater = false,
-                altitude = 0,
-                isHardTraverse = false,
-                surveyId = surveyId.toInt()
-            )
-            caveDao.insertCave(cave)
+            for (node in llSurveyReference.pathNodes) {
+                val nodeDBID = surveyNodeDao.insertSurveyNode(
+                    SurveyNodeEntity(
+                        isEntrance = node.isEntrance,
+                        isJunction = node.isJunction,
+                        x = node.coordinates.first,
+                        y = node.coordinates.second,
+                        surveyId = llSurveyId.toInt()
+                    )
+                )
+                nodesList[node.id] = nodeDBID.toInt()
+            }
 
-            surveyNodeDao.insertSurveyNode(surveyNode)
-            surveyPathDao.insertSurveyPath(surveyPath)
+            for (path in llSurveyReference.paths) {
+                val ends = Pair(nodesList[path.ends.first], nodesList[path.ends.second])
+                surveyPathDao.insertSurveyPath(
+                    SurveyPathEntity(
+                        ends = ends,
+                        distance = path.distance,
+                        hasWater = path.hasWater,
+                        altitude = path.altitude,
+                        isHardTraverse = path.isHardTraverse,
+                        surveyId = llSurveyId.toInt()
+                    )
+                )
+            }
         }
-
     }
-
-
 }
