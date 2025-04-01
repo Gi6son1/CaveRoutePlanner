@@ -94,5 +94,20 @@ Bigger strides today.  I fully completed the UI for the navigation and survey sc
 
 Essentially, this section is completed. The next thing I'll need to work on will be the database, where the survey will be saved and read in an appropriate way. From there, I can create the home screen which displays these surveys, and then can work on the implemetnation that allows a new navigatable survey to be created.
 
+31/03/2025
+Today, I worked on the database. Prior to implementation, I decided to write up a schema so that I knew how to structure my database. For starteres, I needed a Cave table, which wwould store info on the cave that the survey was about. Survey has it's own table, and edges and nodes are stored in different tables (because otherwise, I'd be storing all of these inside a single column in the survey table and it would be a shitshow in terms of storage). 
 
-  
+To implement this, I used a combination of :
+Blackboard materials from my android module,
+https://stackoverflow.com/questions/45988446/how-to-create-a-table-with-a-two-or-more-foreign-keys-using-android-room, 
+https://medium.com/androiddevelopers/7-pro-tips-for-room-fbadea4bfbd1, my previous Quizel app database implementations
+https://github.com/Gi6son1/Quizel-App/blob/main/app/src/main/java/com/cs31620/quizel/datasource, 
+with debugging assistence from GenAI and https://stackoverflow.com/questions/51340694/sqlite-requires-having-a-unique-constraint-android-room-annotations, https://stackoverflow.com/questions/29341380/sqlite-foreign-key-constraint-failed-code-787, https://stackoverflow.com/questions/76840478/sqliteconstraintexception-foreign-key-constraint-failed-code-787,
+
+I bashed my head on the keyboard many times this day, because it was very finnicky to implement. But in the end I was able to store cave info, surveys, and nodes and edges in differrent tables, and then link them all together when reading them. I still have to adapt this system to the current one because it is practically separate still, however now that I have the functionality pretty much solved, it should be a case of "joining up the wires" and replacing the old survey reading system with the new one.
+
+I hope the Kotlin gods take it easy on me
+
+
+
+
