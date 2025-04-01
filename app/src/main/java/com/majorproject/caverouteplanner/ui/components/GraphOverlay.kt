@@ -27,13 +27,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
-import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -41,7 +39,7 @@ import kotlin.math.sin
 
 @Composable
 fun ImageWithGraphOverlay(
-    survey: SurveyWithNodesAndEdges,
+    survey: Survey,
     modifier: Modifier = Modifier,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
@@ -71,7 +69,7 @@ fun ImageWithGraphOverlay(
                 survey.nodes,
             ) { angle, distance, centroid ->
 
-                val referenceDimension = maxOf(survey.survey.width, survey.survey.height).toFloat()
+                val referenceDimension = maxOf(survey.properties.width, survey.properties.height).toFloat()
                 val fractionalZoom = distance / referenceDimension
 
                 zoom = (1f / fractionalZoom) * 0.8f
@@ -84,8 +82,8 @@ fun ImageWithGraphOverlay(
 
                 if (centroid == null) return@performFocusedTransformation
 
-                val centroidX = (centroid.first.toFloat() / survey.survey.width) * boxSize.width
-                val centroidY = (centroid.second.toFloat() / survey.survey.height) * boxSize.height
+                val centroidX = (centroid.first.toFloat() / survey.properties.width) * boxSize.width
+                val centroidY = (centroid.second.toFloat() / survey.properties.height) * boxSize.height
 
                 var targetOffsetX = boxCenterX - centroidX
                 var targetOffsetY = boxCenterY - centroidY
@@ -185,8 +183,8 @@ fun ImageWithGraphOverlay(
                 nodes = survey.nodes,
                 modifier = Modifier.matchParentSize(),
                 surveySize = IntSize(
-                    width = survey.survey.width,
-                    height = survey.survey.height
+                    width = survey.properties.width,
+                    height = survey.properties.height
                 ),
                 currentRoute = currentRoute,
                 destinationNode = pinpointDestinationNode,
@@ -211,13 +209,13 @@ fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
 
 fun performFocusedTransformation(
     currentRoute: Route,
-    nodes: List<SurveyNodeEntity>,
+    nodes: List<SurveyNode>,
     calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
     fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
         kotlin.math.sqrt((coord2.second - coord1.second).toFloat() * (coord2.second - coord1.second).toFloat() + (coord2.first - coord1.first).toFloat() * (coord2.first - coord1.first).toFloat())
 
-    fun calculateCentroid(currentStage: List<SurveyPathEntity>): Pair<Int, Int>? {
+    fun calculateCentroid(currentStage: List<SurveyPath>): Pair<Int, Int>? {
         var cumulativeCentroidX = 0f
         var cumulativeCentroidY = 0f
 
@@ -261,7 +259,7 @@ fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
 @Composable
 fun GraphOverlay(
     modifier: Modifier = Modifier,
-    nodes: List<SurveyNodeEntity>,
+    nodes: List<SurveyNode>,
     surveySize: IntSize,
     currentRoute: Route? = null,
     pinpointNode: Int? = null,

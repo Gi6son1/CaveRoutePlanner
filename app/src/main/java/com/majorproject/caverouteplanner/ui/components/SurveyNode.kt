@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class SurveyNode(
+data class OldSurveyNodeType(
     var id: Int,
     var isEntrance: Boolean = false,
     var isJunction: Boolean = false,
@@ -29,7 +29,7 @@ data class SurveyNode(
     ],
     indices = [Index(value = ["surveyId"])]
 )
-data class SurveyNodeEntity(
+data class SurveyNode(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val isEntrance: Boolean = false,

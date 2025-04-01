@@ -1,7 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,17 +22,14 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
-import com.majorproject.caverouteplanner.ui.components.SurveyWithNodesAndEdges
-import com.majorproject.caverouteplanner.ui.components.llSurvey
+import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
-import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
 fun MapScreenTopLevel(
@@ -44,12 +40,13 @@ fun MapScreenTopLevel(
 
     val survey = repository.getSurveyWithNodesAndEdges(1)
 
-    MapScreen(survey!!)
+    if (survey != null){
+        MapScreen(survey)
+    }
 }
 
 @Composable
-fun MapScreen(survey: SurveyWithNodesAndEdges) {
-
+fun MapScreen(survey: Survey) {
     BackGroundScaffold { innerPadding ->
         val requester = remember { FocusRequester() }
         var volumeKeyPressed by remember { mutableStateOf(false) }

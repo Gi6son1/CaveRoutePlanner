@@ -13,16 +13,16 @@ import com.majorproject.caverouteplanner.model.daos.SurveyDao
 import com.majorproject.caverouteplanner.model.daos.SurveyNodeDao
 import com.majorproject.caverouteplanner.model.daos.SurveyPathDao
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
-import com.majorproject.caverouteplanner.ui.components.SurveyNodeEntity
-import com.majorproject.caverouteplanner.ui.components.SurveyPathEntity
+import com.majorproject.caverouteplanner.ui.components.SurveyNode
+import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
-import com.majorproject.caverouteplanner.ui.components.llSurvey
+import com.majorproject.caverouteplanner.ui.components.llOldSurveyType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [SurveyProperties::class, SurveyNodeEntity::class, SurveyPathEntity::class, CaveProperties::class],
+    entities = [SurveyProperties::class, SurveyNode::class, SurveyPath::class, CaveProperties::class],
     version = 1
 )
 @TypeConverters(PairConverter::class)
@@ -79,7 +79,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
                 imageReference = "llygadlchwr.jpg"
             )
 
-            val llSurveyReference = llSurvey
+            val llSurveyReference = llOldSurveyType
 
             val llSurveyId = surveyDao.insertSurvey(llSurveyProps)
 
@@ -99,7 +99,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
 
             for (node in llSurveyReference.pathNodes) {
                 val nodeDBID = surveyNodeDao.insertSurveyNode(
-                    SurveyNodeEntity(
+                    SurveyNode(
                         isEntrance = node.isEntrance,
                         isJunction = node.isJunction,
                         x = node.coordinates.first,
@@ -113,7 +113,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             for (path in llSurveyReference.paths) {
                 val ends = Pair(nodesList[path.ends.first], nodesList[path.ends.second])
                 surveyPathDao.insertSurveyPath(
-                    SurveyPathEntity(
+                    SurveyPath(
                         ends = ends,
                         distance = path.distance,
                         hasWater = path.hasWater,

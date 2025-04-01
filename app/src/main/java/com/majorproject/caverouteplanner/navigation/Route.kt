@@ -6,12 +6,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
-import com.majorproject.caverouteplanner.ui.components.SurveyPathEntity
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Route(val routeList: List<List<SurveyPathEntity>>,
+data class Route(val routeList: List<List<SurveyPath>>,
                  val totalDistance: Float,
                  val sourceNode: Int,
                  val numberOfTravellers: Int)
@@ -131,7 +130,7 @@ data class Route(val routeList: List<List<SurveyPathEntity>>,
         return 0f
     }
 
-    fun getCurrentStage(): List<SurveyPathEntity> {
+    fun getCurrentStage(): List<SurveyPath> {
         return routeList[currentStage]
     }
 

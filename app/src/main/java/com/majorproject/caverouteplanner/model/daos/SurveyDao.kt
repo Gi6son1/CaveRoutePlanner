@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
-import com.majorproject.caverouteplanner.ui.components.SurveyWithNodesAndEdges
+import com.majorproject.caverouteplanner.ui.components.Survey
 
 @Dao
 interface SurveyDao {
@@ -21,10 +21,10 @@ interface SurveyDao {
 
     @Transaction
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
-    fun getSurveyWithDataById(surveyId: Int): SurveyWithNodesAndEdges?
+    fun getSurveyWithDataById(surveyId: Int): Survey?
 
     @Transaction
     @Query("SELECT * FROM surveys")
-    fun getAllSurveysWithData(): List<SurveyWithNodesAndEdges>
+    fun getAllSurveysWithData(): List<Survey>
 
 }

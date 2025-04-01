@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 
 //Parcelised so that it can be stored in remember saveables
 @Parcelize
-data class SurveyPath(
+data class OldSurveyPathType(
     var id: Int,
     var ends: Pair<Int, Int>,
     var distance: Float = 0.0f,
@@ -41,7 +41,7 @@ data class SurveyPath(
     ],
     indices = [Index(value = ["surveyId"])]
 )
-data class SurveyPathEntity(
+data class SurveyPath(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     @TypeConverters(PairConverter::class)
