@@ -11,7 +11,7 @@ import com.majorproject.caverouteplanner.ui.components.SurveyWithNodesAndEdges
 @Dao
 interface SurveyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertSurvey(cave: SurveyEntity)
+    fun insertSurvey(cave: SurveyEntity): Long
 
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
     fun getSurveyById(surveyId: Int): SurveyEntity?
@@ -22,5 +22,9 @@ interface SurveyDao {
     @Transaction
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
     fun getSurveyWithDataById(surveyId: Int): SurveyWithNodesAndEdges?
+
+    @Transaction
+    @Query("SELECT * FROM surveys")
+    fun getAllSurveysWithData(): List<SurveyWithNodesAndEdges>
 
 }

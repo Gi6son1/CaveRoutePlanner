@@ -109,7 +109,7 @@ fun MapScreen() {
             LaunchedEffect(Unit) {
                 requester.requestFocus()
                 val repository = CaveRoutePlannerRepository(context as Application)
-                Log.d("Taken info", repository.getAllCaves().toString())
+                Log.d("Taken info", repository.getAllSurveysWithData().toString())
             }
 
             ImageWithGraphOverlay(

@@ -48,21 +48,12 @@ data class Survey(
     }
 }
 
-@Entity(tableName = "surveys",
-    foreignKeys = [
-        ForeignKey(
-            entity = Cave::class,
-            parentColumns = ["id"],
-            childColumns = ["caveId"],
-            onDelete = ForeignKey.CASCADE,
-        )
-    ])
+@Entity(tableName = "surveys")
 data class SurveyEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val imageReference: String,
     val pixelsPerMeter: Float,
     val width: Int,
-    val height: Int,
-    val caveId: Int
+    val height: Int
 )

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "947b9bf8f7b1aa76e7d6e2f8f6686f6e",
+    "identityHash": "deb74687a78bb0658abef30b03cbe8d3",
     "entities": [
       {
         "tableName": "surveys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `imageReference` TEXT NOT NULL, `pixelsPerMeter` REAL NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `caveId` INTEGER NOT NULL, FOREIGN KEY(`caveId`) REFERENCES `caves`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `imageReference` TEXT NOT NULL, `pixelsPerMeter` REAL NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -37,12 +37,6 @@
             "columnName": "height",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "caveId",
-            "columnName": "caveId",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -52,19 +46,7 @@
           ]
         },
         "indices": [],
-        "foreignKeys": [
-          {
-            "table": "caves",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "caveId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "surveynodes",
@@ -224,7 +206,7 @@
       },
       {
         "tableName": "caves",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `location` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `location` TEXT NOT NULL, `surveyId` INTEGER NOT NULL, FOREIGN KEY(`surveyId`) REFERENCES `surveys`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -255,6 +237,12 @@
             "columnName": "location",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "surveyId",
+            "columnName": "surveyId",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -264,13 +252,25 @@
           ]
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "surveys",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "surveyId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '947b9bf8f7b1aa76e7d6e2f8f6686f6e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'deb74687a78bb0658abef30b03cbe8d3')"
     ]
   }
 }

@@ -21,10 +21,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [SurveyEntity::class, SurveyNodeEntity::class, SurveyPathEntity::class, Cave::class],
-    version = 1)
+@Database(
+    entities = [SurveyEntity::class, SurveyNodeEntity::class, SurveyPathEntity::class, Cave::class],
+    version = 1
+)
 @TypeConverters(ListConverter::class, PairConverter::class)
-abstract class CaveRoutePlannerRoomDatabase: RoomDatabase() {
+abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
     abstract fun surveyDao(): SurveyDao
     abstract fun surveyNodeDao(): SurveyNodeDao
     abstract fun surveyPathDao(): SurveyPathDao
@@ -70,24 +72,23 @@ abstract class CaveRoutePlannerRoomDatabase: RoomDatabase() {
             val surveyPathDao = db.surveyPathDao()
             val caveDao = db.caveDao()
 
+            val survey = SurveyEntity(
+                width = 1991,
+                height = 1429,
+                pixelsPerMeter = 14.600609f,
+                imageReference = "R.drawable.llygadlchwr"
+            )
+
+            val surveyId = surveyDao.insertSurvey(survey)
+
             val cave = Cave(
                 name = "Llygadlchwr",
                 description = "cool",
                 difficulty = "easy",
                 location = "Llygadlchwr",
+                surveyId = surveyId.toInt()
             )
 
-            caveDao.insertCave(cave)
-
-            val survey = SurveyEntity(
-                width = 1991,
-                height = 1429,
-                pixelsPerMeter = 14.600609f,
-                imageReference = "R.drawable.llygadlchwr",
-                caveId = cave.id
-            )
-
-            //surveyDao.insertSurvey(survey)
 
             val surveyNode = SurveyNodeEntity(
                 isEntrance = true,
@@ -95,7 +96,7 @@ abstract class CaveRoutePlannerRoomDatabase: RoomDatabase() {
                 x = 368,
                 y = 85,
                 edges = listOf(0),
-                surveyId = survey.id
+                surveyId = surveyId.toInt()
             )
 
             val surveyPath = SurveyPathEntity(
@@ -104,16 +105,15 @@ abstract class CaveRoutePlannerRoomDatabase: RoomDatabase() {
                 hasWater = false,
                 altitude = 0,
                 isHardTraverse = false,
-                surveyId = survey.id
+                surveyId = surveyId.toInt()
             )
+            caveDao.insertCave(cave)
 
-            //surveyNodeDao.insertSurveyNode(surveyNode)
-            //surveyPathDao.insertSurveyPath(surveyPath)
-
+            surveyNodeDao.insertSurveyNode(surveyNode)
+            surveyPathDao.insertSurveyPath(surveyPath)
         }
 
     }
-
 
 
 }
