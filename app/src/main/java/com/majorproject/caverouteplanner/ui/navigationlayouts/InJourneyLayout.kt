@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -25,12 +26,16 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomT
 fun InJourneyLayout(
     currentRoute: Route,
     cancelRoute: () -> Unit = {},
-    caveExit: (Int, Boolean) -> Unit = { _, _ -> }
+    caveExit: (Int, Boolean) -> Unit = { _, _ -> },
+    extendedView: Boolean
 ) {
     var openActionCheckDialog by rememberSaveable { mutableStateOf(false) }
     var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }
 
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         val (routeDetails,
             pathDetails,
             cancel,
@@ -39,24 +44,12 @@ fun InJourneyLayout(
             prevStage) = createRefs()
 
         CustomTripInfoBox(
-            onClick = { },
             modifier = Modifier.constrainAs(routeDetails) {
                 top.linkTo(parent.top, 40.dp)
                 start.linkTo(parent.start, 20.dp)
             },
             distance = currentRoute.totalDistance,
             time = currentRoute.getTotalPathTravelTime()
-        )
-
-        CustomTripInfoBox(
-            onClick = { },
-            modifier = Modifier.constrainAs(pathDetails) {
-                top.linkTo(routeDetails.bottom, 20.dp)
-                start.linkTo(parent.start, 20.dp)
-            },
-            pathNotDest = true,
-            distance = currentRoute.getCurrentPathDistance(),
-            time = currentRoute.getCurrentPathTravelTime()
         )
 
         CustomTextButton(
@@ -81,16 +74,6 @@ fun InJourneyLayout(
         )
 
         CustomIconButton(
-            onClick = { openActionCheckDialog = true },
-            modifier = Modifier.constrainAs(cancel) {
-                top.linkTo(caveExit.bottom, 20.dp)
-                end.linkTo(parent.end, 20.dp)
-            },
-            iconVector = Icons.Outlined.Cancel,
-            contentDescription = "Cancel"
-        )
-
-        CustomIconButton(
             onClick = { openCaveExitDialog = true },
             modifier = Modifier.constrainAs(caveExit) {
                 top.linkTo(parent.top, 40.dp)
@@ -100,6 +83,27 @@ fun InJourneyLayout(
             invertedColour = true
         )
 
+        if (extendedView){
+            CustomTripInfoBox(
+                modifier = Modifier.constrainAs(pathDetails) {
+                    top.linkTo(routeDetails.bottom, 20.dp)
+                    start.linkTo(parent.start, 20.dp)
+                },
+                pathNotDest = true,
+                distance = currentRoute.getCurrentPathDistance(),
+                time = currentRoute.getCurrentPathTravelTime()
+            )
+
+            CustomIconButton(
+                onClick = { openActionCheckDialog = true },
+                modifier = Modifier.constrainAs(cancel) {
+                    top.linkTo(caveExit.bottom, 20.dp)
+                    end.linkTo(parent.end, 20.dp)
+                },
+                iconVector = Icons.Outlined.Cancel,
+                contentDescription = "Cancel"
+            )
+        }
 
         ActionCheckDialog(
             dialogIsOpen = openActionCheckDialog,

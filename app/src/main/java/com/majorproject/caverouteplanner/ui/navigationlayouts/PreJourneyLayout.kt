@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
@@ -43,11 +44,15 @@ fun PreJourneyLayout(
             mutableStateOf(false)
         }
 
+        var openHomeButtonDialog by rememberSaveable {
+            mutableStateOf(false)
+        }
+
 
         CustomIconButton(
-            onClick = { returnToMenu() },
+            onClick = { openHomeButtonDialog = true },
             modifier = Modifier.constrainAs(homeButton) {
-                top.linkTo(parent.top, margin = 20.dp)
+                top.linkTo(parent.top, margin = 40.dp)
                 start.linkTo(parent.start, margin = 10.dp)
             },
             iconVector = Icons.Outlined.Home,
@@ -123,6 +128,13 @@ fun PreJourneyLayout(
             updatedConditions = { noWater, noHardTraverse, highAltitude, numberOfTravellers ->
                 changeConditions(noWater, noHardTraverse, highAltitude, numberOfTravellers)
             }
+        )
+
+        ActionCheckDialog(
+            dialogIsOpen = openHomeButtonDialog,
+            dialogOpen = { openHomeButtonDialog = it },
+            confirmAction = { returnToMenu() },
+            message = "Are you sure you'd like to go back to the main menu? You will lose your current route setup if you do."
         )
     }
 }

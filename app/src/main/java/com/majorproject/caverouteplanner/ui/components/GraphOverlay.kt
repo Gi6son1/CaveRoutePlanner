@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -43,6 +44,7 @@ fun ImageWithGraphOverlay(
     modifier: Modifier = Modifier,
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
+    onTap: () -> Unit = {},
     pinpointSourceNode: Int? = null,
     pinpointDestinationNode: Int? = null
 ) {
@@ -167,6 +169,9 @@ fun ImageWithGraphOverlay(
                             val fractionalTapPosition =
                                 calculateFractionalOffset(longPressLoc, boxSize)
                             longPressPosition(fractionalTapPosition)
+                        },
+                        onTap = {
+                                onTap()
                         }
                     )
                 },

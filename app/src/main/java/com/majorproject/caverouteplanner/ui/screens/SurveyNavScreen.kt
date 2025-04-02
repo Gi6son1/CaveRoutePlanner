@@ -1,6 +1,7 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -84,6 +85,10 @@ fun SurveyNavScreen(
             mutableIntStateOf(1)
         }
 
+        var inJourneyExtended: Boolean by rememberSaveable {
+            mutableStateOf(false)
+        }
+
         fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null) {
             routeFinder = RouteFinder(
                 sourceId = sourceId,
@@ -91,6 +96,7 @@ fun SurveyNavScreen(
                 flags = if (tempFlags != null) tempFlags else currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers
             )
+            inJourneyExtended = false
         }
 
 
@@ -144,7 +150,12 @@ fun SurveyNavScreen(
                 },
                 pinpointDestinationNode = pinPointNode,
                 currentRoute = currentRoute,
-                pinpointSourceNode = sourceId
+                pinpointSourceNode = sourceId,
+                onTap = {
+                    if (currentRoute != null && currentRoute!!.routeStarted){
+                        inJourneyExtended = !inJourneyExtended
+                    }
+                }
             )
         }
 
@@ -200,6 +211,7 @@ fun SurveyNavScreen(
                         currentRoute = routeFinder?.getRouteToNode(nearestExit)
                     }
                 },
+                extendedView = inJourneyExtended,
             )
         }
     }

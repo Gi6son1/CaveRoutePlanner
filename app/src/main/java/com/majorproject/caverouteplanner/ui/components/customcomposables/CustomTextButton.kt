@@ -112,7 +112,7 @@ fun CustomTextButton(
 
 @Composable
 fun CustomTripInfoBox(
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
     isGoButton: Boolean = false,
     modifier: Modifier = Modifier,
     distance: Float,

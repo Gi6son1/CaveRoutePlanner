@@ -2,18 +2,25 @@ package com.majorproject.caverouteplanner.ui.screens
 
 import androidx.compose.runtime.Composable
 import android.app.Application
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,6 +31,8 @@ import com.majorproject.caverouteplanner.ui.components.Cave
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveCardButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CollapsableListHeader
+import com.majorproject.caverouteplanner.ui.components.customcomposables.Section
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
@@ -35,7 +44,13 @@ fun CaveListScreenTopLevel(
     val repository = CaveRoutePlannerRepository(context as Application)
     val caves = repository.getAllCaves()
 
-    CaveListScreen(caveList = caves,
+    val caveLocationMap = mutableMapOf<String, MutableList<Cave>>()
+    for (cave in caves){
+        caveLocationMap.getOrPut(cave.caveProperties.location.uppercase(), defaultValue = {mutableListOf()} ).add(cave)
+    }
+    val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase() }
+
+    CaveListScreen(caveList = orderedList,
         navigateSurvey = { surveyId ->
             navigateToSurvey(surveyId)
         }
@@ -45,7 +60,7 @@ fun CaveListScreenTopLevel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaveListScreen(
-    caveList: List<Cave>,
+    caveList: List<List<Cave>>,
     navigateSurvey: (Int) -> Unit = {}
 ){
     BackGroundScaffold(
@@ -62,18 +77,32 @@ fun CaveListScreen(
         },
 
     ) { innerPadding ->
+
+        val isExpandedMap = remember {
+            List(caveList.size) { index: Int -> index to true}.toMutableStateMap()
+        }
+
         LazyColumn(modifier = Modifier.padding(innerPadding).fillMaxSize().padding(10.dp)) {
-            caveList.forEach { cave ->
-                item {
-                    CaveCardButton(
-                        cave = cave,
-                        onClick = { navigateSurvey(cave.caveProperties.surveyId) }
-                    )
+            caveList.forEachIndexed {index, caveListSection ->
+                Section(
+                    caveList = caveListSection,
+                    isExpanded = isExpandedMap[index] != false,
+                    onHeaderClick = {
+                        isExpandedMap[index] = isExpandedMap[index] == false
+                    },
+                    navigateSurvey = {
+                        navigateSurvey(it)
+                    }
+                )
+
+                if (index != caveList.size - 1){
+                    item{
+                        HorizontalDivider()
+                    }
                 }
             }
         }
     }
-
 }
 
 
@@ -82,7 +111,7 @@ fun CaveListScreen(
 fun CaveListScreenPreview(){
     CaveRoutePlannerTheme {
         CaveListScreen(
-            listOf(
+            listOf(listOf(
                 Cave(
                     caveProperties = CaveProperties(
                         name = "Llygadlchwr",
@@ -99,6 +128,7 @@ fun CaveListScreenPreview(){
                         imageReference = "llygadlchwr.jpg"
                     )
                 )
+            )
             )
         )
     }
