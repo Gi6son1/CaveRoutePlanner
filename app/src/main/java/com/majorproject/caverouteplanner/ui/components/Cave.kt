@@ -26,11 +26,11 @@ data class CaveProperties(
     val surveyId: Int
 )
 
-data class CaveWithSurvey(
-    @Embedded val caveProps: CaveProperties,
+data class Cave(
+    @Embedded val caveProperties: CaveProperties,
     @Relation(
         parentColumn = "surveyId",
         entityColumn = "id"
     )
-    val survey: SurveyProperties
+    val surveyProperties: SurveyProperties
 )

@@ -8,7 +8,7 @@ class CaveRoutePlannerRepository(application: Application) {
     private val surveyNodeDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyNodeDao()
     private val surveyPathDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyPathDao()
 
-    fun getCaveById(caveId: Int) = caveDao.getCave(caveId)
+    fun getCavePropertiesById(caveId: Int) = caveDao.getCaveProperties(caveId)
     fun getAllCaves() = caveDao.getAllCaves()
 
     fun getSurveyById(surveyId: Int) = surveyDao.getSurveyById(surveyId)
@@ -19,7 +19,7 @@ class CaveRoutePlannerRepository(application: Application) {
 
     fun getSurveyPathsBySurveyId(surveyId: Int) = surveyPathDao.getSurveyPathsBySurveyId(surveyId)
 
-    fun getCaveWithSurveyProps(caveId: Int) = caveDao.getCaveWithSurveyProps(caveId)
+    fun getCave(caveId: Int) = caveDao.getCaveById(caveId)
 
     fun getSurveyWithNodesAndEdges(surveyId: Int) = surveyDao.getSurveyWithDataById(surveyId)
 }

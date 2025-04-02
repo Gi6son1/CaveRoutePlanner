@@ -92,7 +92,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
                 surveyId = llSurveyId.toInt()
             )
 
-            caveDao.insertCave(llCaveProperties)
+            caveDao.insertCaveProperties(llCaveProperties)
 
             var nodesList: MutableList<Int> =
                 MutableList(llSurveyReference.pathNodes.size) { _ -> 0 }

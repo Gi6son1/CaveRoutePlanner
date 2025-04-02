@@ -6,20 +6,20 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
-import com.majorproject.caverouteplanner.ui.components.CaveWithSurvey
+import com.majorproject.caverouteplanner.ui.components.Cave
 
 @Dao
 interface CaveDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCave(caveProperties: CaveProperties)
+    suspend fun insertCaveProperties(caveProperties: CaveProperties)
 
     @Query("SELECT * FROM caves WHERE name = :caveId")
-    fun getCave(caveId: Int): CaveProperties?
+    fun getCaveProperties(caveId: Int): CaveProperties?
 
     @Query("SELECT * FROM caves")
-    fun getAllCaves(): List<CaveProperties>
+    fun getAllCaves(): List<Cave>
 
     @Transaction
     @Query("SELECT * FROM caves WHERE id = :caveId")
-    fun getCaveWithSurveyProps(caveId: Int): CaveWithSurvey?
+    fun getCaveById(caveId: Int): Cave?
 }
