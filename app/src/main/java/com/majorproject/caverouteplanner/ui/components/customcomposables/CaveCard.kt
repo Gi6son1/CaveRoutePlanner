@@ -26,14 +26,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.majorproject.caverouteplanner.R
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.ui.components.Cave
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
@@ -67,13 +73,19 @@ fun CaveCard(cave: Cave) {
             containerColor = MaterialTheme.colorScheme.outline
         )
     ) {
+        val context = LocalContext.current
+        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromInternalStorage(context = context, filePath = cave.surveyProperties.imageReference)) }
+
         Row {
-            Card {
-                Image(bitmap = ImageBitmap.imageResource(R.drawable.llygadlchwr)
-                    , contentDescription = "Cave Survey",
-                    modifier = Modifier.fillMaxHeight().aspectRatio(1f),
-                    contentScale = ContentScale.Crop)
+            if (imageBitmap != null){
+                Card {
+                    Image(bitmap = imageBitmap!!, contentDescription = "Cave Survey",
+                        modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
+
             Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp).fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly){
                 Text(text = cave.caveProperties.name, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.surface)

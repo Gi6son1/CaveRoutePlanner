@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,16 +11,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorage
+import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 
 import com.majorproject.caverouteplanner.ui.screens.CaveListScreenTopLevel
-import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreen
 import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreenTopLevel
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +34,21 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CaveRoutePlannerTheme {
+                SetupFiles()
                 BuildNavigationGraph()
             }
         }
+    }
+}
+
+@Composable
+fun SetupFiles(){
+    val context = LocalContext.current.applicationContext
+
+    val internalStoragePath = copyImageToInternalStorage(context, "llygadlchwr.jpg", "llygadlchwr.jpg")
+
+    if (internalStoragePath != null) {
+        llSurveyReference.imageReference = internalStoragePath
     }
 }
 

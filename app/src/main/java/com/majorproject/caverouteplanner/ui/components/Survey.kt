@@ -4,12 +4,14 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.majorproject.caverouteplanner.R
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import kotlinx.parcelize.Parcelize
 import kotlin.math.pow
 
@@ -17,7 +19,7 @@ import kotlin.math.pow
 data class OldSurveyType(
     var id: Int = 0,
     var caveName: String = "",
-    val imageReference: Int,
+    var imageReference: String = "",
     var pathNodes: MutableList<OldSurveyNodeType>,
     var paths: MutableList<OldSurveyPathType>,
     val pixelsPerMeter: Float,
@@ -51,8 +53,8 @@ data class Survey(
 ): Parcelable{
 
     @Composable
-    fun imageBitmap(): ImageBitmap {
-        return ImageBitmap.imageResource(R.drawable.llygadlchwr)
+    fun imageBitmap(): ImageBitmap? {
+        return getBitmapFromInternalStorage(LocalContext.current, properties.imageReference)
     }
 
     fun getNearestNode(pointCoordinates: Offset): Int? {

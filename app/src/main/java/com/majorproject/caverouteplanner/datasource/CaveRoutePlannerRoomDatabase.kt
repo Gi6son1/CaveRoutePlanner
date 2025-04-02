@@ -16,7 +16,7 @@ import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
-import com.majorproject.caverouteplanner.ui.components.llOldSurveyType
+import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,14 +72,16 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             val surveyPathDao = db.surveyPathDao()
             val caveDao = db.caveDao()
 
+            val llSurveyReference = llSurveyReference
+            Log.d("TimeSTAMP", "in populate database")
+
+
             val llSurveyProps = SurveyProperties(
                 width = 1991,
                 height = 1429,
                 pixelsPerMeter = 14.600609f,
-                imageReference = "llygadlchwr.jpg"
+                imageReference = llSurveyReference.imageReference
             )
-
-            val llSurveyReference = llOldSurveyType
 
             val llSurveyId = surveyDao.insertSurvey(llSurveyProps)
 

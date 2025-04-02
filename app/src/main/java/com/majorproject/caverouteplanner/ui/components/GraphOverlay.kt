@@ -26,12 +26,14 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.navigation.Route
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -54,6 +56,7 @@ fun ImageWithGraphOverlay(
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
 
     val density = LocalDensity.current
+    val context = LocalContext.current
     val currentConfiguration = LocalConfiguration.current
 
     //these are saved so that they're not recalculated every recomposition, they only change when the screen dimensions change i.e. phone rotate
@@ -177,12 +180,20 @@ fun ImageWithGraphOverlay(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                bitmap = survey.imageBitmap(),
-                contentDescription = "survey",
-                modifier = Modifier,
-                contentScale = ContentScale.Fit
-            )
+            var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+
+            LaunchedEffect(survey) {
+                imageBitmap = getBitmapFromInternalStorage(context = context, survey.properties.imageReference)
+            }
+
+            if (imageBitmap != null) {
+                Image(
+                    bitmap = imageBitmap!!,
+                    contentDescription = "survey",
+                    modifier = Modifier,
+                    contentScale = ContentScale.Fit
+                )
+            }
 
             GraphOverlay(
                 nodes = survey.nodes,

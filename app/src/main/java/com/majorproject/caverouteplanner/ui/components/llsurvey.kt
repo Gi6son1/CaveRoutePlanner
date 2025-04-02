@@ -1,11 +1,8 @@
 package com.majorproject.caverouteplanner.ui.components
 
-import com.majorproject.caverouteplanner.R
-
-val llOldSurveyType = OldSurveyType(
+val llSurveyReference = OldSurveyType(
     size = Pair(1991, 1429),
     pixelsPerMeter = 14.600609f,
-    imageReference = R.drawable.llygadlchwr,
     pathNodes = mutableListOf(
         OldSurveyNodeType(
             id = 7,
