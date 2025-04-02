@@ -24,6 +24,7 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelC
 @Composable
 fun PreJourneyLayout(
     currentRoute: Route?,
+    returnToMenu: () -> Unit = {},
     setSource: () -> Unit = {},
     removePin: () -> Unit = {},
     changeConditions: (Boolean, Boolean, Boolean, Int) -> Unit = { _, _, _, _ -> },
@@ -44,7 +45,7 @@ fun PreJourneyLayout(
 
 
         CustomIconButton(
-            onClick = { /*TODO*/ },
+            onClick = { returnToMenu() },
             modifier = Modifier.constrainAs(homeButton) {
                 top.linkTo(parent.top, margin = 20.dp)
                 start.linkTo(parent.start, margin = 10.dp)

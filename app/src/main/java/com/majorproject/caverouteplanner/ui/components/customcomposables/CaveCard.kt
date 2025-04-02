@@ -77,13 +77,13 @@ fun CaveCard(cave: Cave) {
             Column(modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp).fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly){
                 Text(text = cave.caveProperties.name, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.surface)
-                Text(text = cave.caveProperties.description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.inverseOnSurface)
+                Text(text = cave.caveProperties.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Length: ${cave.caveProperties.length}km", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.inverseOnSurface)
+                    Text(text = "Length: ${cave.caveProperties.length}km", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
                     Spacer(modifier = Modifier.width(5.dp))
                     VerticalDivider(modifier = Modifier.height(16.dp))
                     Spacer(modifier = Modifier.width(5.dp))
-                    Text(text = "Difficulty: ${cave.caveProperties.difficulty}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.inverseOnSurface)
+                    Text(text = "Difficulty: ${cave.caveProperties.difficulty}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
                 }
             }
         }

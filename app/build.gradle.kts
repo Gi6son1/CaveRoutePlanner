@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.constraint.layout)
     implementation(libs.androidx.material.icons)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.navigation.compose)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.gson)

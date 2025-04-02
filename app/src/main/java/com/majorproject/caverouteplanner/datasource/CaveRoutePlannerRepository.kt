@@ -21,5 +21,5 @@ class CaveRoutePlannerRepository(application: Application) {
 
     fun getCave(caveId: Int) = caveDao.getCaveById(caveId)
 
-    fun getSurveyWithNodesAndEdges(surveyId: Int) = surveyDao.getSurveyWithDataById(surveyId)
+    fun getSurveyWithDataById(surveyId: Int) = surveyDao.getSurveyWithDataById(surveyId)
 }

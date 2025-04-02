@@ -22,31 +22,40 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.Survey
+import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
 
 @Composable
-fun MapScreenTopLevel(
-
+fun SurveyNavScreenTopLevel(
+    surveyId: Int,
+    backToMenu: () -> Unit = {},
 ){
     val context = LocalContext.current.applicationContext
     val repository = CaveRoutePlannerRepository(context as Application)
 
-    val survey = repository.getSurveyWithNodesAndEdges(1)
+    val survey = repository.getSurveyWithDataById(surveyId)
 
     if (survey != null){
-        MapScreen(survey)
+        SurveyNavScreen(
+            survey = survey,
+            backToMenu = { backToMenu() }
+        )
     }
 }
 
 @Composable
-fun MapScreen(survey: Survey) {
+fun SurveyNavScreen(
+    survey: Survey,
+    backToMenu: () -> Unit = {}
+) {
     BackGroundScaffold { innerPadding ->
         val requester = remember { FocusRequester() }
         var volumeKeyPressed by remember { mutableStateOf(false) }
@@ -169,7 +178,8 @@ fun MapScreen(survey: Survey) {
                     if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
                 },
                 currentTravelConditions = currentTravelConditions,
-                numberOfTravellers = currentNumberOfTravellers
+                numberOfTravellers = currentNumberOfTravellers,
+                returnToMenu = { backToMenu() }
             )
         } else if (currentRoute != null) {
             InJourneyLayout(

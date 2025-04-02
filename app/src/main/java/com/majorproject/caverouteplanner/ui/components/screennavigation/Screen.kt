@@ -1,0 +1,18 @@
+package com.majorproject.caverouteplanner.ui.components.screennavigation
+
+sealed class Screen(
+    val route: String,
+    val argument: String = ""
+) {
+    data object CaveListScreen : Screen("cave_list_screen")
+    data object SurveyNavScreen : Screen("survey_nav_screen", "survey_id")
+
+    fun routePath() =
+        if (argument.isNotEmpty())
+            "$route/{$argument}"
+        else
+            route
+
+    val basePath = "${route}/"
+
+}
