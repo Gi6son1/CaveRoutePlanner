@@ -19,3 +19,12 @@ LL old survey remove class and store in JSON file
 Make cave card more readable - fix font colours
 
 Highlight last selected
+
+
+https://developer.android.com/develop/sensors-and-location/sensors/sensors_motion#sensors-motion-rotate
+
+https://source.android.com/docs/core/interaction/sensors/sensor-types#rotation_vector
+
+https://developer.android.com/reference/android/hardware/SensorManager.html
+
+https://www.kodeco.com/10838302-sensors-tutorial-for-android-getting-started/page/2

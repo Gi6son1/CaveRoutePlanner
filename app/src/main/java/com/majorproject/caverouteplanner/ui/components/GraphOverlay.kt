@@ -441,7 +441,7 @@ fun GraphOverlay(
                     )
                     if (compassRotation != null) {
                         rotate(
-                            degrees = (compassRotation).toFloat(),
+                            degrees = (compassRotation - 90).toFloat(),
                             pivot = Offset(
                                 (currentStartNode.x / surveySize.width.toFloat()) * size.width,
                                 (currentStartNode.y / surveySize.height.toFloat()) * size.height
