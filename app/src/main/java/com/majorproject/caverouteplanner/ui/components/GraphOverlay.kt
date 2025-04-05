@@ -48,12 +48,18 @@ fun ImageWithGraphOverlay(
     longPressPosition: (Offset) -> Unit = {},
     onTap: () -> Unit = {},
     pinpointSourceNode: Int? = null,
-    pinpointDestinationNode: Int? = null
+    pinpointDestinationNode: Int? = null,
+    compassEnabled: Boolean,
+    compassReading: Double?
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
+
+    var focusedRotation by remember { mutableFloatStateOf(0f) }
+    var focusedOffset by remember { mutableStateOf(Offset.Zero) }
+    var focusedCentroid by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     val density = LocalDensity.current
     val context = LocalContext.current
@@ -73,34 +79,43 @@ fun ImageWithGraphOverlay(
                 currentRoute,
                 survey.nodes,
             ) { angle, distance, centroid ->
+                focusedCentroid = centroid
 
-                val referenceDimension = maxOf(survey.properties.width, survey.properties.height).toFloat()
+
+                val referenceDimension =
+                    maxOf(survey.properties.width, survey.properties.height).toFloat()
                 val fractionalZoom = distance / referenceDimension
 
                 zoom = (1f / fractionalZoom) * 0.8f
 
                 val rotate = -angle + 270
                 rotation = rotate
+                focusedRotation = rotation
 
                 val boxCenterX = boxSize.width / 2f
                 val boxCenterY = boxSize.height / 2f
 
                 if (centroid == null) return@performFocusedTransformation
 
-                val centroidX = (centroid.first.toFloat() / survey.properties.width) * boxSize.width
-                val centroidY = (centroid.second.toFloat() / survey.properties.height) * boxSize.height
+                val centroidX =
+                    (centroid.first.toFloat() / survey.properties.width) * boxSize.width
+                val centroidY =
+                    (centroid.second.toFloat() / survey.properties.height) * boxSize.height
 
                 var targetOffsetX = boxCenterX - centroidX
                 var targetOffsetY = boxCenterY - centroidY
 
                 val angleRad = Math.toRadians(rotation.toDouble()).toFloat()
 
-                val rotatedOffsetX = (targetOffsetX * cos(angleRad) - targetOffsetY * sin(angleRad))
-                val rotatedOffsetY = (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
+                val rotatedOffsetX =
+                    (targetOffsetX * cos(angleRad) - targetOffsetY * sin(angleRad))
+                val rotatedOffsetY =
+                    (targetOffsetX * sin(angleRad) + targetOffsetY * cos(angleRad))
 
                 val focusedTranslation = Offset(rotatedOffsetX * zoom, rotatedOffsetY * zoom)
 
                 offset = focusedTranslation
+                focusedOffset = offset
             }
         } else if (currentRoute != null) {
             offset = Offset.Zero
@@ -174,7 +189,7 @@ fun ImageWithGraphOverlay(
                             longPressPosition(fractionalTapPosition)
                         },
                         onTap = {
-                                onTap()
+                            onTap()
                         }
                     )
                 },
@@ -183,7 +198,10 @@ fun ImageWithGraphOverlay(
             var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
             LaunchedEffect(survey) {
-                imageBitmap = getBitmapFromInternalStorage(context = context, survey.properties.imageReference)
+                imageBitmap = getBitmapFromInternalStorage(
+                    context = context,
+                    survey.properties.imageReference
+                )
             }
 
             if (imageBitmap != null) {
@@ -206,7 +224,8 @@ fun ImageWithGraphOverlay(
                 destinationNode = pinpointDestinationNode,
                 pinpointNode = pinpointSourceNode,
                 currentRotation = rotation,
-                currentZoom = zoom
+                currentZoom = zoom,
+                compassRotation = if (compassEnabled) compassReading else null
             )
         }
     }
@@ -238,7 +257,8 @@ fun performFocusedTransformation(
 
         for (path in currentStage) {
             val firstNode = nodes.find { it.getNodeId() == path.getPathEnds().first } ?: return null
-            val secondNode = nodes.find { it.getNodeId() == path.getPathEnds().second } ?: return null
+            val secondNode =
+                nodes.find { it.getNodeId() == path.getPathEnds().second } ?: return null
             cumulativeCentroidX += (firstNode.x + secondNode.x) / 2
             cumulativeCentroidY += (firstNode.y + secondNode.y) / 2
         }
@@ -260,7 +280,8 @@ fun performFocusedTransformation(
 
     val centroid = calculateCentroid(currentStage)
 
-    val finalDistance = calculateDistance(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
+    val finalDistance =
+        calculateDistance(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
 
     calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
 }
@@ -281,7 +302,8 @@ fun GraphOverlay(
     pinpointNode: Int? = null,
     destinationNode: Int? = null,
     currentRotation: Float,
-    currentZoom: Float
+    currentZoom: Float,
+    compassRotation: Double?
 ) {
     val pinpointIcon = ImageBitmap.imageResource(id = R.drawable.location_icon)
     val destinationIcon = ImageBitmap.imageResource(id = R.drawable.destination_icon)
@@ -379,12 +401,16 @@ fun GraphOverlay(
         }
 
         if (currentRoute?.routeStarted == true) {
-            val currentStartNode = nodes.find { it.getNodeId() == currentRoute.getCurrentStartingNode() }
+            val currentStartNode =
+                nodes.find { it.getNodeId() == currentRoute.getCurrentStartingNode() }
             if (currentStartNode == null) {
                 return@Canvas
             }
             val currentPathEndNode =
-                nodes.find{it.getNodeId() == currentRoute.getCurrentStage().first().next(currentStartNode.getNodeId())}
+                nodes.find {
+                    it.getNodeId() == currentRoute.getCurrentStage().first()
+                        .next(currentStartNode.getNodeId())
+                }
 
             val currentStartAngle = calculateAngle(
                 Pair(currentStartNode.x, currentStartNode.y),
@@ -413,14 +439,23 @@ fun GraphOverlay(
                             (currentStartNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
-
-                    rotate(
-                        degrees = adjustedAngle,
-                        pivot = Offset(
-                            (currentStartNode.x / surveySize.width.toFloat()) * size.width,
-                            (currentStartNode.y / surveySize.height.toFloat()) * size.height
+                    if (compassRotation != null) {
+                        rotate(
+                            degrees = (compassRotation).toFloat(),
+                            pivot = Offset(
+                                (currentStartNode.x / surveySize.width.toFloat()) * size.width,
+                                (currentStartNode.y / surveySize.height.toFloat()) * size.height
+                            )
                         )
-                    )
+                    } else {
+                        rotate(
+                            degrees = adjustedAngle,
+                            pivot = Offset(
+                                (currentStartNode.x / surveySize.width.toFloat()) * size.width,
+                                (currentStartNode.y / surveySize.height.toFloat()) * size.height
+                            )
+                        )
+                    }
                 }
             ) {
                 drawImage(
@@ -432,10 +467,14 @@ fun GraphOverlay(
                 )
             }
 
-            val currentEndNode = nodes.find { it.getNodeId() == currentRoute.getCurrentEndingNode() }
+            val currentEndNode =
+                nodes.find { it.getNodeId() == currentRoute.getCurrentEndingNode() }
             if (currentEndNode == null) return@Canvas
             val currentEndPathStartNode =
-                nodes.find { it.getNodeId() == currentRoute.getCurrentStage().last().next(currentEndNode.getNodeId())}
+                nodes.find {
+                    it.getNodeId() == currentRoute.getCurrentStage().last()
+                        .next(currentEndNode.getNodeId())
+                }
 
             val currentEndAngle = calculateAngle(
                 Pair(currentEndPathStartNode!!.x, currentEndPathStartNode.y),
@@ -465,13 +504,15 @@ fun GraphOverlay(
                         )
                     )
 
-                    rotate(
-                        degrees = adjustedEndAngle,
-                        pivot = Offset(
-                            (currentEndNode.x / surveySize.width.toFloat()) * size.width,
-                            (currentEndNode.y / surveySize.height.toFloat()) * size.height
+                        rotate(
+                            degrees = adjustedEndAngle,
+                            pivot = Offset(
+                                (currentEndNode.x / surveySize.width.toFloat()) * size.width,
+                                (currentEndNode.y / surveySize.height.toFloat()) * size.height
+                            )
                         )
-                    )
+
+
                 }
             ) {
                 drawImage(

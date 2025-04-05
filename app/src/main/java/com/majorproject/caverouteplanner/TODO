@@ -9,6 +9,13 @@ specific path distance area details has same colour as route colour
 left handled vs right handed layout
 icon buttons and text buttons aren't mixed they have separate areas
 
+change yards to meters - add preferences option to change if required
+hold gesture being up as long press buton, fix this
 
-Make landing page i.e. list of surveys to select
-Make room database
+Cancel button in cancel route misleading
+
+LL old survey remove class and store in JSON file
+
+Make cave card more readable - fix font colours
+
+Highlight last selected

@@ -46,6 +46,7 @@ import java.io.InputStream
 fun SurveyNavScreenTopLevel(
     surveyId: Int,
     backToMenu: () -> Unit = {},
+    sensorReading: Double?
 ){
     val context = LocalContext.current.applicationContext
     val repository = CaveRoutePlannerRepository(context as Application)
@@ -55,7 +56,8 @@ fun SurveyNavScreenTopLevel(
     if (survey != null){
         SurveyNavScreen(
             survey = survey,
-            backToMenu = { backToMenu() }
+            backToMenu = { backToMenu() },
+            sensorReading = sensorReading
         )
     }
 }
@@ -63,7 +65,8 @@ fun SurveyNavScreenTopLevel(
 @Composable
 fun SurveyNavScreen(
     survey: Survey,
-    backToMenu: () -> Unit = {}
+    backToMenu: () -> Unit = {},
+    sensorReading: Double? = null
 ) {
     BackGroundScaffold { innerPadding ->
         val requester = remember { FocusRequester() }
@@ -83,6 +86,10 @@ fun SurveyNavScreen(
 
         var sourceId: Int by rememberSaveable {
             mutableIntStateOf(0)
+        }
+
+        var compassEnabled: Boolean by rememberSaveable {
+            mutableStateOf(false)
         }
 
         var currentTravelConditions: Triple<Boolean, Boolean, Boolean> by rememberSaveable {
@@ -163,7 +170,9 @@ fun SurveyNavScreen(
                     if (currentRoute != null && currentRoute!!.routeStarted){
                         inJourneyExtended = !inJourneyExtended
                     }
-                }
+                },
+                compassEnabled = compassEnabled,
+                compassReading = sensorReading
             )
         }
 
@@ -220,6 +229,10 @@ fun SurveyNavScreen(
                     }
                 },
                 extendedView = inJourneyExtended,
+                onCompassClick = {
+                    compassEnabled = !compassEnabled
+                },
+                compassEnabled = compassEnabled
             )
         }
     }

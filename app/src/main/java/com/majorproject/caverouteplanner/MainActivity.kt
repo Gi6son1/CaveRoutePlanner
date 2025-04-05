@@ -1,7 +1,11 @@
 package com.majorproject.caverouteplanner
 
 import android.content.Context
+import android.content.Context.SENSOR_SERVICE
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,7 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
@@ -19,6 +26,7 @@ import androidx.navigation.navArgument
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorage
 import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
+import com.majorproject.caverouteplanner.ui.navigationlayouts.SensorActivity
 
 import com.majorproject.caverouteplanner.ui.screens.CaveListScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreenTopLevel
@@ -31,11 +39,18 @@ import java.io.InputStream
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var sensorReading: Double? by mutableStateOf(null)
+
+        SensorActivity(context = this,
+            sensorReading = {
+                sensorReading = it
+            }
+        )
         enableEdgeToEdge()
         setContent {
             CaveRoutePlannerTheme {
                 SetupFiles()
-                BuildNavigationGraph()
+                BuildNavigationGraph(sensorReading)
             }
         }
     }
@@ -53,9 +68,10 @@ fun SetupFiles(){
 }
 
 @Composable
-private fun BuildNavigationGraph(){
+private fun BuildNavigationGraph(sensorReading: Double?){
     val navController = rememberNavController()
     var selectedSurveyId by remember { mutableIntStateOf(0) }
+
 
     NavHost(navController = navController, startDestination = Screen.CaveListScreen.route){
         composable(Screen.CaveListScreen.routePath()){
@@ -80,7 +96,8 @@ private fun BuildNavigationGraph(){
                 SurveyNavScreenTopLevel(surveyId = selectedSurveyId,
                     backToMenu = {
                         navController.popBackStack(Screen.CaveListScreen.route, inclusive = false)
-                    }
+                    },
+                    sensorReading = sensorReading
                 )
             }
         }

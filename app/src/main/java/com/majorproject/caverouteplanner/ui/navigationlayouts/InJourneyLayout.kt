@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -27,7 +28,9 @@ fun InJourneyLayout(
     currentRoute: Route,
     cancelRoute: () -> Unit = {},
     caveExit: (Int, Boolean) -> Unit = { _, _ -> },
-    extendedView: Boolean
+    extendedView: Boolean,
+    onCompassClick: () -> Unit = {},
+    compassEnabled: Boolean
 ) {
     var openActionCheckDialog by rememberSaveable { mutableStateOf(false) }
     var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }
@@ -40,6 +43,7 @@ fun InJourneyLayout(
             pathDetails,
             cancel,
             caveExit,
+            compass,
             nextStage,
             prevStage) = createRefs()
 
@@ -82,6 +86,17 @@ fun InJourneyLayout(
             iconImage = R.drawable.exit_icon,
             invertedColour = true
         )
+
+        CustomIconButton(
+            onClick = { onCompassClick() },
+            modifier = Modifier.constrainAs(compass) {
+                bottom.linkTo(nextStage.top, 60.dp)
+                end.linkTo(parent.end, 20.dp)
+            },
+            iconImage = R.drawable.compass_icon,
+            invertedColour = !compassEnabled
+        )
+
 
         if (extendedView){
             CustomTripInfoBox(
