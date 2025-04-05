@@ -10,7 +10,9 @@ import kotlin.math.round
 
 class SensorActivity(val context: Context,
     val sensorReading: (Double) -> Unit = {},) : SensorEventListener {
-    private lateinit var sensorManager: SensorManager
+    private var sensorManager: SensorManager
+
+    private  var rotationSensor: Sensor?
     private val rotationVectorReading = FloatArray(5)
 
     private val rotationMatrix = FloatArray(9)
@@ -18,15 +20,20 @@ class SensorActivity(val context: Context,
 
 
     init {
-        sensorSetup()
+        sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI, SensorManager.SENSOR_DELAY_UI)
+
     }
 
-    fun sensorSetup() {
-        sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    fun onResume(){
+        Log.d("SensorActivity", "onResume")
+        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI);
+    }
 
-        sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)?.also { rotationVector ->
-            sensorManager.registerListener(this, rotationVector, SensorManager.SENSOR_DELAY_UI, SensorManager.SENSOR_DELAY_UI)
-        }
+    fun onPause(){
+        Log.d("SensorActivity", "onPause")
+        sensorManager.unregisterListener(this);
     }
 
     fun updateOrientationAngles() {

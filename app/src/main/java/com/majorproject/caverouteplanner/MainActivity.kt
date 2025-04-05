@@ -54,6 +54,20 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        SensorActivity(
+            context = this
+        ).onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SensorActivity(
+            context = this
+        ).onPause()
+    }
 }
 
 @Composable
