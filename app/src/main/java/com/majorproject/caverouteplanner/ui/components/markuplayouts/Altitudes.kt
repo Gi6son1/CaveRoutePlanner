@@ -22,8 +22,10 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomS
 @Composable
 fun AltitudesLayout(
     modifier: Modifier = Modifier,
+    updateCurrentlySelected: (Int) -> Unit,
+    currentlySelectedSetting: Int
+
 ){
-    var currentlySelected by rememberSaveable { mutableIntStateOf(0) }
     val altitudeColours = remember { listOf(
         Color(0xFF001433),
         Color(0xFF003366),
@@ -49,10 +51,10 @@ fun AltitudesLayout(
                 Spacer(modifier = Modifier.height(10.dp))
                 CustomSmallTextButton(
                     onClick = {
-                        currentlySelected = i
+                        updateCurrentlySelected(i)
                     },
                     text = i.toString(),
-                    currentlySelected = currentlySelected == i,
+                    currentlySelected = currentlySelectedSetting == i,
                     buttonColour = altitudeColours[i + 5],
                     textColour = Color.White
                 )

@@ -46,8 +46,8 @@ fun MarkupImageAndGraphOverlay(
     nodes: List<SurveyNode>,
     surveyImage: ImageBitmap,
     modifier: Modifier = Modifier,
-    longPressPosition: (Offset) -> Unit = {},
-    onTapPosition: (Offset) -> Unit = {},
+    longPressPosition: (Offset) -> Unit,
+    onTapPosition: (Offset) -> Unit,
     markupStage: Int
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }

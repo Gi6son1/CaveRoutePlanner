@@ -47,8 +47,8 @@ fun ImageWithGraphOverlay(
     currentRoute: Route? = null,
     longPressPosition: (Offset) -> Unit = {},
     onTap: () -> Unit = {},
-    pinpointSourceNode: Int? = null,
-    pinpointDestinationNode: Int? = null,
+    pinpointSourceNode: SurveyNode? = null,
+    pinpointDestinationNode: SurveyNode? = null,
     compassEnabled: Boolean,
     compassReading: Double?
 ) {
@@ -313,8 +313,8 @@ fun GraphOverlay(
     nodes: List<SurveyNode>,
     surveySize: IntSize,
     currentRoute: Route? = null,
-    pinpointNode: Int? = null,
-    destinationNode: Int? = null,
+    pinpointNode: SurveyNode? = null,
+    destinationNode: SurveyNode? = null,
     currentRotation: Float,
     currentZoom: Float,
     compassRotation: Double?
@@ -369,14 +369,11 @@ fun GraphOverlay(
             }
         }
         if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) {
-            val node = nodes.find { it.getNodeId() == pinpointNode }
-            if (node == null) return@Canvas
-
             val iconOffsetX = pinpointIcon.width
             val iconOffsetY = pinpointIcon.height.toFloat() * 2
 
-            val pinPointCoodsX = (node.x - iconOffsetX).toFloat()
-            val pinPointCoodsY = (node.y - iconOffsetY).toFloat()
+            val pinPointCoodsX = (pinpointNode.x - iconOffsetX).toFloat()
+            val pinPointCoodsY = (pinpointNode.y - iconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -389,15 +386,15 @@ fun GraphOverlay(
                         scaleX = 0.75f / adjustedZoom,
                         scaleY = 0.75f / adjustedZoom,
                         pivot = Offset(
-                            (node.x / surveySize.width.toFloat()) * size.width,
-                            (node.y / surveySize.height.toFloat()) * size.height
+                            (pinpointNode.x / surveySize.width.toFloat()) * size.width,
+                            (pinpointNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                     rotate(
                         degrees = -currentRotation,
                         pivot = Offset(
-                            (node.x / surveySize.width.toFloat()) * size.width,
-                            (node.y / surveySize.height.toFloat()) * size.height
+                            (pinpointNode.x / surveySize.width.toFloat()) * size.width,
+                            (pinpointNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }
@@ -431,6 +428,8 @@ fun GraphOverlay(
                 Pair(currentPathEndNode!!.x, currentPathEndNode.y)
             ).toFloat()
 
+            val adjustedStartAngle = currentStartAngle + 90
+
             val iconOffsetX = currentDirectionIcon.width.toFloat()
             val iconOffsetY = currentDirectionIcon.height.toFloat()
 
@@ -453,7 +452,7 @@ fun GraphOverlay(
                     )
                     if (compassRotation != null) {
                         rotate(
-                            degrees = (compassRotation - 90).toFloat(),
+                            degrees = (compassRotation - 180).toFloat(),
                             pivot = Offset(
                                 (currentStartNode.x / surveySize.width.toFloat()) * size.width,
                                 (currentStartNode.y / surveySize.height.toFloat()) * size.height
@@ -461,7 +460,7 @@ fun GraphOverlay(
                         )
                     } else {
                         rotate(
-                            degrees = currentStartAngle,
+                            degrees = adjustedStartAngle,
                             pivot = Offset(
                                 (currentStartNode.x / surveySize.width.toFloat()) * size.width,
                                 (currentStartNode.y / surveySize.height.toFloat()) * size.height
@@ -540,14 +539,11 @@ fun GraphOverlay(
 
 
         if (destinationNode != null) {
-            val node = nodes.find { it.getNodeId() == destinationNode }
-            if (node == null) return@Canvas
-
             val iconOffsetX = 0
             val iconOffsetY = destinationIcon.height.toFloat() * 2
 
-            val pinPointCoodsX = (node.x - iconOffsetX).toFloat()
-            val pinPointCoodsY = (node.y - iconOffsetY).toFloat()
+            val pinPointCoodsX = (destinationNode.x - iconOffsetX).toFloat()
+            val pinPointCoodsY = (destinationNode.y - iconOffsetY).toFloat()
 
             withTransform(
                 {
@@ -555,15 +551,15 @@ fun GraphOverlay(
                         scaleX = 0.75f / adjustedZoom,
                         scaleY = 0.75f / adjustedZoom,
                         pivot = Offset(
-                            (node.x / surveySize.width.toFloat()) * size.width,
-                            (node.y / surveySize.height.toFloat()) * size.height
+                            (destinationNode.x / surveySize.width.toFloat()) * size.width,
+                            (destinationNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                     rotate(
                         degrees = -currentRotation,
                         pivot = Offset(
-                            (node.x / surveySize.width.toFloat()) * size.width,
-                            (node.y / surveySize.height.toFloat()) * size.height
+                            (destinationNode.x / surveySize.width.toFloat()) * size.width,
+                            (destinationNode.y / surveySize.height.toFloat()) * size.height
                         )
                     )
                 }

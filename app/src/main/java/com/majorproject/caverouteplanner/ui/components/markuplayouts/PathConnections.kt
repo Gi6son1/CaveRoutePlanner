@@ -19,10 +19,9 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomS
 @Composable
 fun PathConnectionsLayout(
     modifier: Modifier = Modifier,
+    updateCurrentlySelected: (Int) -> Unit,
+    currentlySelectedSetting: Int
 ){
-
-    var currentlySelected by rememberSaveable { mutableIntStateOf(0) }
-
     Column(modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End) {
         Text(
@@ -31,29 +30,29 @@ fun PathConnectionsLayout(
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 1
+                updateCurrentlySelected(1)
             },
             text = "Annotate Path",
-            currentlySelected = currentlySelected == 1,
+            currentlySelected = currentlySelectedSetting == 1,
             buttonColour = Color(0xFF05166b),
             textColour = Color.White
         )
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 2
+                updateCurrentlySelected(2)
             },
             text = "Remove Path Node",
-            currentlySelected = currentlySelected == 2,
+            currentlySelected = currentlySelectedSetting == 2,
             removeButton = true
         )
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 3
+                updateCurrentlySelected(3)
             },
             text = "Remove Path Edge",
-            currentlySelected = currentlySelected == 3,
+            currentlySelected = currentlySelectedSetting == 3,
             removeButton = true
         )
     }

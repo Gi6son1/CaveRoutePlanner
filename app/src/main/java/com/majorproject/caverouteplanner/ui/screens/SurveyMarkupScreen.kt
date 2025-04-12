@@ -1,7 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,14 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.automirrored.outlined.Undo
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,9 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -59,6 +58,16 @@ fun SurveyMarkupScreen(
         )
     }
 
+    var currentlySelectedMarkupOption by rememberSaveable { mutableIntStateOf(0) }
+
+    val surveyImage =
+        BitmapFactory.decodeStream(context.assets.open("llygadlchwr.jpg")).asImageBitmap()
+
+    LaunchedEffect(markupStage) {
+        currentlySelectedMarkupOption = 0
+    }
+
+
     var openHomeButtonDialog by rememberSaveable {
         mutableStateOf(false)
     }
@@ -70,10 +79,9 @@ fun SurveyMarkupScreen(
             )
         }
     ) { innerPadding ->
-        val surveyImage =
-            BitmapFactory.decodeStream(context.assets.open("llygadlchwr.jpg")).asImageBitmap()
-        var nodesList by rememberSaveable { mutableStateOf(mutableListOf<SurveyNode>()) }
-        var pathsList by rememberSaveable { mutableStateOf(mutableListOf<SurveyPath>()) }
+
+        var nodesList by rememberSaveable { mutableStateOf(listOf<SurveyNode>()) }
+        var pathsList by rememberSaveable { mutableStateOf(listOf<SurveyPath>()) }
 
         MarkupImageAndGraphOverlay(
             surveyImage = surveyImage,
@@ -81,11 +89,41 @@ fun SurveyMarkupScreen(
             paths = pathsList,
             modifier = Modifier.padding(innerPadding),
             markupStage = markupStage,
+            longPressPosition = { longPressPosition ->
+
+            },
+            onTapPosition = { tapPosition ->
+                when (markupStage) {
+                    0 -> {
+                        if (currentlySelectedMarkupOption == 1 || currentlySelectedMarkupOption == 2) {
+                            val adjustedPixelsCoordinates = calculateCoordinatePixels(
+                                tapPosition,
+                                IntSize(
+                                    width = surveyImage.width,
+                                    height = surveyImage.height
+                                )
+                            )
+                            nodesList = nodesList + SurveyNode(
+                                x = adjustedPixelsCoordinates.x.toInt(),
+                                y = adjustedPixelsCoordinates.y.toInt(),
+                                surveyId = -1,
+                                isEntrance = currentlySelectedMarkupOption == 1,
+                                isJunction = currentlySelectedMarkupOption == 2
+                            )
+                        }
+                        else if (currentlySelectedMarkupOption == 3) {
+
+                        }
+                    }
+                }
+            }
         )
 
-        ConstraintLayout(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+        ConstraintLayout(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
             val (stageButtons, homeButton, customLayout, saveButton) = createRefs()
 
             CustomIconButton(
@@ -138,34 +176,60 @@ fun SurveyMarkupScreen(
             }
 
             when (markupStage) {
-                0 -> EntrancesAndJunctionsLayout(modifier = Modifier.constrainAs(customLayout) {
-                    bottom.linkTo(stageButtons.top, margin = 20.dp)
-                    end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(parent.top, 20.dp)
-                    height = Dimension.fillToConstraints
-                }.fillMaxHeight().fillMaxWidth(0.5f)
+                0 -> EntrancesAndJunctionsLayout(
+                    modifier = Modifier
+                        .constrainAs(customLayout) {
+                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            end.linkTo(parent.end, margin = 10.dp)
+                            top.linkTo(parent.top, 20.dp)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    updateCurrentlySelected = { currentlySelectedMarkupOption = it },
+                    currentlySelectedSetting = currentlySelectedMarkupOption
                 )
 
-                1 -> PathConnectionsLayout (modifier = Modifier.constrainAs(customLayout) {
-                    bottom.linkTo(stageButtons.top, margin = 20.dp)
-                    end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(parent.top, 20.dp)
-                    height = Dimension.fillToConstraints
-                }.fillMaxHeight().fillMaxWidth(0.5f)
+                1 -> PathConnectionsLayout(
+                    modifier = Modifier
+                        .constrainAs(customLayout) {
+                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            end.linkTo(parent.end, margin = 10.dp)
+                            top.linkTo(parent.top, 20.dp)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    updateCurrentlySelected = { currentlySelectedMarkupOption = it },
+                    currentlySelectedSetting = currentlySelectedMarkupOption
                 )
-                2 -> WaterAndHardTraverseLayout (modifier = Modifier.constrainAs(customLayout) {
-                    bottom.linkTo(stageButtons.top, margin = 20.dp)
-                    end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(parent.top, 20.dp)
-                    height = Dimension.fillToConstraints
-                }.fillMaxHeight().fillMaxWidth(0.5f)
+
+                2 -> WaterAndHardTraverseLayout(
+                    modifier = Modifier
+                        .constrainAs(customLayout) {
+                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            end.linkTo(parent.end, margin = 10.dp)
+                            top.linkTo(parent.top, 20.dp)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    updateCurrentlySelected = { currentlySelectedMarkupOption = it },
+                    currentlySelectedSetting = currentlySelectedMarkupOption
                 )
-                3 -> AltitudesLayout (modifier = Modifier.constrainAs(customLayout) {
-                    bottom.linkTo(stageButtons.top, margin = 20.dp)
-                    end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(parent.top, 20.dp)
-                    height = Dimension.fillToConstraints
-                }.fillMaxHeight().fillMaxWidth(0.5f)
+
+                3 -> AltitudesLayout(
+                    modifier = Modifier
+                        .constrainAs(customLayout) {
+                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            end.linkTo(parent.end, margin = 10.dp)
+                            top.linkTo(parent.top, 20.dp)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    updateCurrentlySelected = { currentlySelectedMarkupOption = it },
+                    currentlySelectedSetting = currentlySelectedMarkupOption
                 )
             }
         }
@@ -178,4 +242,11 @@ fun SurveyMarkupScreen(
         )
 
     }
+}
+
+fun calculateCoordinatePixels(coords: Offset, size: IntSize): Offset {
+    return Offset(
+        x = (coords.x * size.width.toFloat()),
+        y = (coords.y * size.height.toFloat())
+    )
 }

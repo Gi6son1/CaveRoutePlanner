@@ -23,9 +23,9 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomS
 @Composable
 fun EntrancesAndJunctionsLayout(
     modifier: Modifier = Modifier,
+    updateCurrentlySelected: (Int) -> Unit,
+    currentlySelectedSetting: Int
 ){
-    var currentlySelected by rememberSaveable { mutableIntStateOf(0) }
-
     Column(modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End) {
         Text(
@@ -34,30 +34,30 @@ fun EntrancesAndJunctionsLayout(
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 1
+                updateCurrentlySelected(1)
             },
             text = "Entrance",
-            currentlySelected = currentlySelected == 1,
+            currentlySelected = currentlySelectedSetting == 1,
             buttonColour = Color(0xFF05166b),
             textColour = Color.White
         )
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 2
+                updateCurrentlySelected(2)
             },
             text = "Junction",
-            currentlySelected = currentlySelected == 2,
+            currentlySelected = currentlySelectedSetting == 2,
             buttonColour = Color(0xFF730606),
             textColour = Color.White
         )
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
             onClick = {
-                currentlySelected = 3
+                updateCurrentlySelected(3)
             },
             text = "Remove",
-            currentlySelected = currentlySelected == 3,
+            currentlySelected = currentlySelectedSetting == 3,
             removeButton = true
         )
     }

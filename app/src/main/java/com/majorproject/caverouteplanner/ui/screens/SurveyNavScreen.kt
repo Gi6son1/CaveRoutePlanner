@@ -28,6 +28,7 @@ import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.ImageWithGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.Survey
+import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
 
@@ -65,7 +66,7 @@ fun SurveyNavScreen(
             mutableStateOf(null)
         }
 
-        var pinPointNode: Int? by rememberSaveable {
+        var pinPointNode: SurveyNode? by rememberSaveable {
             mutableStateOf(null)
         }
 
@@ -73,8 +74,8 @@ fun SurveyNavScreen(
             mutableStateOf(null)
         }
 
-        var sourceId: Int by rememberSaveable {
-            mutableIntStateOf(0)
+        var sourceNode: SurveyNode by rememberSaveable {
+            mutableStateOf(survey.nodes[0])
         }
 
         var compassEnabled: Boolean by rememberSaveable {
@@ -95,7 +96,7 @@ fun SurveyNavScreen(
 
         fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null) {
             routeFinder = RouteFinder(
-                sourceId = sourceId,
+                sourceNode = sourceNode,
                 survey = survey,
                 flags = if (tempFlags != null) tempFlags else currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers
@@ -144,7 +145,7 @@ fun SurveyNavScreen(
                 longPressPosition = { tapPosition ->
                     if (currentRoute == null || currentRoute?.routeStarted == false) {
                         resetRouteFinder()
-                        val nearestNode = survey.getNearestNode(tapPosition)
+                        val nearestNode = survey.nearestNode(tapPosition)
 
                         if (nearestNode != null) {
                             pinPointNode = nearestNode
@@ -154,7 +155,7 @@ fun SurveyNavScreen(
                 },
                 pinpointDestinationNode = pinPointNode,
                 currentRoute = currentRoute,
-                pinpointSourceNode = sourceId,
+                pinpointSourceNode = sourceNode,
                 onTap = {
                     if (currentRoute != null && currentRoute!!.routeStarted){
                         inJourneyExtended = !inJourneyExtended
@@ -169,9 +170,11 @@ fun SurveyNavScreen(
             PreJourneyLayout(
                 currentRoute = currentRoute,
                 setSource = {
-                    sourceId = pinPointNode!!
-                    pinPointNode = null
-                    currentRoute = null
+                    if (pinPointNode != null) {
+                        sourceNode = pinPointNode!!
+                        pinPointNode = null
+                        currentRoute = null
+                    }
                 },
                 removePin = {
                     pinPointNode = null
@@ -186,13 +189,15 @@ fun SurveyNavScreen(
                     }
                 },
                 caveExit = {
-                    sourceId = pinPointNode!!
+                    if (pinPointNode != null){
+                        sourceNode = pinPointNode!!
 
-                    resetRouteFinder()
+                        resetRouteFinder()
 
-                    val nearestExit = routeFinder?.findNearestExit()
-                    pinPointNode = nearestExit
-                    if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                        val nearestExit = routeFinder?.findNearestExit()
+                        pinPointNode = nearestExit
+                        if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                    }
                 },
                 currentTravelConditions = currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers,
@@ -206,16 +211,20 @@ fun SurveyNavScreen(
                     pinPointNode = null
                 },
                 caveExit = { currentLocation, emergencyExit ->
-                    sourceId = currentLocation
-                    resetRouteFinder(if (emergencyExit) Triple(false, false, true) else null)
+                    val foundNode = survey.nodes.find { it.getNodeId() == currentLocation }
+                    if (foundNode != null) {
+                        sourceNode = foundNode
+                        resetRouteFinder(if (emergencyExit) Triple(false, false, true) else null)
 
-                    val nearestExit = routeFinder?.findNearestExit()
+                        val nearestExit = routeFinder?.findNearestExit()
 
-                    if (nearestExit != null) {
-                        pinPointNode = nearestExit
+                        if (nearestExit != null) {
+                            pinPointNode = nearestExit
 
-                        currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                            currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                        }
                     }
+
                 },
                 extendedView = inJourneyExtended,
                 onCompassClick = {

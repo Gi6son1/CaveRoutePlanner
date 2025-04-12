@@ -11,7 +11,7 @@ import kotlin.math.pow
 
 @Parcelize
 data class RouteFinder(
-    val sourceId: Int,
+    val sourceNode: SurveyNode,
     val survey: Survey,
     val flags: Triple<Boolean, Boolean, Boolean>,
     val avoidEdges: List<Int> = listOf(),
@@ -34,9 +34,6 @@ data class RouteFinder(
             }
             return pathList
         }
-
-        val sourceNode =
-            survey.nodes.find { it.getNodeId() == sourceId } ?: throw Exception("Source node not found")
 
         val (noWater, noHardTraverse, highAltitude) = flags
 
@@ -100,8 +97,8 @@ data class RouteFinder(
     }
 
 
-    fun getRouteToNode(nodeId: Int): Route? {
-        var currentNode = survey.nodes.find { it.getNodeId() == nodeId } ?: return null
+    fun getRouteToNode(node: SurveyNode?): Route? {
+        var currentNode = node ?: return null
         var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
@@ -114,7 +111,7 @@ data class RouteFinder(
             return Triple(foundEdge!!, neighbourNode, foundEdge.distance)
         }
 
-        while (currentNode.getNodeId() != sourceId) {
+        while (currentNode.getNodeId() != sourceNode.getNodeId()) {
             val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode)
             totalDistance += newDistance
             if (currentNode.isJunction) {
@@ -133,15 +130,15 @@ data class RouteFinder(
         return Route(
             routeList = routeList,
             totalDistance = totalDistance,
-            sourceNode = sourceId,
+            sourceNode = sourceNode.getNodeId(),
             numberOfTravellers = numberOfTravellers
         )
     }
 
-    fun findNearestExit(): Int? {
+    fun findNearestExit(): SurveyNode? {
         val exitNodes = survey.caveExits()
         var nearestExitDistance: Float = Float.MAX_VALUE
-        var nearestExit: Int? = null
+        var nearestExit: SurveyNode? = null
 
         for (exit in exitNodes) {
             if (getRouteToNode(exit) != null) {
