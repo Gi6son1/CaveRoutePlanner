@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,7 +7,6 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,25 +18,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.majorproject.caverouteplanner.R
-import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
-import com.majorproject.caverouteplanner.navigation.Route
-import kotlin.math.atan2
-import kotlin.math.cos
+import com.majorproject.caverouteplanner.ui.util.calculateFractionalOffset
 import kotlin.math.max
-import kotlin.math.sin
 
 @Composable
 fun MarkupImageAndGraphOverlay(
@@ -154,10 +144,10 @@ fun MarkupImageAndGraphOverlay(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                    bitmap = surveyImage,
-                    contentDescription = "survey",
-                    modifier = Modifier,
-                    contentScale = ContentScale.Fit
+                bitmap = surveyImage,
+                contentDescription = "survey",
+                modifier = Modifier,
+                contentScale = ContentScale.Fit
             )
 
             MarkupGraphOverlay(
@@ -183,37 +173,64 @@ fun MarkupGraphOverlay(
     surveySize: IntSize,
     markupStage: Int
 ) {
+    val altitudeColours = remember {
+        listOf(
+            Color(0xFF001433),
+            Color(0xFF003366),
+            Color(0xFF005C99),
+            Color(0xFF0086A8),
+            Color(0xFF00997A),
+            Color(0xFF228B22),
+            Color(0xFF6B8E23),
+            Color(0xFFB8860B),
+            Color(0xFFCD6600),
+            Color(0xFFB22222),
+            Color(0xFF800000)
+        )
+    }
+
     Canvas(modifier = modifier) {
-        for (node in nodes) {
-            drawCircle(
-                color = Color.Green,
-                radius = 2f,
-                center = Offset(
-                    (node.x / surveySize.width.toFloat()) * size.width,
-                    (node.y / surveySize.height.toFloat()) * size.height
+        if (markupStage == 0 || markupStage == 1) {
+            nodes.forEach { node ->
+                drawCircle(
+                    color = if (node.isEntrance) Color(0xFF05166b) else if (node.isJunction) Color(
+                        0xFF730606
+                    ) else Color.DarkGray,
+                    radius = if (node.isEntrance || node.isJunction) 3f else 2f,
+                    center = Offset(
+                        (node.x / surveySize.width.toFloat()) * size.width,
+                        (node.y / surveySize.height.toFloat()) * size.height
+                    )
                 )
-            )
+            }
         }
+        if (markupStage == 1 || markupStage == 2 || markupStage == 3) {
+            paths.forEach { path ->
+                val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
-        for (path in paths) {
-            val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
-            val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
+                drawLine(
+                    color = when {
+                        markupStage == 3 -> altitudeColours[path.altitude + 5]
+                        markupStage == 1 -> Color.DarkGray
+                        path.isHardTraverse && path.hasWater -> Color(0xFF36056b)
+                        path.isHardTraverse -> Color(0xFF730606)
+                        path.hasWater -> Color(0xFF05166b)
+                        else -> Color.DarkGray
+                    },
 
-            drawLine(
-                color = if (path.hasWater) Color(0xFF007ADD) else Color(0xFFA3A3A3),
-
-                start = Offset(
-                    (startNode.x / surveySize.width.toFloat()) * size.width,
-                    (startNode.y / surveySize.height.toFloat()) * size.height
-                ),
-                end = Offset(
-                    (endNode.x / surveySize.width.toFloat()) * size.width,
-                    (endNode.y / surveySize.height.toFloat()) * size.height
-                ),
-                strokeWidth = 4f,
-                cap = StrokeCap.Round
-            )
-
+                    start = Offset(
+                        (startNode.x / surveySize.width.toFloat()) * size.width,
+                        (startNode.y / surveySize.height.toFloat()) * size.height
+                    ),
+                    end = Offset(
+                        (endNode.x / surveySize.width.toFloat()) * size.width,
+                        (endNode.y / surveySize.height.toFloat()) * size.height
+                    ),
+                    strokeWidth = 4f,
+                    cap = StrokeCap.Round
+                )
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import androidx.room.Relation
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
 import kotlinx.parcelize.Parcelize
+import kotlin.math.pow
 
 @Parcelize
 data class OldSurveyType(
@@ -56,7 +57,7 @@ data class Survey(
     }
 
     fun nearestNode(pointCoordinates: Offset): SurveyNode? {
-        return getNearestNode(pointCoordinates, nodes, properties.width, properties.height)
+        return getNearestNode(pointCoordinates, nodes, properties.width, properties.height, 0.05f)
     }
 
     fun caveExits(): List<SurveyNode> {

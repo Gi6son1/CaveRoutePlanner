@@ -35,6 +35,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.navigation.Route
+import com.majorproject.caverouteplanner.ui.util.calculateAngle
+import com.majorproject.caverouteplanner.ui.util.calculateDistance
+import com.majorproject.caverouteplanner.ui.util.calculateFractionalOffset
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -245,25 +248,11 @@ fun ImageWithGraphOverlay(
     }
 }
 
-fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
-    val angle = Math.toDegrees(
-        atan2(
-            (coord2.second - coord1.second).toDouble(),
-            (coord2.first - coord1.first).toDouble()
-        )
-    )
-
-    return angle
-}
-
 fun performFocusedTransformation(
     currentRoute: Route,
     nodes: List<SurveyNode>,
     calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
-    fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =
-        kotlin.math.sqrt((coord2.second - coord1.second).toFloat() * (coord2.second - coord1.second).toFloat() + (coord2.first - coord1.first).toFloat() * (coord2.first - coord1.first).toFloat())
-
     fun calculateCentroid(currentStage: List<SurveyPath>): Pair<Int, Int>? {
         var cumulativeCentroidX = 0f
         var cumulativeCentroidY = 0f
@@ -298,13 +287,6 @@ fun performFocusedTransformation(
         calculateDistance(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
 
     calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
-}
-
-fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
-    return Offset(
-        x = (tapLoc.x / size.width.toFloat()),
-        y = (tapLoc.y / size.height.toFloat())
-    )
 }
 
 @Composable
@@ -452,7 +434,7 @@ fun GraphOverlay(
                     )
                     if (compassRotation != null) {
                         rotate(
-                            degrees = (compassRotation - 180).toFloat(),
+                            degrees = compassRotation.toFloat(),
                             pivot = Offset(
                                 (currentStartNode.x / surveySize.width.toFloat()) * size.width,
                                 (currentStartNode.y / surveySize.height.toFloat()) * size.height
@@ -574,11 +556,4 @@ fun GraphOverlay(
             }
         }
     }
-}
-
-fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
-    val pixelsPerMeter = 14.600609f
-    val xDiff = (end.first - start.first).toFloat()
-    val yDiff = (end.second - start.second).toFloat()
-    return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
 }

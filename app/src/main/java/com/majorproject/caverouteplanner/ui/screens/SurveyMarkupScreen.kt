@@ -1,6 +1,7 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,8 @@ import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLa
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAndJunctionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.PathConnectionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.WaterAndHardTraverseLayout
+import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
+import com.majorproject.caverouteplanner.ui.util.getNearestNode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +75,9 @@ fun SurveyMarkupScreen(
         mutableStateOf(false)
     }
 
+    var nodesList by rememberSaveable { mutableStateOf(listOf<SurveyNode>()) }
+    var pathsList by rememberSaveable { mutableStateOf(listOf<SurveyPath>()) }
+
     BackGroundScaffold(
         topBar = {
             TopAppBar(
@@ -80,8 +86,6 @@ fun SurveyMarkupScreen(
         }
     ) { innerPadding ->
 
-        var nodesList by rememberSaveable { mutableStateOf(listOf<SurveyNode>()) }
-        var pathsList by rememberSaveable { mutableStateOf(listOf<SurveyPath>()) }
 
         MarkupImageAndGraphOverlay(
             surveyImage = surveyImage,
@@ -103,17 +107,26 @@ fun SurveyMarkupScreen(
                                     height = surveyImage.height
                                 )
                             )
-                            nodesList = nodesList + SurveyNode(
+                            val newList = nodesList + SurveyNode(
                                 x = adjustedPixelsCoordinates.x.toInt(),
                                 y = adjustedPixelsCoordinates.y.toInt(),
                                 surveyId = -1,
                                 isEntrance = currentlySelectedMarkupOption == 1,
                                 isJunction = currentlySelectedMarkupOption == 2
                             )
+                            nodesList = newList
                         }
                         else if (currentlySelectedMarkupOption == 3) {
-
+                            val foundNode = getNearestNode(tapPosition, nodesList, surveyImage.width, surveyImage.height, 0.001f)
+                            if (foundNode != null) {
+                                val newList = nodesList.toMutableList()
+                                newList.remove(foundNode)
+                                nodesList = newList
+                            }
                         }
+                    }
+                    1 -> {
+
                     }
                 }
             }
@@ -242,11 +255,4 @@ fun SurveyMarkupScreen(
         )
 
     }
-}
-
-fun calculateCoordinatePixels(coords: Offset, size: IntSize): Offset {
-    return Offset(
-        x = (coords.x * size.width.toFloat()),
-        y = (coords.y * size.height.toFloat())
-    )
 }
