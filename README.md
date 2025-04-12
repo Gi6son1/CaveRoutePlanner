@@ -114,6 +114,16 @@ I finishhed off the database implementation, replacing the old system with the n
 
 I also started work on the landing page, where the list of caves will be. After making a card to hold the cave data, I turned it into a button which I used to select a cave from the list of caves read from the DB (currently only one). I also used my previous project work for inspiration on how I'd join up the cave list screen and the navigation screen, https://github.com/Gi6son1/Quizel-App/blob/main/app/src/main/java/com/cs31620/quizel/MainActivity.kt and now it's set up so that when a cave in the list is tapped on, the corresponding survey is read from the DB and the user can navigate with it, and the home button in the navigation screen sends the user back to the main menu if tapped. Bosh. Still need to make it look prettier since it's pretty basic, but functionality is there, and I should soon be able to work on the create your own navigateable survey feature. For the expandable list I used this: https://mrugendrathatte.medium.com/expandable-list-in-compose-b5ebdd768f37
 
+05/04/2025
+I am a god. Turns out to work out the sensor fusion stuff, I looking in the wrong place. I looked for libraries that would do this for me, HOWEVER, in android studio, there's stuff that already exists that uses sensor fusion. There's a class callled the Sensor Manager https://developer.android.com/reference/android/hardware/SensorManager.html that allows you to register a specific sensor to be monitored. 
+I started out by looking at this tutorial https://www.kodeco.com/10838302-sensors-tutorial-for-android-getting-started/page/2 that walks you through how to use the accelarometor and magnetometer to read in sensor imput about the phones magnetic inputs and combines them with the accelarometer to be able to find the Z axis rotation, with respect to true north. 
+I decided to use this one the direction arrow instead the entire survey box because I realised that 
+a) the sensor input didn't have any filtering which means that the rotation would be very jittery, so adding that jitter rotation on a smaller object would make the experience better for the user.
+b) Rotating the screen is great, but the direction arrow  doesnt' rotate and actually it less confusing to the user if the arrow is rotated instead of the map, so that they can the rotate it towards the correct direction (which would aligh their phone straight towards the correct direction)
+This gave a good base compass. I then started looking at filters to apply to the input data to smooth it out, and in my search, I discovered that another sesnor RotationVector https://source.android.com/docs/core/interaction/sensors/sensor-types#rotation_vector, https://developer.android.com/develop/sensors-and-location/sensors/sensors_motion#sensors-motion-rotate actually already combines the magnetometer, gyroscope, and accelerometer, with smoothing and filtering, to provide a better sense of direction. Using the same technique from the tutorial (and the example code in the rotationVector page) to turn the data into z-axis direction, I was able to greatly improve the compass feature, and now it's mint!
+
+Enough procrastinating, I should probably work on the survey creation feature now, but it's just so long! And I can't be bothered.
+
 
 
 
