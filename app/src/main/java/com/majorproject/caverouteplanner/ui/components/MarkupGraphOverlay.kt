@@ -48,6 +48,7 @@ fun MarkupImageAndGraphOverlay(
     modifier: Modifier = Modifier,
     longPressPosition: (Offset) -> Unit = {},
     onTapPosition: (Offset) -> Unit = {},
+    markupStage: Int
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -166,7 +167,8 @@ fun MarkupImageAndGraphOverlay(
                     width = surveyImage.width,
                     height = surveyImage.height
                 ),
-                paths = paths
+                paths = paths,
+                markupStage = markupStage
             )
         }
     }
@@ -179,6 +181,7 @@ fun MarkupGraphOverlay(
     nodes: List<SurveyNode>,
     paths: List<SurveyPath>,
     surveySize: IntSize,
+    markupStage: Int
 ) {
     Canvas(modifier = modifier) {
         for (node in nodes) {

@@ -11,7 +11,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -77,13 +79,14 @@ fun SurveyMarkupScreen(
             surveyImage = surveyImage,
             nodes = nodesList,
             paths = pathsList,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            markupStage = markupStage,
         )
 
         ConstraintLayout(modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize()) {
-            val (stageButtons, undoButton, homeButton, customLayout) = createRefs()
+            val (stageButtons, homeButton, customLayout, saveButton) = createRefs()
 
             CustomIconButton(
                 onClick = { openHomeButtonDialog = true },
@@ -93,6 +96,16 @@ fun SurveyMarkupScreen(
                 },
                 iconVector = Icons.Outlined.Home,
                 contentDescription = "Home"
+            )
+
+            CustomIconButton(
+                onClick = {},
+                modifier = Modifier.constrainAs(saveButton) {
+                    top.linkTo(homeButton.bottom, margin = 20.dp)
+                    start.linkTo(parent.start, margin = 10.dp)
+                },
+                iconVector = Icons.Outlined.Save,
+                contentDescription = "Save",
             )
 
             Row(modifier = Modifier.constrainAs(stageButtons) {
@@ -128,7 +141,7 @@ fun SurveyMarkupScreen(
                 0 -> EntrancesAndJunctionsLayout(modifier = Modifier.constrainAs(customLayout) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
                     end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(homeButton.bottom, 20.dp)
+                    top.linkTo(parent.top, 20.dp)
                     height = Dimension.fillToConstraints
                 }.fillMaxHeight().fillMaxWidth(0.5f)
                 )
@@ -136,37 +149,25 @@ fun SurveyMarkupScreen(
                 1 -> PathConnectionsLayout (modifier = Modifier.constrainAs(customLayout) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
                     end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(homeButton.bottom, 20.dp)
+                    top.linkTo(parent.top, 20.dp)
                     height = Dimension.fillToConstraints
                 }.fillMaxHeight().fillMaxWidth(0.5f)
                 )
                 2 -> WaterAndHardTraverseLayout (modifier = Modifier.constrainAs(customLayout) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
                     end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(homeButton.bottom, 20.dp)
+                    top.linkTo(parent.top, 20.dp)
                     height = Dimension.fillToConstraints
                 }.fillMaxHeight().fillMaxWidth(0.5f)
                 )
                 3 -> AltitudesLayout (modifier = Modifier.constrainAs(customLayout) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
                     end.linkTo(parent.end, margin = 10.dp)
-                    top.linkTo(homeButton.bottom, 20.dp)
+                    top.linkTo(parent.top, 20.dp)
                     height = Dimension.fillToConstraints
                 }.fillMaxHeight().fillMaxWidth(0.5f)
                 )
             }
-
-            CustomTextButton(
-                onClick = {},
-                text = "Undo",
-                modifier = Modifier.constrainAs(undoButton) {
-                    bottom.linkTo(customLayout.bottom, margin = 20.dp)
-                    start.linkTo(parent.start, margin = 10.dp)
-                },
-                iconVector = Icons.AutoMirrored.Outlined.Undo
-            )
-
-
         }
 
         ActionCheckDialog(
