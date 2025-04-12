@@ -39,6 +39,7 @@ import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 @Composable
 fun CaveListScreenTopLevel(
     navigateToSurvey: (Int) -> Unit = {},
+    markupNewSurvey: () -> Unit = {}
 ) {
     val context = LocalContext.current.applicationContext
     val repository = CaveRoutePlannerRepository(context as Application)
@@ -53,6 +54,9 @@ fun CaveListScreenTopLevel(
     CaveListScreen(caveList = orderedList,
         navigateSurvey = { surveyId ->
             navigateToSurvey(surveyId)
+        },
+        markupNewSurvey = {
+            markupNewSurvey()
         }
     )
 }
@@ -61,7 +65,8 @@ fun CaveListScreenTopLevel(
 @Composable
 fun CaveListScreen(
     caveList: List<List<Cave>>,
-    navigateSurvey: (Int) -> Unit = {}
+    navigateSurvey: (Int) -> Unit = {},
+    markupNewSurvey: () -> Unit = {}
 ){
     BackGroundScaffold(
         topBar = {
@@ -70,7 +75,7 @@ fun CaveListScreen(
             )
         },
         floatingActionButton = {
-            LargeFloatingActionButton(onClick = { /*TODO*/ },
+            LargeFloatingActionButton(onClick = { markupNewSurvey() },
                 ){
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
             }

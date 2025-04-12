@@ -6,6 +6,7 @@ sealed class Screen(
 ) {
     data object CaveListScreen : Screen("cave_list_screen")
     data object SurveyNavScreen : Screen("survey_nav_screen", "survey_id")
+    data object SurveyMarkupScreen : Screen("survey_markup_screen")
 
     fun routePath() =
         if (argument.isNotEmpty())

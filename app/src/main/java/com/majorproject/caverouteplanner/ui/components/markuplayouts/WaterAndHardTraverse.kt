@@ -1,4 +1,10 @@
 package com.majorproject.caverouteplanner.ui.components.markuplayouts
 
-class WaterAndHardTraverse {
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@Composable
+fun WaterAndHardTraverseLayout(
+    modifier: Modifier = Modifier,
+){
 }
