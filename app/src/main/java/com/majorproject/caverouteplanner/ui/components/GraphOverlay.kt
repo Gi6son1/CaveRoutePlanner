@@ -73,6 +73,8 @@ fun ImageWithGraphOverlay(
         with(density) { currentConfiguration.screenHeightDp.dp.toPx() }
     }
 
+    var currentlyTransformGesturing by remember { mutableStateOf(false) }
+
     LaunchedEffect(currentRoute?.currentStage) {
         if (currentRoute != null && currentRoute.currentStage != -1) {
             performFocusedTransformation(
@@ -158,8 +160,18 @@ fun ImageWithGraphOverlay(
                         rotation += newRotate
                         offset = adjustedOffset
 
-                    }
+                    },
                 )
+            }
+            .pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        val pressedPointers = event.changes.count { it.pressed }
+
+                        currentlyTransformGesturing = pressedPointers >= 2
+                    }
+                }
             }
     ) {
         val (overlay) = createRefs()
@@ -181,17 +193,19 @@ fun ImageWithGraphOverlay(
                 .onGloballyPositioned { coordinates ->
                     boxSize = coordinates.size
                 }
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { longPressLoc ->
-                            val fractionalTapPosition =
-                                calculateFractionalOffset(longPressLoc, boxSize)
-                            longPressPosition(fractionalTapPosition)
-                        },
-                        onTap = {
-                            onTap()
-                        }
-                    )
+                .pointerInput(currentlyTransformGesturing) {
+                    if (!currentlyTransformGesturing) {
+                        detectTapGestures(
+                            onLongPress = { longPressLoc ->
+                                val fractionalTapPosition =
+                                    calculateFractionalOffset(longPressLoc, boxSize)
+                                longPressPosition(fractionalTapPosition)
+                            },
+                            onTap = {
+                                onTap()
+                            }
+                        )
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -417,8 +431,6 @@ fun GraphOverlay(
                 Pair(currentPathEndNode!!.x, currentPathEndNode.y)
             ).toFloat()
 
-            val adjustedAngle = currentStartAngle + 90
-
             val iconOffsetX = currentDirectionIcon.width.toFloat()
             val iconOffsetY = currentDirectionIcon.height.toFloat()
 
@@ -449,7 +461,7 @@ fun GraphOverlay(
                         )
                     } else {
                         rotate(
-                            degrees = adjustedAngle,
+                            degrees = currentStartAngle,
                             pivot = Offset(
                                 (currentStartNode.x / surveySize.width.toFloat()) * size.width,
                                 (currentStartNode.y / surveySize.height.toFloat()) * size.height

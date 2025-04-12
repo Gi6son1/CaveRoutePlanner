@@ -66,7 +66,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             }
         }
 
-        private suspend fun populateDatabase(context: Context, db: CaveRoutePlannerRoomDatabase) {
+        private fun populateDatabase(context: Context, db: CaveRoutePlannerRoomDatabase) {
             val surveyDao = db.surveyDao()
             val surveyNodeDao = db.surveyNodeDao()
             val surveyPathDao = db.surveyPathDao()

@@ -11,7 +11,7 @@ import com.majorproject.caverouteplanner.ui.components.Cave
 @Dao
 interface CaveDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCaveProperties(caveProperties: CaveProperties)
+    fun insertCaveProperties(caveProperties: CaveProperties)
 
     @Query("SELECT * FROM caves WHERE name = :caveId")
     fun getCaveProperties(caveId: Int): CaveProperties?
