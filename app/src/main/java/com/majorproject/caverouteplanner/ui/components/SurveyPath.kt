@@ -46,10 +46,10 @@ data class SurveyPath(
     val id: Int = 0,
     @TypeConverters(PairConverter::class)
     val ends: Pair<Int, Int>,
-    val distance: Float = 0.0f,
-    val hasWater: Boolean = false,
-    val altitude: Int = 0,
-    val isHardTraverse: Boolean = false,
+    var distance: Float = 0.0f,
+    var hasWater: Boolean = false,
+    var altitude: Int = 0,
+    var isHardTraverse: Boolean = false,
     val surveyId: Int
 ): Parcelable {
     fun next(currentId: Int) : Int {

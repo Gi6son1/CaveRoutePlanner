@@ -23,8 +23,7 @@ fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
     return angle
 }
 
-fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>): Float {
-    val pixelsPerMeter = 14.600609f
+fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>, pixelsPerMeter: Float): Float {
     val xDiff = (end.first - start.first).toFloat()
     val yDiff = (end.second - start.second).toFloat()
     return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter

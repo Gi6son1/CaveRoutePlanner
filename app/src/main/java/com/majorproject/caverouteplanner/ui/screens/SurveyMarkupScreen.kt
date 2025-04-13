@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -39,11 +40,18 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionC
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLayout
+import com.majorproject.caverouteplanner.ui.components.markuplayouts.DistanceAndCompassCalibrationLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAndJunctionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.PathConnectionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.WaterAndHardTraverseLayout
 import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
+import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
+
+val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
+    save = { offset -> Pair(offset.x, offset.y) },
+    restore = { pair -> Offset(pair.first, pair.second) }
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,6 +62,7 @@ fun SurveyMarkupScreen(
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
     val titleList = remember {
         listOf(
+            "Compass/Distance calibration",
             "Entrances/Junctions",
             "Connect Paths",
             "Water/Hard Traverse",
@@ -78,6 +87,11 @@ fun SurveyMarkupScreen(
     var nodesList by rememberSaveable { mutableStateOf(listOf<SurveyNode>()) }
     var pathsList by rememberSaveable { mutableStateOf(listOf<SurveyPath>()) }
 
+    var northMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var centreMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distanceMarker1 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distanceMarker2 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+
     BackGroundScaffold(
         topBar = {
             TopAppBar(
@@ -93,12 +107,24 @@ fun SurveyMarkupScreen(
             paths = pathsList,
             modifier = Modifier.padding(innerPadding),
             markupStage = markupStage,
+            northMarker = northMarker,
+            centreMarker = centreMarker,
+            distanceMarker1 = distanceMarker1,
+            distanceMarker2 = distanceMarker2,
             longPressPosition = { longPressPosition ->
 
             },
             onTapPosition = { tapPosition ->
                 when (markupStage) {
                     0 -> {
+                        when (currentlySelectedMarkupOption) {
+                            1 -> northMarker = tapPosition
+                            2 -> centreMarker = tapPosition
+                            3 -> distanceMarker1 = tapPosition
+                            4 -> distanceMarker2 = tapPosition
+                        }
+                    }
+                    1 -> {
                         if (currentlySelectedMarkupOption == 1 || currentlySelectedMarkupOption == 2) {
                             val adjustedPixelsCoordinates = calculateCoordinatePixels(
                                 tapPosition,
@@ -125,8 +151,31 @@ fun SurveyMarkupScreen(
                             }
                         }
                     }
-                    1 -> {
+                    2 -> {
 
+                    }
+                    3 -> {
+                        val foundPath = getNearestLine(tapPosition, nodesList, pathsList, surveyImage.width, surveyImage.height, 0.25f)
+                        if (foundPath != null) {
+                            val newList = pathsList.toMutableList()
+                            when (currentlySelectedMarkupOption) {
+                                1 -> newList[newList.indexOf(foundPath)].hasWater = true
+                                2 -> newList[newList.indexOf(foundPath)].isHardTraverse = true
+                                3 -> {
+                                    newList[newList.indexOf(foundPath)].hasWater = false
+                                    newList[newList.indexOf(foundPath)].isHardTraverse = false
+                                }
+                            }
+                            pathsList = newList
+                        }
+                    }
+                    4 -> {
+                        val foundPath = getNearestLine(tapPosition, nodesList, pathsList, surveyImage.width, surveyImage.height, 0.25f)
+                        if (foundPath != null) {
+                            val newList = pathsList.toMutableList()
+                            newList[newList.indexOf(foundPath)].altitude = currentlySelectedMarkupOption-5
+                            pathsList = newList
+                        }
                     }
                 }
             }
@@ -189,7 +238,20 @@ fun SurveyMarkupScreen(
             }
 
             when (markupStage) {
-                0 -> EntrancesAndJunctionsLayout(
+                0 -> DistanceAndCompassCalibrationLayout(
+                    modifier = Modifier
+                        .constrainAs(customLayout) {
+                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            end.linkTo(parent.end, margin = 10.dp)
+                            top.linkTo(parent.top, 20.dp)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    updateCurrentlySelected = { currentlySelectedMarkupOption = it },
+                    currentlySelectedSetting = currentlySelectedMarkupOption
+                )
+                1 -> EntrancesAndJunctionsLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
                             bottom.linkTo(stageButtons.top, margin = 20.dp)
@@ -203,7 +265,7 @@ fun SurveyMarkupScreen(
                     currentlySelectedSetting = currentlySelectedMarkupOption
                 )
 
-                1 -> PathConnectionsLayout(
+                2 -> PathConnectionsLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
                             bottom.linkTo(stageButtons.top, margin = 20.dp)
@@ -217,7 +279,7 @@ fun SurveyMarkupScreen(
                     currentlySelectedSetting = currentlySelectedMarkupOption
                 )
 
-                2 -> WaterAndHardTraverseLayout(
+                3 -> WaterAndHardTraverseLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
                             bottom.linkTo(stageButtons.top, margin = 20.dp)
@@ -231,7 +293,7 @@ fun SurveyMarkupScreen(
                     currentlySelectedSetting = currentlySelectedMarkupOption
                 )
 
-                3 -> AltitudesLayout(
+                4 -> AltitudesLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
                             bottom.linkTo(stageButtons.top, margin = 20.dp)

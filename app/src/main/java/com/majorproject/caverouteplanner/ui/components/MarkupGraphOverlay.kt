@@ -38,7 +38,11 @@ fun MarkupImageAndGraphOverlay(
     modifier: Modifier = Modifier,
     longPressPosition: (Offset) -> Unit,
     onTapPosition: (Offset) -> Unit,
-    markupStage: Int
+    markupStage: Int,
+    northMarker: Offset,
+    centreMarker: Offset,
+    distanceMarker1: Offset,
+    distanceMarker2: Offset
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -158,7 +162,11 @@ fun MarkupImageAndGraphOverlay(
                     height = surveyImage.height
                 ),
                 paths = paths,
-                markupStage = markupStage
+                markupStage = markupStage,
+                northMarker = northMarker,
+                centreMarker = centreMarker,
+                distanceMarker1 = distanceMarker1,
+                distanceMarker2 = distanceMarker2
             )
         }
     }
@@ -171,7 +179,11 @@ fun MarkupGraphOverlay(
     nodes: List<SurveyNode>,
     paths: List<SurveyPath>,
     surveySize: IntSize,
-    markupStage: Int
+    markupStage: Int,
+    northMarker: Offset,
+    centreMarker: Offset,
+    distanceMarker1: Offset,
+    distanceMarker2: Offset
 ) {
     val altitudeColours = remember {
         listOf(
@@ -190,7 +202,42 @@ fun MarkupGraphOverlay(
     }
 
     Canvas(modifier = modifier) {
-        if (markupStage == 0 || markupStage == 1) {
+        if (markupStage == 0){
+            drawCircle(
+                color = Color(0xFF05166b),
+                radius = 2f,
+                center = Offset(
+                    northMarker.x * size.width,
+                    northMarker.y* size.height
+                )
+            )
+            drawCircle(
+                color = Color(0xFF730606),
+                radius = 2f,
+                center = Offset(
+                    centreMarker.x * size.width,
+                    centreMarker.y* size.height
+                )
+            )
+            drawCircle(
+                color = Color(0xFF228B22),
+                radius = 2f,
+                center = Offset(
+                    distanceMarker1.x * size.width,
+                    distanceMarker1.y* size.height
+                )
+            )
+            drawCircle(
+                color = Color(0xFF228B22),
+                radius = 2f,
+                center = Offset(
+                    distanceMarker2.x * size.width,
+                    distanceMarker2.y* size.height
+                )
+            )
+        }
+
+        if (markupStage == 1 || markupStage == 2) {
             nodes.forEach { node ->
                 drawCircle(
                     color = if (node.isEntrance) Color(0xFF05166b) else if (node.isJunction) Color(
@@ -204,7 +251,7 @@ fun MarkupGraphOverlay(
                 )
             }
         }
-        if (markupStage == 1 || markupStage == 2 || markupStage == 3) {
+        if (markupStage == 2 || markupStage == 3 || markupStage == 4) {
             paths.forEach { path ->
                 val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
                 val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
