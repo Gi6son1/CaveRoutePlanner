@@ -42,7 +42,8 @@ fun MarkupImageAndGraphOverlay(
     northMarker: Offset,
     centreMarker: Offset,
     distanceMarker1: Offset,
-    distanceMarker2: Offset
+    distanceMarker2: Offset,
+    currentlySelectedSurveyNode: SurveyNode?
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
@@ -166,7 +167,8 @@ fun MarkupImageAndGraphOverlay(
                 northMarker = northMarker,
                 centreMarker = centreMarker,
                 distanceMarker1 = distanceMarker1,
-                distanceMarker2 = distanceMarker2
+                distanceMarker2 = distanceMarker2,
+                currentlySelectedSurveyNode = currentlySelectedSurveyNode
             )
         }
     }
@@ -183,7 +185,8 @@ fun MarkupGraphOverlay(
     northMarker: Offset,
     centreMarker: Offset,
     distanceMarker1: Offset,
-    distanceMarker2: Offset
+    distanceMarker2: Offset,
+    currentlySelectedSurveyNode: SurveyNode?
 ) {
     val altitudeColours = remember {
         listOf(
@@ -243,7 +246,7 @@ fun MarkupGraphOverlay(
                     color = if (node.isEntrance) Color(0xFF05166b) else if (node.isJunction) Color(
                         0xFF730606
                     ) else Color.DarkGray,
-                    radius = if (node.isEntrance || node.isJunction) 3f else 2f,
+                    radius = if (currentlySelectedSurveyNode == node) 5f else if (node.isEntrance || node.isJunction) 3f else 2f,
                     center = Offset(
                         (node.x / surveySize.width.toFloat()) * size.width,
                         (node.y / surveySize.height.toFloat()) * size.height

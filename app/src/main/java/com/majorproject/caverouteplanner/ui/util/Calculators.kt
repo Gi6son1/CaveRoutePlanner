@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.atan2
 import kotlin.math.pow
+import kotlin.math.round
 
 fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
     return Offset(
@@ -23,7 +24,7 @@ fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
     return angle
 }
 
-fun calculateLength(start: Pair<Int, Int>, end: Pair<Int, Int>, pixelsPerMeter: Float): Float {
+fun calculatePathLength(start: Pair<Int, Int>, end: Pair<Int, Int>, pixelsPerMeter: Float): Float {
     val xDiff = (end.first - start.first).toFloat()
     val yDiff = (end.second - start.second).toFloat()
     return kotlin.math.sqrt(xDiff * xDiff + yDiff * yDiff) / pixelsPerMeter
@@ -34,6 +35,20 @@ fun calculateCoordinatePixels(coords: Offset, size: IntSize): Offset {
         x = (coords.x * size.width.toFloat()),
         y = (coords.y * size.height.toFloat())
     )
+}
+
+fun calculatePixelsPerMeter(coords1: Offset, coords2: Offset, size: IntSize, distance: Int): Float{
+    val xDiff = (coords2.x - coords1.x) * size.width
+    val yDiff = (coords2.y - coords1.y) * size.height
+
+    return kotlin.math.sqrt(xDiff.pow(2) + yDiff.pow(2)) / distance
+}
+
+fun calculateMetersFromFractionalOffsets(coords1: Offset, coords2: Offset, size: IntSize, pixelsPerMeter: Float): Int {
+    val xDiff = (coords2.x - coords1.x) * size.width
+    val yDiff = (coords2.y - coords1.y) * size.height
+
+    return round(kotlin.math.sqrt(xDiff.pow(2) + yDiff.pow(2)) / pixelsPerMeter).toInt()
 }
 
 fun calculateDistance(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>) =

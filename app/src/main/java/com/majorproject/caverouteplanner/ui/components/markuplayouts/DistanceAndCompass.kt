@@ -11,9 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.chillibits.composenumberpicker.HorizontalNumberPicker
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
@@ -23,8 +20,8 @@ fun DistanceAndCompassCalibrationLayout(
     modifier: Modifier = Modifier,
     updateCurrentlySelected: (Int) -> Unit,
     currentlySelectedSetting: Int,
-    distBetweenPoints: Int,
-    updateDistBetweenPoints: (Int) -> Unit
+    metersBetweenPoints: Int,
+    updatePixelsPerMeter: (Int) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -69,7 +66,7 @@ fun DistanceAndCompassCalibrationLayout(
                 updateCurrentlySelected(3)
             },
             text = "Distance Mark 1",
-            currentlySelected = currentlySelectedSetting == 2,
+            currentlySelected = currentlySelectedSetting == 3,
             buttonColour = Color(0xFF228B22),
             textColour = Color.White
         )
@@ -79,7 +76,7 @@ fun DistanceAndCompassCalibrationLayout(
                 updateCurrentlySelected(4)
             },
             text = "Distance Mark 2",
-            currentlySelected = currentlySelectedSetting == 2,
+            currentlySelected = currentlySelectedSetting == 4,
             buttonColour = Color(0xFF228B22),
             textColour = Color.White
         )
@@ -92,9 +89,9 @@ fun DistanceAndCompassCalibrationLayout(
             min = 1,
             max = 50,
             onValueChange = {
-                updateDistBetweenPoints(it)
+                updatePixelsPerMeter(it)
             },
-            default = distBetweenPoints
+            default = metersBetweenPoints
         )
     }
 }
