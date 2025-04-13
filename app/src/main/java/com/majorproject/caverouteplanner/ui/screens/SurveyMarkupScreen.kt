@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,6 +92,7 @@ fun SurveyMarkupScreen(
     var centreMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var distanceMarker1 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var distanceMarker2 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distBetweenDistMarkers by rememberSaveable { mutableIntStateOf(1) }
 
     BackGroundScaffold(
         topBar = {
@@ -249,7 +251,9 @@ fun SurveyMarkupScreen(
                         .fillMaxHeight()
                         .fillMaxWidth(0.5f),
                     updateCurrentlySelected = { currentlySelectedMarkupOption = it },
-                    currentlySelectedSetting = currentlySelectedMarkupOption
+                    currentlySelectedSetting = currentlySelectedMarkupOption,
+                    distBetweenPoints = distBetweenDistMarkers,
+                    updateDistBetweenPoints = { distBetweenDistMarkers = it }
                 )
                 1 -> EntrancesAndJunctionsLayout(
                     modifier = Modifier

@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.components.markuplayouts
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +30,10 @@ fun EntrancesAndJunctionsLayout(
     Column(modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End) {
         Text(
-            text = "Mark as:"
+            text = "Mark as:",
+            modifier = Modifier.background(
+                MaterialTheme.colorScheme.surfaceBright,
+            ),
         )
         Spacer(modifier = Modifier.height(10.dp))
         CustomSmallTextButton(
