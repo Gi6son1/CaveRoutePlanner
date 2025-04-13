@@ -47,17 +47,8 @@ fun PathConnectionsLayout(
             onClick = {
                 updateCurrentlySelected(2)
             },
-            text = "Remove Path Node",
+            text = "Remove Path",
             currentlySelected = currentlySelectedSetting == 2,
-            removeButton = true
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        CustomSmallTextButton(
-            onClick = {
-                updateCurrentlySelected(3)
-            },
-            text = "Remove Path Edge",
-            currentlySelected = currentlySelectedSetting == 3,
             removeButton = true
         )
     }

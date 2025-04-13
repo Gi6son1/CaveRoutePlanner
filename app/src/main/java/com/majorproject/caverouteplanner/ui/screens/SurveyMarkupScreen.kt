@@ -46,6 +46,7 @@ import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAn
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.PathConnectionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.WaterAndHardTraverseLayout
 import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
+import com.majorproject.caverouteplanner.ui.util.calculateDistance
 import com.majorproject.caverouteplanner.ui.util.calculateMetersFromFractionalOffsets
 import com.majorproject.caverouteplanner.ui.util.calculatePixelsPerMeter
 import com.majorproject.caverouteplanner.ui.util.getNearestLine
@@ -167,7 +168,7 @@ fun SurveyMarkupScreen(
                                 nodesList,
                                 surveyImage.width,
                                 surveyImage.height,
-                                0.001f
+                                0.005f
                             )
                             if (foundNode != null) {
                                 val newList = nodesList.toMutableList()
@@ -182,52 +183,80 @@ fun SurveyMarkupScreen(
                     }
 
                     2 -> {
-                        if (currentlySelectedSurveyNode != null) {
-                            if (currentlySelectedMarkupOption == 1) {
-                                var nextSurveyNode = getNearestNode(tapPosition, nodesList, surveyImage.width, surveyImage.height, 0.001f)
-                                if (nextSurveyNode == null || (!nextSurveyNode.isEntrance && !nextSurveyNode.isJunction)) {
-                                    val adjustedPixelsCoordinates = calculateCoordinatePixels(
-                                        tapPosition,
-                                        IntSize(
-                                            width = surveyImage.width,
-                                            height = surveyImage.height
-                                        )
+                        if (currentlySelectedMarkupOption == 1 && currentlySelectedSurveyNode != null) {
+                            var nextSurveyNode = getNearestNode(
+                                tapPosition,
+                                nodesList,
+                                surveyImage.width,
+                                surveyImage.height,
+                                0.005f
+                            )
+                            if (nextSurveyNode == null || (!nextSurveyNode.isEntrance && !nextSurveyNode.isJunction)) {
+                                val adjustedPixelsCoordinates = calculateCoordinatePixels(
+                                    tapPosition,
+                                    IntSize(
+                                        width = surveyImage.width,
+                                        height = surveyImage.height
                                     )
-                                    nextSurveyNode = SurveyNode(
-                                        x = adjustedPixelsCoordinates.x.toInt(),
-                                        y = adjustedPixelsCoordinates.y.toInt(),
-                                        surveyId = -1,
-                                        id = nodeIdCount++,
-                                    )
-                                    val newNodeList = nodesList.toMutableList()
-                                    newNodeList.add(nextSurveyNode)
-                                    nodesList = newNodeList
+                                )
+                                nextSurveyNode = SurveyNode(
+                                    x = adjustedPixelsCoordinates.x.toInt(),
+                                    y = adjustedPixelsCoordinates.y.toInt(),
+                                    surveyId = -1,
+                                    id = nodeIdCount++,
+                                )
+                                val newNodeList = nodesList.toMutableList()
+                                newNodeList.add(nextSurveyNode)
+                                nodesList = newNodeList
+                            }
+
+                            val newPathList = pathsList.toMutableList()
+                            newPathList.add(
+                                SurveyPath(
+                                    ends = Pair(
+                                        currentlySelectedSurveyNode!!.id,
+                                        nextSurveyNode.id
+                                    ),
+                                    distance = calculateDistance(
+                                        Pair(
+                                            currentlySelectedSurveyNode!!.x,
+                                            currentlySelectedSurveyNode!!.y
+                                        ), Pair(nextSurveyNode.x, nextSurveyNode.y)
+                                    ),
+                                    surveyId = -1,
+                                )
+                            )
+                            pathsList = newPathList
+                            currentlySelectedSurveyNode = nextSurveyNode
+
+                        } else if (currentlySelectedMarkupOption == 2) {
+                            val foundEdge = getNearestLine(
+                                tapPosition,
+                                nodesList,
+                                pathsList,
+                                surveyImage.width,
+                                surveyImage.height,
+                                0.5f
+                            )
+                            if (foundEdge != null) {
+                                val newPathList = pathsList.toMutableList()
+                                val newNodeList = nodesList.toMutableList()
+
+                                cleanupGraphFromEdge(
+                                    foundEdge,
+                                    newNodeList,
+                                    newPathList,
+                                )
+
+                                if (!newNodeList.contains(currentlySelectedSurveyNode)) {
+                                    currentlySelectedSurveyNode = null
                                 }
 
-                                    val newPathList = pathsList.toMutableList()
-                                    newPathList.add(
-                                        SurveyPath(
-                                            ends = Pair(
-                                                currentlySelectedSurveyNode!!.id,
-                                                nextSurveyNode.id
-                                            ),
-                                            surveyId = -1,
-                                        )
-                                    )
                                 pathsList = newPathList
-                                    currentlySelectedSurveyNode = nextSurveyNode
-
-                            } else if (currentlySelectedMarkupOption == 2) {
-                                val foundNode = getNearestNode(tapPosition, nodesList, surveyImage.width, surveyImage.height, 0.001f)
-                                if (foundNode != null && !foundNode.isEntrance && !foundNode.isJunction) {
-
-                                }
-
-
-                            } else if (currentlySelectedMarkupOption == 3) {
-
+                                nodesList = newNodeList
                             }
                         }
+
                     }
 
                     3 -> {
@@ -237,16 +266,15 @@ fun SurveyMarkupScreen(
                             pathsList,
                             surveyImage.width,
                             surveyImage.height,
-                            0.25f
+                            0.5f
                         )
                         if (foundPath != null) {
                             val newList = pathsList.toMutableList()
                             when (currentlySelectedMarkupOption) {
-                                1 -> newList[newList.indexOf(foundPath)].hasWater = true
-                                2 -> newList[newList.indexOf(foundPath)].isHardTraverse = true
+                                1 -> newList[newList.indexOf(foundPath)] = foundPath.copy(hasWater = true)
+                                2 -> newList[newList.indexOf(foundPath)] = foundPath.copy(isHardTraverse = true)
                                 3 -> {
-                                    newList[newList.indexOf(foundPath)].hasWater = false
-                                    newList[newList.indexOf(foundPath)].isHardTraverse = false
+                                    newList[newList.indexOf(foundPath)] = foundPath.copy(hasWater = false, isHardTraverse = false)
                                 }
                             }
                             pathsList = newList
@@ -260,13 +288,14 @@ fun SurveyMarkupScreen(
                             pathsList,
                             surveyImage.width,
                             surveyImage.height,
-                            0.25f
+                            0.5f
                         )
                         if (foundPath != null) {
                             val newList = pathsList.toMutableList()
-                            newList[newList.indexOf(foundPath)].altitude =
-                                currentlySelectedMarkupOption - 5
+                            newList[newList.indexOf(foundPath)] = foundPath.copy(altitude =
+                                currentlySelectedMarkupOption)
                             pathsList = newList
+                            Log.d("Paths", pathsList.toString())
                         }
                     }
                 }
@@ -423,5 +452,56 @@ fun SurveyMarkupScreen(
             message = "Are you sure you'd like to go back to the main menu? You will lose your current route setup if you do."
         )
 
+    }
+}
+
+
+fun cleanupGraphFromEdge(
+    foundEdge: SurveyPath,
+    nodes: MutableList<SurveyNode>,
+    paths: MutableList<SurveyPath>
+) {
+    val newPathList = paths.toMutableList()
+    val newNodeList = nodes.toMutableList()
+
+    newPathList.remove(foundEdge)
+
+    // Cleanup from the first node of the edge
+    cleanupFromNode(foundEdge.getPathEnds().first, newNodeList, newPathList)
+
+    // Cleanup from the second node of the edge
+    cleanupFromNode(foundEdge.getPathEnds().second, newNodeList, newPathList)
+
+    paths.clear()
+    paths.addAll(newPathList)
+    nodes.clear()
+    nodes.addAll(newNodeList)
+}
+
+private fun cleanupFromNode(
+    startNodeId: Int,
+    nodes: MutableList<SurveyNode>,
+    paths: MutableList<SurveyPath>
+) {
+    var currentNode: SurveyNode? = nodes.find { it.getNodeId() == startNodeId }
+    while (currentNode != null && !currentNode.isEntrance && !currentNode.isJunction) {
+        // Remove the current node
+        nodes.remove(currentNode)
+
+        // Find the connecting path
+        val connectingPath =
+            paths.find { it.getPathEnds().first == currentNode.getNodeId() || it.getPathEnds().second == currentNode.getNodeId() }
+
+        if (connectingPath != null) {
+            // Remove the connecting path
+            paths.remove(connectingPath)
+
+            // Determine the next node
+            val nextNodeId = connectingPath.next(currentNode.getNodeId())
+            currentNode = nodes.find { it.getNodeId() == nextNodeId }
+        } else {
+            // No connecting path, stop the cleanup
+            currentNode = null
+        }
     }
 }

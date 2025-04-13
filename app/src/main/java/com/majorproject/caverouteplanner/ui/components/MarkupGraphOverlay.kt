@@ -261,8 +261,8 @@ fun MarkupGraphOverlay(
 
                 drawLine(
                     color = when {
-                        markupStage == 3 -> altitudeColours[path.altitude + 5]
-                        markupStage == 1 -> Color.DarkGray
+                        markupStage == 4 -> altitudeColours[path.altitude + 5]
+                        markupStage == 2 -> Color.DarkGray
                         path.isHardTraverse && path.hasWater -> Color(0xFF36056b)
                         path.isHardTraverse -> Color(0xFF730606)
                         path.hasWater -> Color(0xFF05166b)
