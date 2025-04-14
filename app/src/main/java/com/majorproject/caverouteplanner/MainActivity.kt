@@ -1,15 +1,23 @@
 package com.majorproject.caverouteplanner
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,10 +30,24 @@ import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 import com.majorproject.caverouteplanner.ui.navigationlayouts.SensorActivity
 import com.majorproject.caverouteplanner.ui.screens.CaveListScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyMarkupScreen
+import com.majorproject.caverouteplanner.ui.screens.SurveyMarkupScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreenTopLevel
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 class MainActivity : ComponentActivity() {
+    var imageBitmap: ImageBitmap? = null
+
+    val pickMedia =
+        registerForActivityResult(PickVisualMedia()){ uri ->
+            if (uri != null){
+                val source = ImageDecoder.createSource(this.contentResolver, uri)
+                val bitmap = ImageDecoder.decodeBitmap(source).asImageBitmap()
+                imageBitmap = bitmap
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var sensorReading: Double? by mutableStateOf(null)
@@ -35,11 +57,22 @@ class MainActivity : ComponentActivity() {
                 sensorReading = it
             }
         )
+
         enableEdgeToEdge()
         setContent {
+            fun uploadImage(): ImageBitmap? {
+                pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
+                Log.d("SurveyMarkupScreen", imageBitmap?.width.toString() )
+                return imageBitmap
+            }
+
             CaveRoutePlannerTheme {
                 SetupFiles()
-                BuildNavigationGraph(sensorReading)
+                BuildNavigationGraph(
+                    sensorReading,
+                    uploadImageCall = ::uploadImage,
+                    imageBitmap
+                )
             }
         }
     }
@@ -72,9 +105,13 @@ fun SetupFiles() {
 }
 
 @Composable
-private fun BuildNavigationGraph(sensorReading: Double?) {
+private fun BuildNavigationGraph(sensorReading: Double?,
+                                 uploadImageCall : () -> Unit,
+                                 imageBitmap: ImageBitmap?
+) {
     val navController = rememberNavController()
     var selectedSurveyId by remember { mutableIntStateOf(0) }
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(imageBitmap) }
 
 
     NavHost(navController = navController, startDestination = Screen.CaveListScreen.route) {
@@ -87,6 +124,9 @@ private fun BuildNavigationGraph(sensorReading: Double?) {
                     }
                 },
                 markupNewSurvey = {
+
+                    uploadImageCall()
+
                     navController.navigate(Screen.SurveyMarkupScreen.route){
                         launchSingleTop = true
                     }
@@ -116,7 +156,12 @@ private fun BuildNavigationGraph(sensorReading: Double?) {
         }
 
         composable(route = Screen.SurveyMarkupScreen.routePath()) {
-            SurveyMarkupScreen()
+            SurveyMarkupScreenTopLevel(
+                returnToMenu = {
+                    navController.popBackStack(Screen.CaveListScreen.route, inclusive = false)
+                },
+                imageBitmap = imageBitmap
+            )
         }
     }
 

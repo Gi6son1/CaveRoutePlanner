@@ -245,8 +245,8 @@ fun MarkupGraphOverlay(
                 drawCircle(
                     color = if (node.isEntrance) Color(0xFF05166b) else if (node.isJunction) Color(
                         0xFF730606
-                    ) else Color.DarkGray,
-                    radius = if (currentlySelectedSurveyNode == node) 5f else if (node.isEntrance || node.isJunction) 3f else 2f,
+                    ) else if (markupStage == 1) Color.Transparent else Color.DarkGray,
+                    radius = if (currentlySelectedSurveyNode == node && markupStage == 2) 5f else if (node.isEntrance || node.isJunction) 3f else 2f,
                     center = Offset(
                         (node.x / surveySize.width.toFloat()) * size.width,
                         (node.y / surveySize.height.toFloat()) * size.height

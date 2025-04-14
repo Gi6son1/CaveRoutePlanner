@@ -2,6 +2,7 @@ package com.majorproject.caverouteplanner.ui.screens
 
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
@@ -57,12 +59,31 @@ val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
     restore = { pair -> Offset(pair.first, pair.second) }
 )
 
+@Composable
+fun SurveyMarkupScreenTopLevel(
+    returnToMenu: () -> Unit = {},
+    imageBitmap: ImageBitmap?
+){
+
+    if (imageBitmap != null){
+        Log.d("SurveyMarkupScreen", "Image bitmap is not null")
+        SurveyMarkupScreen(
+            returnToMenu = returnToMenu,
+            markupSurveyBitmap = imageBitmap
+        )
+    } else {
+        Log.d("SurveyMarkupScreen", "Image bitmap is null")
+        returnToMenu()
+    }
+
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurveyMarkupScreen(
     returnToMenu: () -> Unit = {},
+    markupSurveyBitmap: ImageBitmap
 ) {
-    val context = LocalContext.current.applicationContext
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
     val titleList = remember {
         listOf(
@@ -76,8 +97,7 @@ fun SurveyMarkupScreen(
 
     var currentlySelectedMarkupOption by rememberSaveable { mutableIntStateOf(0) }
 
-    val surveyImage =
-        BitmapFactory.decodeStream(context.assets.open("llygadlchwr.jpg")).asImageBitmap()
+    val surveyImage by rememberSaveable { mutableStateOf<ImageBitmap>(markupSurveyBitmap) }
 
     LaunchedEffect(markupStage) {
         currentlySelectedMarkupOption = 0
