@@ -22,6 +22,9 @@ Highlight last selected
 
 have loading text when loading image on survey
 
+do validation for cave survey data input
+difficulty none shows up on easy
+
 maybe switch the order of creation i.e. enter cave details then do survey image uplaod and markup
 
 https://stackoverflow.com/questions/68840221/kotlin-how-to-convert-image-uri-to-bitmap

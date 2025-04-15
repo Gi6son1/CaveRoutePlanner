@@ -1,18 +1,12 @@
 package com.majorproject.caverouteplanner
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,8 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -31,14 +23,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.majorproject.caverouteplanner.datasource.util.clearTempStorage
-import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorage
+import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromAssets
 import com.majorproject.caverouteplanner.datasource.util.saveUploadedImageToTempStorage
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 import com.majorproject.caverouteplanner.ui.navigationlayouts.SensorActivity
 import com.majorproject.caverouteplanner.ui.screens.CaveListScreenTopLevel
-import com.majorproject.caverouteplanner.ui.screens.SurveyMarkupScreen
 import com.majorproject.caverouteplanner.ui.screens.SurveyMarkupScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreenTopLevel
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
@@ -111,7 +102,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SetupFiles(context: Context) {
     val internalStoragePath =
-        copyImageToInternalStorage(context, "llygadlchwr.jpg", "llygadlchwr.jpg")
+        copyImageToInternalStorageFromAssets(context, "llygadlchwr.jpg", "llygadlchwr.jpg")
 
     if (internalStoragePath != null) {
         llSurveyReference.imageReference = internalStoragePath

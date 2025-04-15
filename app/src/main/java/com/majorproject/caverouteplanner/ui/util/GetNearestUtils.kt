@@ -4,7 +4,6 @@ import androidx.compose.ui.geometry.Offset
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import kotlin.math.abs
-import kotlin.math.pow
 
 fun getNearestNode(pointCoordinates: Offset, nodes: List<SurveyNode>, surveyWidth: Int, surveyHeight: Int, searchBoundary: Float): SurveyNode? {
     val convertedX = pointCoordinates.x * surveyWidth

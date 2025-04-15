@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -31,6 +32,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
+import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromTemp
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
@@ -65,13 +68,21 @@ val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
 fun SurveyMarkupScreenTopLevel(
     returnToMenu: () -> Unit = {}
 ) {
+    val context = LocalContext.current
 
-    val surveyBitmap = getBitmapFromTempInternalStorage(LocalContext.current)
+    val surveyBitmap = getBitmapFromTempInternalStorage(context)
     if (surveyBitmap != null) {
         Log.d("SurveyMarkupScreen", "Image bitmap is not null")
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
-            markupSurveyBitmap = surveyBitmap
+            markupSurveyBitmap = surveyBitmap,
+            saveCaveAndSurvey = {
+                    caveProperties, surveyProperties, nodes, paths ->
+
+                val repository = CaveRoutePlannerRepository(context.applicationContext as Application)
+                repository.saveCaveAndSurvey(caveProperties, surveyProperties, nodes, paths)
+                returnToMenu()
+            }
         )
     } else {
         Log.d("SurveyMarkupScreen", "Image bitmap is null")
@@ -84,7 +95,8 @@ fun SurveyMarkupScreenTopLevel(
 @Composable
 fun SurveyMarkupScreen(
     returnToMenu: () -> Unit = {},
-    markupSurveyBitmap: ImageBitmap
+    markupSurveyBitmap: ImageBitmap,
+    saveCaveAndSurvey: (CaveProperties, SurveyProperties, List<SurveyNode>, List<SurveyPath>) -> Unit = {_, _, _, _ ->}
 ) {
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
     val titleList = remember {
@@ -104,6 +116,8 @@ fun SurveyMarkupScreen(
     LaunchedEffect(markupStage) {
         currentlySelectedMarkupOption = 0
     }
+
+    val context = LocalContext.current
 
 
     var openHomeButtonDialog by rememberSaveable {
@@ -472,15 +486,13 @@ fun SurveyMarkupScreen(
             dialogIsOpen = openHomeButtonDialog,
             dialogOpen = { openHomeButtonDialog = it },
             confirmAction = { returnToMenu() },
-            message = "Are you sure you'd like to go back to the main menu? You will lose your current route setup if you do."
+            message = "Are you sure you'd like to go back to the main menu? You will lose your current markup if you do."
         )
 
         SaveSurveyDialog(
             dialogIsOpen = openSaveDialog,
             dialogOpen = { openSaveDialog = it },
             saveSurvey = { name, length, description, difficulty, location ->
-                //TODO COMPLETE THIS SAVING
-
                 fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
                     var convertedPathList = pathList
                     for (path in convertedPathList) {
@@ -506,8 +518,12 @@ fun SurveyMarkupScreen(
                     Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
                 ).toFloat()
 
-                //TODO need to save image from temp to surveys
-                val reference = ""
+                val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg")
+
+                if (reference == null) {
+                    returnToMenu()
+                    return@SaveSurveyDialog
+                }
 
                 var surveyProperties: SurveyProperties = SurveyProperties(
                     width = surveyImage.width,
@@ -515,6 +531,13 @@ fun SurveyMarkupScreen(
                     pixelsPerMeter = pixelsPerMeter,
                     imageReference = reference,
                     northAngle = northAngle
+                )
+
+                saveCaveAndSurvey(
+                    caveProperties,
+                    surveyProperties,
+                    nodesList,
+                    formattedPathList
                 )
             }
         )

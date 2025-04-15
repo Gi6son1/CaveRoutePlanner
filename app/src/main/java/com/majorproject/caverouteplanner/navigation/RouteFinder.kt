@@ -48,11 +48,11 @@ data class RouteFinder(
         while (priorityQueue.isNotEmpty()) {
             val (currentDistance, currentNode) = priorityQueue.poll()
 
-            if (visitedNodes[currentNode.getNodeId()]) {
+            if (visitedNodes[survey.nodes.indexOf(currentNode)]) {
                 continue
             }
 
-            visitedNodes[currentNode.getNodeId()] = true
+            visitedNodes[survey.nodes.indexOf(currentNode)] = true
 
             for (edge in getNodeEdges(currentNode.getNodeId())) {
                 if (edge.getPathId() in avoidEdges) {

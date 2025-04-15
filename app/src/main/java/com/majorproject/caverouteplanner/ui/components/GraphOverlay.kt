@@ -65,7 +65,6 @@ fun ImageWithGraphOverlay(
     var focusedCentroid by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
     val density = LocalDensity.current
-    val context = LocalContext.current
     val currentConfiguration = LocalConfiguration.current
 
     //these are saved so that they're not recalculated every recomposition, they only change when the screen dimensions change i.e. phone rotate
@@ -241,7 +240,7 @@ fun ImageWithGraphOverlay(
                 pinpointNode = pinpointSourceNode,
                 currentRotation = rotation,
                 currentZoom = zoom,
-                compassRotation = if (compassEnabled) compassReading else null
+                compassRotation = if (compassEnabled) (compassReading?.plus(survey.properties.northAngle.toDouble())) else null
             )
         }
     }

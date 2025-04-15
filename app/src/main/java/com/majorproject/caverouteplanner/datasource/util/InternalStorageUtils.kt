@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.datasource.util
 
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,7 +16,7 @@ import java.io.IOException
 import java.io.InputStream
 
 
-fun copyImageToInternalStorage(
+fun copyImageToInternalStorageFromAssets(
     context: Context,
     assetFileName: String,
     imageName: String
@@ -53,9 +54,41 @@ fun copyImageToInternalStorage(
     }
 }
 
+fun copyImageToInternalStorageFromTemp(
+    context: Context,
+    imageName: String
+): String? {
+
+    val destinationDirectory = File(context.filesDir, "surveys")
+    if (!destinationDirectory.exists()) {
+        if (!destinationDirectory.mkdirs()) {
+            return null
+        }
+    }
+
+    val destinationFile = File(destinationDirectory, imageName)
+    val sourceFile = File(context.filesDir, "temp_images/temp_image.jpg")
+
+    try {
+        sourceFile.inputStream().use { inputStream ->
+            destinationFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        return destinationFile.absolutePath
+    } catch (e: IOException) {
+        return null
+    } finally {
+        try {
+        } catch (e: IOException) {
+        }
+    }
+}
+
 fun saveUploadedImageToTempStorage(
     bitmap: Uri,
-    contentResolver: android.content.ContentResolver,
+    contentResolver: ContentResolver,
     context: Context
 ): String? {
     val source = ImageDecoder.createSource(contentResolver, bitmap)
