@@ -24,6 +24,7 @@ have loading text when loading image on survey
 
 do validation for cave survey data input
 difficulty none shows up on easy
+validation for (must have nodes and edges)
 
 maybe switch the order of creation i.e. enter cave details then do survey image uplaod and markup
 

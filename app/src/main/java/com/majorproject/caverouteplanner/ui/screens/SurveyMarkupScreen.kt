@@ -496,7 +496,7 @@ fun SurveyMarkupScreen(
                 fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
                     var convertedPathList = pathList
                     for (path in convertedPathList) {
-                        path.distance = (path.distance * pixelsPerMeter).toFloat()
+                        path.distance = (path.distance / pixelsPerMeter)
                     }
                     return convertedPathList
                 }
@@ -516,7 +516,7 @@ fun SurveyMarkupScreen(
                 var northAngle = calculateAngle(
                     Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
                     Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
-                ).toFloat()
+                ).toFloat() - 90f
 
                 val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg")
 
