@@ -25,6 +25,7 @@ have loading text when loading image on survey
 do validation for cave survey data input
 difficulty none shows up on easy
 validation for (must have nodes and edges)
+move save logic out of UI thread, big images saving will crash app (if pixels per meter is big, then compress image)
 
 maybe switch the order of creation i.e. enter cave details then do survey image uplaod and markup
 
@@ -37,5 +38,7 @@ https://developer.android.com/reference/kotlin/androidx/compose/ui/input/pointer
 https://developer.android.com/training/data-storage/shared-preferences
 
 https://m3.material.io/components/segmented-buttons/overview
+
+https://stackoverflow.com/questions/17839388/creating-a-scaled-bitmap-with-createscaledbitmap-in-android
 
 https://stackoverflow.com/questions/28753285/how-can-i-create-static-method-for-enum-in-kotlin

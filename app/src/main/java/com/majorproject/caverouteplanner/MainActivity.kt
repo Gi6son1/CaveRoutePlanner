@@ -2,6 +2,7 @@ package com.majorproject.caverouteplanner
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -28,7 +29,7 @@ import com.majorproject.caverouteplanner.datasource.util.saveUploadedImageToTemp
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
-import com.majorproject.caverouteplanner.ui.navigationlayouts.SensorActivity
+import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.ui.screens.CaveListScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyMarkupScreenTopLevel
 import com.majorproject.caverouteplanner.ui.screens.SurveyNavScreenTopLevel

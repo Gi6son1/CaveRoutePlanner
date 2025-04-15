@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
 import kotlin.math.ceil
+import kotlin.math.round
 
 @Composable
 fun CustomTextButton(
@@ -119,10 +120,10 @@ fun CustomTripInfoBox(
     time: Int,
     pathNotDest: Boolean = false,
 ) {
+    var roundedDistance = round(distance).toInt()
     var distanceString: String
-    if (distance < 200) {
-        val newDistance = (distance * 1.094).toInt()
-        distanceString = "${newDistance}yd"
+    if (roundedDistance < 100) {
+        distanceString = "${roundedDistance}m"
     } else {
         val newDistance = distance / 1000
         distanceString = "${String.format(Locale.UK, "%.1f", newDistance)}km"

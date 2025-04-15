@@ -1,4 +1,4 @@
-package com.majorproject.caverouteplanner.ui.navigationlayouts
+package com.majorproject.caverouteplanner.datasource
 
 import android.content.Context
 import android.hardware.Sensor

@@ -518,7 +518,13 @@ fun SurveyMarkupScreen(
                     Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
                 ).toFloat() - 90f
 
-                val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg")
+                var resizePercentage = 0f
+                if (pixelsPerMeter > 25f) {
+                    resizePercentage = 25f/ pixelsPerMeter
+                    pixelsPerMeter *= resizePercentage
+                }
+
+                val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg", compressPercentage = resizePercentage)
 
                 if (reference == null) {
                     returnToMenu()

@@ -56,7 +56,8 @@ fun copyImageToInternalStorageFromAssets(
 
 fun copyImageToInternalStorageFromTemp(
     context: Context,
-    imageName: String
+    imageName: String,
+    compressPercentage: Float = 0f
 ): String? {
 
     val destinationDirectory = File(context.filesDir, "surveys")
@@ -70,21 +71,25 @@ fun copyImageToInternalStorageFromTemp(
     val sourceFile = File(context.filesDir, "temp_images/temp_image.jpg")
 
     try {
-        sourceFile.inputStream().use { inputStream ->
-            destinationFile.outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-        }
+        if (compressPercentage > 0f && compressPercentage <= 1f) {
+            val bitmap = BitmapFactory.decodeFile(sourceFile.absolutePath)
+            val outputStream = FileOutputStream(destinationFile)
 
-        return destinationFile.absolutePath
+            val newWidth = (bitmap.width * compressPercentage).toInt()
+            val newHeight = (bitmap.height * compressPercentage).toInt()
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false)
+
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.close()
+            return destinationFile.absolutePath
+        }
     } catch (e: IOException) {
         return null
     } finally {
-        try {
-        } catch (e: IOException) {
-        }
     }
+    return null
 }
+
 
 fun saveUploadedImageToTempStorage(
     bitmap: Uri,
@@ -121,7 +126,7 @@ fun getBitmapFromTempInternalStorage(context: Context): ImageBitmap? {
     var imageBitmap: ImageBitmap? = null
     var fileInputStream: FileInputStream? = null
 
-    try{
+    try {
         val destinationDirectory = File(context.filesDir, "temp_images")
         val file = File(destinationDirectory, "temp_image.jpg")
 
@@ -147,7 +152,7 @@ fun clearTempStorage(context: Context): Boolean {
         if (destinationDirectory.exists()) {
             val files = destinationDirectory.listFiles()
             files?.forEach { file ->
-                if (!file.delete()){
+                if (!file.delete()) {
                     return false
                 }
             }
