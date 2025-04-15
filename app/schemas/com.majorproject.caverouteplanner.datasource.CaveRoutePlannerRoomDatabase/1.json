@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d71877480213fa133f756f1c9cba7b67",
+    "identityHash": "f14f893b524762dc0f6c5241fa889c6b",
     "entities": [
       {
         "tableName": "surveys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `imageReference` TEXT NOT NULL, `pixelsPerMeter` REAL NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `imageReference` TEXT NOT NULL, `pixelsPerMeter` REAL NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `northAngle` REAL NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -36,6 +36,12 @@
             "fieldPath": "height",
             "columnName": "height",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "northAngle",
+            "columnName": "northAngle",
+            "affinity": "REAL",
             "notNull": true
           }
         ],
@@ -270,7 +276,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd71877480213fa133f756f1c9cba7b67')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f14f893b524762dc0f6c5241fa889c6b')"
     ]
   }
 }

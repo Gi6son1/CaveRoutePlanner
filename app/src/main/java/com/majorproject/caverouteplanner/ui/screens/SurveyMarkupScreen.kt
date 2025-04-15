@@ -1,10 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-import android.net.Uri
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,34 +26,35 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
+import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.MarkupImageAndGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
+import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
-import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.SaveSurveyDialog
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.DistanceAndCompassCalibrationLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAndJunctionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.PathConnectionsLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.WaterAndHardTraverseLayout
+import com.majorproject.caverouteplanner.ui.util.calculateAngle
 import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
 import com.majorproject.caverouteplanner.ui.util.calculateDistance
 import com.majorproject.caverouteplanner.ui.util.calculateMetersFromFractionalOffsets
 import com.majorproject.caverouteplanner.ui.util.calculatePixelsPerMeter
 import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
+import kotlin.math.round
 
 val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
     save = { offset -> Pair(offset.x, offset.y) },
@@ -69,10 +64,10 @@ val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
 @Composable
 fun SurveyMarkupScreenTopLevel(
     returnToMenu: () -> Unit = {}
-){
+) {
 
     val surveyBitmap = getBitmapFromTempInternalStorage(LocalContext.current)
-    if (surveyBitmap != null){
+    if (surveyBitmap != null) {
         Log.d("SurveyMarkupScreen", "Image bitmap is not null")
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
@@ -300,10 +295,15 @@ fun SurveyMarkupScreen(
                         if (foundPath != null) {
                             val newList = pathsList.toMutableList()
                             when (currentlySelectedMarkupOption) {
-                                1 -> newList[newList.indexOf(foundPath)] = foundPath.copy(hasWater = true)
-                                2 -> newList[newList.indexOf(foundPath)] = foundPath.copy(isHardTraverse = true)
+                                1 -> newList[newList.indexOf(foundPath)] =
+                                    foundPath.copy(hasWater = true)
+
+                                2 -> newList[newList.indexOf(foundPath)] =
+                                    foundPath.copy(isHardTraverse = true)
+
                                 3 -> {
-                                    newList[newList.indexOf(foundPath)] = foundPath.copy(hasWater = false, isHardTraverse = false)
+                                    newList[newList.indexOf(foundPath)] =
+                                        foundPath.copy(hasWater = false, isHardTraverse = false)
                                 }
                             }
                             pathsList = newList
@@ -321,8 +321,10 @@ fun SurveyMarkupScreen(
                         )
                         if (foundPath != null) {
                             val newList = pathsList.toMutableList()
-                            newList[newList.indexOf(foundPath)] = foundPath.copy(altitude =
-                                currentlySelectedMarkupOption)
+                            newList[newList.indexOf(foundPath)] = foundPath.copy(
+                                altitude =
+                                currentlySelectedMarkupOption
+                            )
                             pathsList = newList
                             Log.d("Paths", pathsList.toString())
                         }
@@ -360,17 +362,19 @@ fun SurveyMarkupScreen(
                 contentDescription = "Save",
             )
 
-            Row(modifier = Modifier.constrainAs(stageButtons) {
-                bottom.linkTo(parent.bottom, 20.dp)
-                start.linkTo(parent.start, 10.dp)
-                end.linkTo(parent.end, 10.dp)
-                width = Dimension.fillToConstraints
-            },
-                horizontalArrangement = Arrangement.SpaceEvenly) {
+            Row(
+                modifier = Modifier.constrainAs(stageButtons) {
+                    bottom.linkTo(parent.bottom, 20.dp)
+                    start.linkTo(parent.start, 10.dp)
+                    end.linkTo(parent.end, 10.dp)
+                    width = Dimension.fillToConstraints
+                },
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
                 for (i in 0..titleList.size - 1) {
                     CustomSmallTextButton(
                         onClick = { markupStage = i },
-                        text = (i+1).toString(),
+                        text = (i + 1).toString(),
                         currentlySelected = i == markupStage,
                         square = true
                     )
@@ -477,6 +481,41 @@ fun SurveyMarkupScreen(
             saveSurvey = { name, length, description, difficulty, location ->
                 //TODO COMPLETE THIS SAVING
 
+                fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
+                    var convertedPathList = pathList
+                    for (path in convertedPathList) {
+                        path.distance = (path.distance * pixelsPerMeter).toFloat()
+                    }
+                    return convertedPathList
+                }
+
+
+                var caveProperties: CaveProperties = CaveProperties(
+                    name = name,
+                    length = length,
+                    description = description,
+                    difficulty = difficulty.displayName,
+                    location = location,
+                    surveyId = -1
+                )
+
+                var formattedPathList = convertToMeters(pathsList, pixelsPerMeter)
+
+                var northAngle = calculateAngle(
+                    Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
+                    Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
+                ).toFloat()
+
+                //TODO need to save image from temp to surveys
+                val reference = ""
+
+                var surveyProperties: SurveyProperties = SurveyProperties(
+                    width = surveyImage.width,
+                    height = surveyImage.height,
+                    pixelsPerMeter = pixelsPerMeter,
+                    imageReference = reference,
+                    northAngle = northAngle
+                )
             }
         )
 

@@ -3,6 +3,7 @@ package com.majorproject.caverouteplanner.ui.components
 val llSurveyReference = OldSurveyType(
     size = Pair(1991, 1429),
     pixelsPerMeter = 14.600609f,
+    northAngle = 0f,
     pathNodes = mutableListOf(
         OldSurveyNodeType(
             id = 7,

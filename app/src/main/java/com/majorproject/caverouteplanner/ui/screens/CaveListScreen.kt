@@ -50,7 +50,7 @@ fun CaveListScreenTopLevel(
         caveLocationMap.getOrPut(cave.caveProperties.location.uppercase().trim(), defaultValue = {mutableListOf()} ).add(cave)
     }
     val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase().trim() }
-    
+
 
     CaveListScreen(caveList = orderedList,
         navigateSurvey = { surveyId ->
@@ -131,7 +131,8 @@ fun CaveListScreenPreview(){
                         width = 1991,
                         height = 1429,
                         pixelsPerMeter = 14.600609f,
-                        imageReference = "llygadlchwr.jpg"
+                        imageReference = "llygadlchwr.jpg",
+                        northAngle = 0f
                     )
                 )
             )

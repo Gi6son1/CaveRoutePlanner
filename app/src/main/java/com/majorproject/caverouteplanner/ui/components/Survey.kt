@@ -22,6 +22,7 @@ data class OldSurveyType(
     var pathNodes: MutableList<OldSurveyNodeType>,
     var paths: MutableList<OldSurveyPathType>,
     val pixelsPerMeter: Float,
+    var northAngle: Float,
     val size: Pair<Int, Int>
 ) : Parcelable
 
@@ -33,7 +34,8 @@ data class SurveyProperties(
     val imageReference: String,
     val pixelsPerMeter: Float,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val northAngle: Float
 ) : Parcelable
 
 @Parcelize

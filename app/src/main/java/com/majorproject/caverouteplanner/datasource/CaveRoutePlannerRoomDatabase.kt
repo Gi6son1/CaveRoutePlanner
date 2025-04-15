@@ -80,7 +80,8 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
                 width = 1991,
                 height = 1429,
                 pixelsPerMeter = 14.600609f,
-                imageReference = llSurveyReference.imageReference
+                imageReference = llSurveyReference.imageReference,
+                northAngle = llSurveyReference.northAngle
             )
 
             val llSurveyId = surveyDao.insertSurvey(llSurveyProps)

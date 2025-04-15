@@ -120,7 +120,8 @@ fun CaveCardPreview(
                     width = 1991,
                     height = 1429,
                     pixelsPerMeter = 14.600609f,
-                    imageReference = "llygadlchwr.jpg"
+                    imageReference = "llygadlchwr.jpg",
+                    northAngle = 0f
                 )
             )
         )
