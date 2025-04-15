@@ -1,8 +1,11 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,13 +38,17 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.MarkupImageAndGraphOverlay
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.SaveSurveyDialog
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.DistanceAndCompassCalibrationLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAndJunctionsLayout
@@ -61,15 +68,15 @@ val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
 
 @Composable
 fun SurveyMarkupScreenTopLevel(
-    returnToMenu: () -> Unit = {},
-    imageBitmap: ImageBitmap?
+    returnToMenu: () -> Unit = {}
 ){
 
-    if (imageBitmap != null){
+    val surveyBitmap = getBitmapFromTempInternalStorage(LocalContext.current)
+    if (surveyBitmap != null){
         Log.d("SurveyMarkupScreen", "Image bitmap is not null")
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
-            markupSurveyBitmap = imageBitmap
+            markupSurveyBitmap = surveyBitmap
         )
     } else {
         Log.d("SurveyMarkupScreen", "Image bitmap is null")
@@ -97,7 +104,7 @@ fun SurveyMarkupScreen(
 
     var currentlySelectedMarkupOption by rememberSaveable { mutableIntStateOf(0) }
 
-    val surveyImage by rememberSaveable { mutableStateOf<ImageBitmap>(markupSurveyBitmap) }
+    val surveyImage by remember { mutableStateOf<ImageBitmap>(markupSurveyBitmap) }
 
     LaunchedEffect(markupStage) {
         currentlySelectedMarkupOption = 0
@@ -107,6 +114,8 @@ fun SurveyMarkupScreen(
     var openHomeButtonDialog by rememberSaveable {
         mutableStateOf(false)
     }
+
+    var openSaveDialog by rememberSaveable { mutableStateOf(false) }
 
     var nodeIdCount by rememberSaveable { mutableIntStateOf(0) }
 
@@ -340,7 +349,9 @@ fun SurveyMarkupScreen(
             )
 
             CustomIconButton(
-                onClick = {},
+                onClick = {
+                    openSaveDialog = true
+                },
                 modifier = Modifier.constrainAs(saveButton) {
                     top.linkTo(homeButton.bottom, margin = 20.dp)
                     start.linkTo(parent.start, margin = 10.dp)
@@ -354,26 +365,14 @@ fun SurveyMarkupScreen(
                 start.linkTo(parent.start, 10.dp)
                 end.linkTo(parent.end, 10.dp)
                 width = Dimension.fillToConstraints
-            }) {
-                if (markupStage > 0) {
-                    CustomTextButton(
-                        onClick = {
-                            markupStage--
-                        },
-                        text = titleList[markupStage - 1],
-                        flipped = true,
-                        modifier = Modifier.weight(1f),
-                        iconVector = Icons.AutoMirrored.Outlined.ArrowBack
-                    )
-                }
-                if (markupStage < titleList.size - 1) {
-                    CustomTextButton(
-                        onClick = {
-                            markupStage++
-                        },
-                        text = titleList[markupStage + 1],
-                        modifier = Modifier.weight(1f),
-                        iconVector = Icons.AutoMirrored.Outlined.ArrowForward
+            },
+                horizontalArrangement = Arrangement.SpaceEvenly) {
+                for (i in 0..titleList.size - 1) {
+                    CustomSmallTextButton(
+                        onClick = { markupStage = i },
+                        text = (i+1).toString(),
+                        currentlySelected = i == markupStage,
+                        square = true
                     )
                 }
             }
@@ -470,6 +469,15 @@ fun SurveyMarkupScreen(
             dialogOpen = { openHomeButtonDialog = it },
             confirmAction = { returnToMenu() },
             message = "Are you sure you'd like to go back to the main menu? You will lose your current route setup if you do."
+        )
+
+        SaveSurveyDialog(
+            dialogIsOpen = openSaveDialog,
+            dialogOpen = { openSaveDialog = it },
+            saveSurvey = { name, length, description, difficulty, location ->
+                //TODO COMPLETE THIS SAVING
+
+            }
         )
 
     }

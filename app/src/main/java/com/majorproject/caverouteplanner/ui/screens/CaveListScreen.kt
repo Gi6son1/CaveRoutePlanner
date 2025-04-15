@@ -47,9 +47,10 @@ fun CaveListScreenTopLevel(
 
     val caveLocationMap = mutableMapOf<String, MutableList<Cave>>()
     for (cave in caves){
-        caveLocationMap.getOrPut(cave.caveProperties.location.uppercase(), defaultValue = {mutableListOf()} ).add(cave)
+        caveLocationMap.getOrPut(cave.caveProperties.location.uppercase().trim(), defaultValue = {mutableListOf()} ).add(cave)
     }
-    val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase() }
+    val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase().trim() }
+    
 
     CaveListScreen(caveList = orderedList,
         navigateSurvey = { surveyId ->

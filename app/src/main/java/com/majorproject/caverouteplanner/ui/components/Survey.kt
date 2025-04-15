@@ -53,7 +53,7 @@ data class Survey(
 
     @Composable
     fun imageBitmap(): ImageBitmap? {
-        return getBitmapFromInternalStorage(LocalContext.current, properties.imageReference)
+        return getBitmapFromInternalStorage(properties.imageReference)
     }
 
     fun nearestNode(pointCoordinates: Offset): SurveyNode? {

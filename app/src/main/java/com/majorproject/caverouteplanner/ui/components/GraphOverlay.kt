@@ -216,7 +216,6 @@ fun ImageWithGraphOverlay(
 
             LaunchedEffect(survey) {
                 imageBitmap = getBitmapFromInternalStorage(
-                    context = context,
                     survey.properties.imageReference
                 )
             }

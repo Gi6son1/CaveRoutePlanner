@@ -52,7 +52,7 @@ fun LazyListScope.Section(
         CollapsableListHeader(
             onClick = onHeaderClick,
             isExpanded = isExpanded,
-            locationString = caveList.first().caveProperties.location
+            locationString = caveList.first().caveProperties.location.trim().lowercase().replaceFirstChar { char -> char.uppercase() }
         )
     }
 

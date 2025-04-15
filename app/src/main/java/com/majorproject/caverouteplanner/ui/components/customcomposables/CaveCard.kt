@@ -73,8 +73,7 @@ fun CaveCard(cave: Cave) {
             containerColor = MaterialTheme.colorScheme.outline
         )
     ) {
-        val context = LocalContext.current
-        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromInternalStorage(context = context, filePath = cave.surveyProperties.imageReference)) }
+        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromInternalStorage(filePath = cave.surveyProperties.imageReference)) }
 
         Row {
             if (imageBitmap != null){
