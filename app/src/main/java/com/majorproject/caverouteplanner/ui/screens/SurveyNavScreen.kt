@@ -5,12 +5,15 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,6 +26,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
+import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
@@ -31,14 +35,17 @@ import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
+import kotlinx.coroutines.launch
 
 @Composable
 fun SurveyNavScreenTopLevel(
     surveyId: Int,
     backToMenu: () -> Unit = {},
-    sensorReading: Double?
 ){
     val context = LocalContext.current.applicationContext
+
+    var sensorReading: Double? by rememberSaveable { mutableStateOf(null) }
+
     val repository = CaveRoutePlannerRepository(context as Application)
 
     val survey = repository.getSurveyWithDataById(surveyId)
@@ -47,7 +54,21 @@ fun SurveyNavScreenTopLevel(
         SurveyNavScreen(
             survey = survey,
             backToMenu = { backToMenu() },
-            sensorReading = sensorReading
+            sensorReading = sensorReading,
+            enableCompass = {
+                SensorActivity(
+                    context = context,
+                    sensorReading = {
+                        sensorReading = it
+                    }
+                ).start()
+            },
+            disableCompass = {
+                SensorActivity(
+                    context = context,
+                    sensorReading = { sensorReading = null }
+                ).stop()
+            }
         )
     }
 }
@@ -56,9 +77,18 @@ fun SurveyNavScreenTopLevel(
 fun SurveyNavScreen(
     survey: Survey,
     backToMenu: () -> Unit = {},
-    sensorReading: Double? = null
+    enableCompass: () -> Unit = {},
+    disableCompass: () -> Unit = {},
+    sensorReading: Double?
 ) {
-    BackGroundScaffold { innerPadding ->
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    BackGroundScaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }) { innerPadding ->
         val requester = remember { FocusRequester() }
         var volumeKeyPressed by remember { mutableStateOf(false) }
 
@@ -150,6 +180,12 @@ fun SurveyNavScreen(
                         if (nearestNode != null) {
                             pinPointNode = nearestNode
                             currentRoute = routeFinder?.getRouteToNode(nearestNode)
+                            if (currentRoute == null) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(message = "No route from source has been found")
+                                }
+                                pinPointNode = null
+                            }
                         }
                     }
                 },
@@ -186,6 +222,12 @@ fun SurveyNavScreen(
                     resetRouteFinder()
                     if (pinPointNode != null) {
                         currentRoute = routeFinder?.getRouteToNode(pinPointNode!!)
+                        if (currentRoute == null) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(message = "No route from source has been found")
+                            }
+                            pinPointNode = null
+                        }
                     }
                 },
                 caveExit = {
@@ -197,6 +239,12 @@ fun SurveyNavScreen(
                         val nearestExit = routeFinder?.findNearestExit()
                         pinPointNode = nearestExit
                         if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                        if (currentRoute == null) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(message = "No route from source has been found")
+                            }
+                            pinPointNode = null
+                        }
                     }
                 },
                 currentTravelConditions = currentTravelConditions,
@@ -222,6 +270,13 @@ fun SurveyNavScreen(
                             pinPointNode = nearestExit
 
                             currentRoute = routeFinder?.getRouteToNode(nearestExit)
+
+                            if (currentRoute == null) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(message = "No route from source has been found")
+                                }
+                                pinPointNode = null
+                            }
                         }
                     }
 
@@ -229,6 +284,7 @@ fun SurveyNavScreen(
                 extendedView = inJourneyExtended,
                 onCompassClick = {
                     compassEnabled = !compassEnabled
+                    if (compassEnabled) enableCompass() else disableCompass()
                 },
                 compassEnabled = compassEnabled
             )

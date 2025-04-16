@@ -16,7 +16,9 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.CaveRoutePlanner" >
+            android:screenOrientation="nosensor"
+            android:theme="@style/Theme.CaveRoutePlanner"
+            tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

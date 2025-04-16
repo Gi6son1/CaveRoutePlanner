@@ -145,6 +145,57 @@ fun SurveyMarkupScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var savedSurveyReference by rememberSaveable { mutableStateOf<String?>(null) }
+    var name by rememberSaveable { mutableStateOf("") }
+    var length by rememberSaveable { mutableFloatStateOf(0.0f) }
+    var description by rememberSaveable { mutableStateOf("") }
+    var difficulty by rememberSaveable { mutableStateOf(Difficulty.NONE) }
+    var location by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(savedSurveyReference) {
+        if (savedSurveyReference != null) {
+            fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
+                var convertedPathList = pathList
+                for (path in convertedPathList) {
+                    path.distance = (path.distance / pixelsPerMeter)
+                }
+                return convertedPathList
+            }
+
+
+            var caveProperties: CaveProperties = CaveProperties(
+                name = name,
+                length = length,
+                description = description,
+                difficulty = difficulty.displayName,
+                location = location,
+                surveyId = -1
+            )
+
+            var formattedPathList = convertToMeters(pathsList, pixelsPerMeter)
+
+            var northAngle = calculateAngle(
+                Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
+                Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
+            ).toFloat() - 90f
+
+            var surveyProperties: SurveyProperties = SurveyProperties(
+                width = imageBitmap.width,
+                height = imageBitmap.height,
+                pixelsPerMeter = pixelsPerMeter,
+                imageReference = savedSurveyReference!!,
+                northAngle = northAngle
+            )
+
+            saveCaveAndSurvey(
+                caveProperties,
+                surveyProperties,
+                nodesList,
+                formattedPathList
+            )
+        }
+    }
+
 
     BackGroundScaffold(
         topBar = {
@@ -511,80 +562,39 @@ fun SurveyMarkupScreen(
         SaveSurveyDialog(
             dialogIsOpen = openSaveDialog,
             dialogOpen = { openSaveDialog = it },
-            saveSurvey = { name, length, description, difficulty, location ->
+            saveSurvey = { enterName, enterLength, enterDescription, enterDifficulty, enterLocation ->
 
                 val errorMessage = validateInputs(
-                    name,
-                    length,
-                    difficulty,
+                    enterName,
+                    enterLength,
+                    enterDifficulty,
                     nodesList,
                     pathsList,
                     distanceMarker1,
                     distanceMarker2
                 )
 
+                name = enterName
+                length = enterLength
+                description = enterDescription
+                difficulty = enterDifficulty
+                location = enterLocation
+
                 if (errorMessage != null){
                     scope.launch {
                         snackbarHostState.showSnackbar(errorMessage)
                     }
-                }
-
-
-                fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
-                    var convertedPathList = pathList
-                    for (path in convertedPathList) {
-                        path.distance = (path.distance / pixelsPerMeter)
+                } else {
+                    var resizePercentage = 0f
+                    if (pixelsPerMeter > 100f) {
+                        resizePercentage = 100f/ pixelsPerMeter
+                        pixelsPerMeter = pixelsPerMeter * resizePercentage
                     }
-                    return convertedPathList
+
+                    savedSurveyReference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg", compressPercentage = resizePercentage)
                 }
-
-
-                var caveProperties: CaveProperties = CaveProperties(
-                    name = name,
-                    length = length,
-                    description = description,
-                    difficulty = difficulty.displayName,
-                    location = location,
-                    surveyId = -1
-                )
-
-                var formattedPathList = convertToMeters(pathsList, pixelsPerMeter)
-
-                var northAngle = calculateAngle(
-                    Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
-                    Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
-                ).toFloat() - 90f
-
-                var resizePercentage = 0f
-                if (pixelsPerMeter > 100f) {
-                    resizePercentage = 100f/ pixelsPerMeter
-                    pixelsPerMeter = pixelsPerMeter * resizePercentage
-                }
-
-                val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg", compressPercentage = resizePercentage)
-
-                if (reference == null) {
-                    returnToMenu()
-                    return@SaveSurveyDialog
-                }
-
-                var surveyProperties: SurveyProperties = SurveyProperties(
-                    width = imageBitmap.width,
-                    height = imageBitmap.height,
-                    pixelsPerMeter = pixelsPerMeter,
-                    imageReference = reference,
-                    northAngle = northAngle
-                )
-
-                saveCaveAndSurvey(
-                    caveProperties,
-                    surveyProperties,
-                    nodesList,
-                    formattedPathList
-                )
             }
         )
-
     }
 }
 

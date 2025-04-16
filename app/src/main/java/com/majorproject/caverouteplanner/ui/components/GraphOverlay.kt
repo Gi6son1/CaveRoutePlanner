@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -26,7 +25,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.IntSize
@@ -38,7 +36,6 @@ import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.util.calculateAngle
 import com.majorproject.caverouteplanner.ui.util.calculateDistance
 import com.majorproject.caverouteplanner.ui.util.calculateFractionalOffset
-import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -240,6 +237,7 @@ fun ImageWithGraphOverlay(
                 pinpointNode = pinpointSourceNode,
                 currentRotation = rotation,
                 currentZoom = zoom,
+                paths = survey.paths,
                 compassRotation = if (compassEnabled) (compassReading?.plus(survey.properties.northAngle.toDouble())) else null
             )
         }
@@ -291,6 +289,7 @@ fun performFocusedTransformation(
 fun GraphOverlay(
     modifier: Modifier = Modifier,
     nodes: List<SurveyNode>,
+    paths: List<SurveyPath>,
     surveySize: IntSize,
     currentRoute: Route? = null,
     pinpointNode: SurveyNode? = null,
@@ -307,47 +306,71 @@ fun GraphOverlay(
     val adjustedZoom = if (currentZoom == 0f) 0.000001f else currentZoom
 
     Canvas(modifier = modifier) {
-        currentRoute?.routeList?.forEachIndexed { index, pathList ->
-            if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
-                currentRoute.getCurrentStage().forEach { path ->
-                    val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
-                    val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
+        if (currentRoute != null) {
+            currentRoute.routeList.forEachIndexed { index, pathList ->
+                if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
+                    currentRoute.getCurrentStage().forEach { path ->
+                        val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                        val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
-                    drawLine(
-                        color = Color(0xFF00B126),
-                        start = Offset(
-                            (startNode.x / surveySize.width.toFloat()) * size.width,
-                            (startNode.y / surveySize.height.toFloat()) * size.height
-                        ),
-                        end = Offset(
-                            (endNode.x / surveySize.width.toFloat()) * size.width,
-                            (endNode.y / surveySize.height.toFloat()) * size.height
-                        ),
-                        strokeWidth = 4f,
-                        cap = StrokeCap.Round
-                    )
-                }
-            } else {
-                pathList.forEach { path ->
-                    val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
-                    val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
+                        drawLine(
+                            color = Color(0xFF00B126),
+                            start = Offset(
+                                (startNode.x / surveySize.width.toFloat()) * size.width,
+                                (startNode.y / surveySize.height.toFloat()) * size.height
+                            ),
+                            end = Offset(
+                                (endNode.x / surveySize.width.toFloat()) * size.width,
+                                (endNode.y / surveySize.height.toFloat()) * size.height
+                            ),
+                            strokeWidth = 4f,
+                            cap = StrokeCap.Round
+                        )
+                    }
+                } else {
+                    pathList.forEach { path ->
+                        val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                        val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
-                    drawLine(
-                        color = if (path.hasWater) Color(0xFF007ADD) else Color(0xFFA3A3A3),
-                        start = Offset(
-                            (startNode.x / surveySize.width.toFloat()) * size.width,
-                            (startNode.y / surveySize.height.toFloat()) * size.height
-                        ),
-                        end = Offset(
-                            (endNode.x / surveySize.width.toFloat()) * size.width,
-                            (endNode.y / surveySize.height.toFloat()) * size.height
-                        ),
-                        strokeWidth = 4f,
-                        cap = StrokeCap.Round
-                    )
+                        drawLine(
+                            color = if (path.hasWater) Color(0xFF007ADD) else Color(0xFFA3A3A3),
+                            start = Offset(
+                                (startNode.x / surveySize.width.toFloat()) * size.width,
+                                (startNode.y / surveySize.height.toFloat()) * size.height
+                            ),
+                            end = Offset(
+                                (endNode.x / surveySize.width.toFloat()) * size.width,
+                                (endNode.y / surveySize.height.toFloat()) * size.height
+                            ),
+                            strokeWidth = 4f,
+                            cap = StrokeCap.Round
+                        )
+                    }
                 }
             }
+        } else {
+            paths.forEach { path ->
+                val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
+                val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
+
+                drawLine(
+                    color = if (path.hasWater) Color(0xFF007ADD).copy(alpha = 0.5f) else Color(
+                        0xFFA3A3A3
+                    ).copy(alpha = 0.5f),
+                    start = Offset(
+                        (startNode.x / surveySize.width.toFloat()) * size.width,
+                        (startNode.y / surveySize.height.toFloat()) * size.height
+                    ),
+                    end = Offset(
+                        (endNode.x / surveySize.width.toFloat()) * size.width,
+                        (endNode.y / surveySize.height.toFloat()) * size.height
+                    ),
+                    strokeWidth = 4f,
+                    cap = StrokeCap.Round
+                )
+            }
         }
+
         if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) {
             val iconOffsetX = pinpointIcon.width
             val iconOffsetY = pinpointIcon.height.toFloat() * 2
@@ -390,6 +413,8 @@ fun GraphOverlay(
 
 
         }
+
+
 
         if (currentRoute?.routeStarted == true) {
             val currentStartNode =
@@ -495,13 +520,13 @@ fun GraphOverlay(
                         )
                     )
 
-                        rotate(
-                            degrees = adjustedEndAngle,
-                            pivot = Offset(
-                                (currentEndNode.x / surveySize.width.toFloat()) * size.width,
-                                (currentEndNode.y / surveySize.height.toFloat()) * size.height
-                            )
+                    rotate(
+                        degrees = adjustedEndAngle,
+                        pivot = Offset(
+                            (currentEndNode.x / surveySize.width.toFloat()) * size.width,
+                            (currentEndNode.y / surveySize.height.toFloat()) * size.height
                         )
+                    )
 
 
                 }

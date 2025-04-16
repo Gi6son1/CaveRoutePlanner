@@ -102,17 +102,23 @@ data class RouteFinder(
         var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
-        fun getEdgeFromNode(id: SurveyNode): Triple<SurveyPath, SurveyNode?, Float> {
+        fun getEdgeFromNode(id: SurveyNode): Triple<SurveyPath?, SurveyNode?, Float> {
             val foundEdge = routeMap[id]
+            if (foundEdge == null) {
+                return Triple(null, null, 0f)
+            }
             val neighbour =
-                if (foundEdge?.getPathEnds()?.first == id.getNodeId()) foundEdge.getPathEnds().second else foundEdge?.getPathEnds()?.first
+                if (foundEdge.getPathEnds().first == id.getNodeId()) foundEdge.getPathEnds().second else foundEdge.getPathEnds()?.first
             val neighbourNode = survey.nodes.find { it.getNodeId() == neighbour }
 
-            return Triple(foundEdge!!, neighbourNode, foundEdge.distance)
+            return Triple(foundEdge, neighbourNode, foundEdge.distance)
         }
 
         while (currentNode.getNodeId() != sourceNode.getNodeId()) {
             val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode)
+            if (edge == null) {
+                return null
+            }
             totalDistance += newDistance
             if (currentNode.isJunction) {
                 routeList.add(0, mutableListOf(edge))

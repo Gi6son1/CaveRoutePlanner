@@ -7,18 +7,20 @@ toggle cave route lines on map
 specific path distance area details has same colour as route colour
 
 left handled vs right handed layout
-icon buttons and text buttons aren't mixed they have separate areas
 
 change yards to meters - add preferences option to change if required
-hold gesture being up as long press buton, fix this
 
 Cancel button in cancel route misleading
 
 LL old survey remove class and store in JSON file
 
+Add instructions on markup and prejourney layout
+
 Make cave card more readable - fix font colours
 
 Highlight last selected
+
+turn off sensor when not on compass screen
 
 have loading text when loading image on survey
 
