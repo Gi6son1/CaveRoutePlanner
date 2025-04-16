@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,10 +24,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
+import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.ui.util.calculateFractionalOffset
 import kotlin.math.max
 
@@ -34,7 +38,6 @@ import kotlin.math.max
 fun MarkupImageAndGraphOverlay(
     paths: List<SurveyPath>,
     nodes: List<SurveyNode>,
-    surveyImage: ImageBitmap,
     modifier: Modifier = Modifier,
     longPressPosition: (Offset) -> Unit,
     onTapPosition: (Offset) -> Unit,
@@ -43,12 +46,15 @@ fun MarkupImageAndGraphOverlay(
     centreMarker: Offset,
     distanceMarker1: Offset,
     distanceMarker2: Offset,
+    surveySize: (IntSize) -> Unit,
     currentlySelectedSurveyNode: SurveyNode?
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
+
+    val context = LocalContext.current
 
     val density = LocalDensity.current
     val currentConfiguration = LocalConfiguration.current
@@ -148,28 +154,39 @@ fun MarkupImageAndGraphOverlay(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                bitmap = surveyImage,
-                contentDescription = "survey",
-                modifier = Modifier,
-                contentScale = ContentScale.Fit
-            )
+            var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromTempInternalStorage(context)) }
 
-            MarkupGraphOverlay(
-                nodes = nodes,
-                modifier = Modifier.matchParentSize(),
-                surveySize = IntSize(
-                    width = surveyImage.width,
-                    height = surveyImage.height
-                ),
-                paths = paths,
-                markupStage = markupStage,
-                northMarker = northMarker,
-                centreMarker = centreMarker,
-                distanceMarker1 = distanceMarker1,
-                distanceMarker2 = distanceMarker2,
-                currentlySelectedSurveyNode = currentlySelectedSurveyNode
-            )
+            if (imageBitmap != null) {
+                LaunchedEffect(imageBitmap) {
+                    surveySize( IntSize(
+                        width = imageBitmap!!.width,
+                        height = imageBitmap!!.height
+                    ))
+                }
+
+                Image(
+                    bitmap = imageBitmap!!,
+                    contentDescription = "survey",
+                    modifier = Modifier,
+                    contentScale = ContentScale.Fit
+                )
+
+                MarkupGraphOverlay(
+                    nodes = nodes,
+                    modifier = Modifier.matchParentSize(),
+                    surveySize = IntSize(
+                        width = imageBitmap!!.width,
+                        height = imageBitmap!!.height
+                    ),
+                    paths = paths,
+                    markupStage = markupStage,
+                    northMarker = northMarker,
+                    centreMarker = centreMarker,
+                    distanceMarker1 = distanceMarker1,
+                    distanceMarker2 = distanceMarker2,
+                    currentlySelectedSurveyNode = currentlySelectedSurveyNode
+                )
+            }
         }
     }
 }
