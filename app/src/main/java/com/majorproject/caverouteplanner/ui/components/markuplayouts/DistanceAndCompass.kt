@@ -91,7 +91,7 @@ fun DistanceAndCompassCalibrationLayout(
             onValueChange = {
                 updatePixelsPerMeter(it)
             },
-            default = metersBetweenPoints
+            default = metersBetweenPoints.coerceIn(1, 50)
         )
     }
 }

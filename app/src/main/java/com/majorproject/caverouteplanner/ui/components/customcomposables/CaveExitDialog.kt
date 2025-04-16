@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.components.customcomposables
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +39,9 @@ fun CaveExitDialog(
             properties = DialogProperties(usePlatformDefaultWidth = false),
             onDismissRequest = {}, //sets it so that user cannot dismiss dialog by tapping outside
         ) {
+
+            BackHandler { dialogOpen(false) }
+
             Card(modifier = Modifier.width(370.dp)) {
                 Column {
                     Spacer(modifier = Modifier.height(15.dp))

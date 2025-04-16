@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.components.customcomposables
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +44,9 @@ fun TravelConditionsDialog(
         Dialog(
             onDismissRequest = {}, //sets it so that user cannot dismiss dialog by tapping outside
         ) {
+
+            BackHandler { dialogOpen(false) }
+
             var noWater by rememberSaveable { mutableStateOf(currentConditions.first) }
 
             var noHardTraverse by rememberSaveable { mutableStateOf(currentConditions.second) }

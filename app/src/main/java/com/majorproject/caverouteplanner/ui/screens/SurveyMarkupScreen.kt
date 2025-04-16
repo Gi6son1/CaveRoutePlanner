@@ -2,6 +2,7 @@ package com.majorproject.caverouteplanner.ui.screens
 
 import android.app.Application
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -21,6 +24,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,6 +49,7 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionC
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.SaveSurveyDialog
+import com.majorproject.caverouteplanner.ui.components.enums.Difficulty
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.DistanceAndCompassCalibrationLayout
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.EntrancesAndJunctionsLayout
@@ -57,6 +62,7 @@ import com.majorproject.caverouteplanner.ui.util.calculateMetersFromFractionalOf
 import com.majorproject.caverouteplanner.ui.util.calculatePixelsPerMeter
 import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
+import kotlinx.coroutines.launch
 import kotlin.math.round
 
 val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
@@ -130,19 +136,29 @@ fun SurveyMarkupScreen(
 
     var northMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var centreMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
-    var distanceMarker1 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
-    var distanceMarker2 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distanceMarker1: Offset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distanceMarker2: Offset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var pixelsPerMeter by rememberSaveable { mutableFloatStateOf(1f) }
 
     var currentlySelectedSurveyNode by rememberSaveable { mutableStateOf<SurveyNode?>(null) }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     BackGroundScaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "Stage ${markupStage + 1}: ${titleList[markupStage]}") },
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
+
+        BackHandler { openHomeButtonDialog = true }
+
         MarkupImageAndGraphOverlay(
             nodes = nodesList,
             paths = pathsList,
@@ -496,6 +512,24 @@ fun SurveyMarkupScreen(
             dialogIsOpen = openSaveDialog,
             dialogOpen = { openSaveDialog = it },
             saveSurvey = { name, length, description, difficulty, location ->
+
+                val errorMessage = validateInputs(
+                    name,
+                    length,
+                    difficulty,
+                    nodesList,
+                    pathsList,
+                    distanceMarker1,
+                    distanceMarker2
+                )
+
+                if (errorMessage != null){
+                    scope.launch {
+                        snackbarHostState.showSnackbar(errorMessage)
+                    }
+                }
+
+
                 fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
                     var convertedPathList = pathList
                     for (path in convertedPathList) {
@@ -603,4 +637,30 @@ private fun cleanupFromNode(
             currentNode = null
         }
     }
+}
+
+private fun validateInputs(
+    name: String,
+    length: Float,
+    difficulty: Difficulty,
+    nodesList: List<SurveyNode>,
+    pathsList: List<SurveyPath>,
+    distanceMarker1: Offset,
+    distanceMarker2: Offset,
+) : String?{
+    var errorMessage: String? = null
+    if (name.isNullOrBlank()){
+        errorMessage = "Name cannot be blank"
+    } else if (length < 0f){
+        errorMessage = "Length cannot be negative"
+    } else if (difficulty == Difficulty.NONE){
+        errorMessage = "Please choose a difficulty for this cave"
+    } else if (nodesList.isEmpty()){
+        errorMessage = "Please add at least one node"
+    } else if (pathsList.isEmpty()){
+        errorMessage = "Please add at least one path"
+    } else if (distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero){
+        errorMessage = "Please calibrate the distance markers"
+    }
+    return errorMessage
 }

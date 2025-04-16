@@ -2,12 +2,9 @@ package com.majorproject.caverouteplanner.ui.screens
 
 import androidx.compose.runtime.Composable
 import android.app.Application
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,8 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.Cave
@@ -33,7 +28,6 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveCardButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CollapsableListHeader
 import com.majorproject.caverouteplanner.ui.components.customcomposables.Section
-import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable

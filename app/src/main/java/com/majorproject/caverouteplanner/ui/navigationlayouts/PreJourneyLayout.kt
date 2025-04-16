@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
@@ -47,6 +48,8 @@ fun PreJourneyLayout(
         var openHomeButtonDialog by rememberSaveable {
             mutableStateOf(false)
         }
+
+        BackHandler { openHomeButtonDialog = true }
 
 
         CustomIconButton(

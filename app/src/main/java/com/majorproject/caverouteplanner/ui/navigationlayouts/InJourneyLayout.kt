@@ -1,7 +1,6 @@
 package com.majorproject.caverouteplanner.ui.navigationlayouts
 
-import android.util.Log
-import androidx.compose.foundation.clickable
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -32,8 +31,10 @@ fun InJourneyLayout(
     onCompassClick: () -> Unit = {},
     compassEnabled: Boolean
 ) {
-    var openActionCheckDialog by rememberSaveable { mutableStateOf(false) }
+    var openCancelRouteCheckDialog by rememberSaveable { mutableStateOf(false) }
     var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler { openCancelRouteCheckDialog = true }
 
     ConstraintLayout(
         modifier = Modifier
@@ -110,7 +111,7 @@ fun InJourneyLayout(
             )
 
             CustomIconButton(
-                onClick = { openActionCheckDialog = true },
+                onClick = { openCancelRouteCheckDialog = true },
                 modifier = Modifier.constrainAs(cancel) {
                     top.linkTo(caveExit.bottom, 20.dp)
                     end.linkTo(parent.end, 20.dp)
@@ -121,8 +122,8 @@ fun InJourneyLayout(
         }
 
         ActionCheckDialog(
-            dialogIsOpen = openActionCheckDialog,
-            dialogOpen = { openActionCheckDialog = it },
+            dialogIsOpen = openCancelRouteCheckDialog,
+            dialogOpen = { openCancelRouteCheckDialog = it },
             confirmAction = { cancelRoute() },
             message = "Are you sure you want to cancel this route? You'll lose your progress if you do."
         )

@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.components.customcomposables
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Card
@@ -56,13 +56,18 @@ fun SaveSurveyDialog(
     var difficulty: Difficulty by rememberSaveable { mutableStateOf(Difficulty.NONE) }
     var location: String by rememberSaveable { mutableStateOf("") }
 
+    val nameCharLimit = 20
+    val descriptionCharLimit = 100
+    val floatCharLimit = 10
+    val locationCharLimit = 20
+
     if (dialogIsOpen) {
         Dialog(
             properties = DialogProperties(usePlatformDefaultWidth = true),
             onDismissRequest = {}, //sets it so that user cannot dismiss dialog by tapping outside
         ) {
 
-
+            BackHandler { /*nothing happens when back is pressed*/ }
 
             Card {
                 Column(modifier = Modifier.padding(10.dp)) {
@@ -77,7 +82,7 @@ fun SaveSurveyDialog(
                     Spacer(modifier = Modifier.height(15.dp))
                     OutlinedTextField(
                         value = name,
-                        onValueChange = { name = it },
+                        onValueChange = { if (it.length <= nameCharLimit) name = it },
                         label = { Text(text = "Name") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -86,7 +91,11 @@ fun SaveSurveyDialog(
                     Spacer(modifier = Modifier.height(15.dp))
                     OutlinedTextField(
                         value = length.toString(),
-                        onValueChange = { length = it.toFloat() },
+                        onValueChange = {
+                            if (it.isNotEmpty() && it.all { char -> char.isDigit() }){
+                                if (it.length <= floatCharLimit) length = it.toFloat()
+                            }
+                                        },
                         label = { Text(text = "Length (m)") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -94,7 +103,7 @@ fun SaveSurveyDialog(
                     Spacer(modifier = Modifier.height(15.dp))
                     OutlinedTextField(
                         value = description,
-                        onValueChange = { description = it },
+                        onValueChange = { if (it.length <= descriptionCharLimit) description = it },
                         label = { Text(text = "Description") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -107,10 +116,10 @@ fun SaveSurveyDialog(
                         text = "Cave Difficulty"
                     )
                     SingleChoiceSegmentedButtonRow {
-                        var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+                        var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
                         SingleChoiceSegmentedButtonRow {
                             val difficultyList = Difficulty.all()
-                            difficultyList.forEachIndexed { index, label ->
+                            difficultyList.forEachIndexed { index, _ ->
                                 SegmentedButton(
                                     shape = SegmentedButtonDefaults.itemShape(
                                         index = index,
@@ -136,7 +145,7 @@ fun SaveSurveyDialog(
                     Spacer(modifier = Modifier.height(15.dp))
                     OutlinedTextField(
                         value = location,
-                        onValueChange = { location = it },
+                        onValueChange = { if (it.length <= locationCharLimit) location = it },
                         label = { Text(text = "Location") },
                         modifier = Modifier
                             .fillMaxWidth()
