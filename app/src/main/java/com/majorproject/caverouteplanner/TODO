@@ -22,6 +22,8 @@ Highlight last selected
 
 have loading text when loading image on survey
 
+make composables stateless
+
 do validation for cave survey data input
 difficulty none shows up on easy
 validation for (must have nodes and edges)

@@ -77,9 +77,9 @@ fun copyImageToInternalStorageFromTemp(
 
             val newWidth = (bitmap.width * compressPercentage).toInt()
             val newHeight = (bitmap.height * compressPercentage).toInt()
-            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, false)
+            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
 
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
             outputStream.close()
             return destinationFile.absolutePath
         }

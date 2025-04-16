@@ -522,9 +522,9 @@ fun SurveyMarkupScreen(
                 ).toFloat() - 90f
 
                 var resizePercentage = 0f
-                if (pixelsPerMeter > 25f) {
-                    resizePercentage = 25f/ pixelsPerMeter
-                    pixelsPerMeter *= resizePercentage
+                if (pixelsPerMeter > 100f) {
+                    resizePercentage = 100f/ pixelsPerMeter
+                    pixelsPerMeter = pixelsPerMeter * resizePercentage
                 }
 
                 val reference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg", compressPercentage = resizePercentage)
