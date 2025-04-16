@@ -46,15 +46,13 @@ fun MarkupImageAndGraphOverlay(
     centreMarker: Offset,
     distanceMarker1: Offset,
     distanceMarker2: Offset,
-    surveySize: (IntSize) -> Unit,
+    imageBitmap: ImageBitmap,
     currentlySelectedSurveyNode: SurveyNode?
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var rotation by remember { mutableFloatStateOf(0f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
-
-    val context = LocalContext.current
 
     val density = LocalDensity.current
     val currentConfiguration = LocalConfiguration.current
@@ -154,15 +152,7 @@ fun MarkupImageAndGraphOverlay(
                 },
             contentAlignment = Alignment.Center
         ) {
-            var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromTempInternalStorage(context)) }
 
-            if (imageBitmap != null) {
-                LaunchedEffect(imageBitmap) {
-                    surveySize( IntSize(
-                        width = imageBitmap!!.width,
-                        height = imageBitmap!!.height
-                    ))
-                }
 
                 Image(
                     bitmap = imageBitmap!!,
@@ -175,8 +165,8 @@ fun MarkupImageAndGraphOverlay(
                     nodes = nodes,
                     modifier = Modifier.matchParentSize(),
                     surveySize = IntSize(
-                        width = imageBitmap!!.width,
-                        height = imageBitmap!!.height
+                        width = imageBitmap.width,
+                        height = imageBitmap.height
                     ),
                     paths = paths,
                     markupStage = markupStage,
@@ -187,7 +177,7 @@ fun MarkupImageAndGraphOverlay(
                     currentlySelectedSurveyNode = currentlySelectedSurveyNode
                 )
             }
-        }
+
     }
 }
 

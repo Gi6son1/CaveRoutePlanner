@@ -69,18 +69,24 @@ fun SurveyMarkupScreenTopLevel(
     returnToMenu: () -> Unit = {}
 ) {
     val context = LocalContext.current
-        Log.d("SurveyMarkupScreen", "Image bitmap is not null")
+
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromTempInternalStorage(context)) }
+
+    if (imageBitmap != null) {
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
-            saveCaveAndSurvey = {
-                    caveProperties, surveyProperties, nodes, paths ->
+            saveCaveAndSurvey = { caveProperties, surveyProperties, nodes, paths ->
 
-                val repository = CaveRoutePlannerRepository(context.applicationContext as Application)
+                val repository =
+                    CaveRoutePlannerRepository(context.applicationContext as Application)
                 repository.saveCaveAndSurvey(caveProperties, surveyProperties, nodes, paths)
                 returnToMenu()
-            }
+            },
+            imageBitmap = imageBitmap!!
         )
-
+    } else {
+        returnToMenu()
+    }
 
 }
 
@@ -88,6 +94,7 @@ fun SurveyMarkupScreenTopLevel(
 @Composable
 fun SurveyMarkupScreen(
     returnToMenu: () -> Unit = {},
+    imageBitmap: ImageBitmap,
     saveCaveAndSurvey: (CaveProperties, SurveyProperties, List<SurveyNode>, List<SurveyPath>) -> Unit = {_, _, _, _ ->}
 ) {
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
@@ -127,8 +134,6 @@ fun SurveyMarkupScreen(
     var distanceMarker2 by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var pixelsPerMeter by rememberSaveable { mutableFloatStateOf(1f) }
 
-    var surveySize by rememberSaveable { mutableStateOf(Pair(0, 0)) }
-
     var currentlySelectedSurveyNode by rememberSaveable { mutableStateOf<SurveyNode?>(null) }
 
     BackGroundScaffold(
@@ -144,6 +149,7 @@ fun SurveyMarkupScreen(
             modifier = Modifier.padding(innerPadding),
             markupStage = markupStage,
             northMarker = northMarker,
+            imageBitmap = imageBitmap,
             centreMarker = centreMarker,
             distanceMarker1 = distanceMarker1,
             distanceMarker2 = distanceMarker2,
@@ -153,8 +159,8 @@ fun SurveyMarkupScreen(
                     val foundNode = getNearestNode(
                         longPressPosition,
                         nodesList,
-                        surveySize.first,
-                        surveySize.second,
+                        imageBitmap.width,
+                        imageBitmap.height,
                         0.01f
                     )
                     if (foundNode != null && (foundNode.isEntrance || foundNode.isJunction)) {
@@ -178,8 +184,8 @@ fun SurveyMarkupScreen(
                             val adjustedPixelsCoordinates = calculateCoordinatePixels(
                                 tapPosition,
                                 IntSize(
-                                    width = surveySize.first,
-                                    height = surveySize.second
+                                    width = imageBitmap.width,
+                                    height = imageBitmap.height
                                 )
                             )
                             val newList = nodesList + SurveyNode(
@@ -195,8 +201,8 @@ fun SurveyMarkupScreen(
                             val foundNode = getNearestNode(
                                 tapPosition,
                                 nodesList,
-                                surveySize.first,
-                                surveySize.second,
+                                imageBitmap.width,
+                                imageBitmap.height,
                                 0.005f
                             )
                             if (foundNode != null) {
@@ -216,16 +222,16 @@ fun SurveyMarkupScreen(
                             var nextSurveyNode = getNearestNode(
                                 tapPosition,
                                 nodesList,
-                                surveySize.first,
-                                surveySize.second,
+                                imageBitmap.width,
+                                imageBitmap.height,
                                 0.005f
                             )
                             if (nextSurveyNode == null || (!nextSurveyNode.isEntrance && !nextSurveyNode.isJunction)) {
                                 val adjustedPixelsCoordinates = calculateCoordinatePixels(
                                     tapPosition,
                                     IntSize(
-                                        width = surveySize.first,
-                                        height = surveySize.second
+                                        width = imageBitmap.width,
+                                        height = imageBitmap.height
                                     )
                                 )
                                 nextSurveyNode = SurveyNode(
@@ -263,8 +269,8 @@ fun SurveyMarkupScreen(
                                 tapPosition,
                                 nodesList,
                                 pathsList,
-                                surveySize.first,
-                                surveySize.second,
+                                imageBitmap.width,
+                                imageBitmap.height,
                                 0.5f
                             )
                             if (foundEdge != null) {
@@ -293,8 +299,8 @@ fun SurveyMarkupScreen(
                             tapPosition,
                             nodesList,
                             pathsList,
-                            surveySize.first,
-                            surveySize.second,
+                            imageBitmap.width,
+                            imageBitmap.height,
                             0.5f
                         )
                         if (foundPath != null) {
@@ -320,8 +326,8 @@ fun SurveyMarkupScreen(
                             tapPosition,
                             nodesList,
                             pathsList,
-                            surveySize.first,
-                            surveySize.second,
+                            imageBitmap.width,
+                            imageBitmap.height,
                             0.5f
                         )
                         if (foundPath != null) {
@@ -335,9 +341,6 @@ fun SurveyMarkupScreen(
                         }
                     }
                 }
-            },
-            surveySize = {
-                surveySize =  Pair(it.width, it.height)
             }
         )
 
@@ -406,8 +409,8 @@ fun SurveyMarkupScreen(
                         distanceMarker1,
                         distanceMarker2,
                         IntSize(
-                            width = surveySize.first,
-                            height = surveySize.second
+                            width = imageBitmap.width,
+                            height = imageBitmap.height
                         ),
                         pixelsPerMeter
                     )),
@@ -416,8 +419,8 @@ fun SurveyMarkupScreen(
                             distanceMarker1,
                             distanceMarker2,
                             IntSize(
-                                width = surveySize.first,
-                                height = surveySize.second
+                                width = imageBitmap.width,
+                                height = imageBitmap.height
                             ),
                             numberOfMeters
                         )
@@ -532,8 +535,8 @@ fun SurveyMarkupScreen(
                 }
 
                 var surveyProperties: SurveyProperties = SurveyProperties(
-                    width = surveySize.first,
-                    height = surveySize.second,
+                    width = imageBitmap.width,
+                    height = imageBitmap.height,
                     pixelsPerMeter = pixelsPerMeter,
                     imageReference = reference,
                     northAngle = northAngle
