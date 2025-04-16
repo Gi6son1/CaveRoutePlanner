@@ -31,6 +31,7 @@ class CaveRoutePlannerRepository(application: Application) {
 
     fun saveCaveAndSurvey(caveProperties: CaveProperties, surveyProps: SurveyProperties, surveyNodes: List<SurveyNode>, surveyPaths: List<SurveyPath>) {
         val surveyId = surveyDao.insertSurvey(surveyProps)
+        Log.d("DEBUGLOG", "Saved Survey")
 
         val finalisedCaveProperties = CaveProperties(
             name = caveProperties.name,
@@ -40,11 +41,14 @@ class CaveRoutePlannerRepository(application: Application) {
             length = caveProperties.length,
             surveyId = surveyId.toInt()
         )
+        Log.d("DEBUGLOG", "Created CaveProperties")
 
         caveDao.insertCaveProperties(finalisedCaveProperties)
+        Log.d("DEBUGLOG", "Saved Cave")
 
         var nodesList: MutableList<Int> =
             MutableList(surveyNodes.size) { _ -> 0 }
+
 
         for (node in surveyNodes) {
             val nodeDBID = surveyNodeDao.insertSurveyNode(
@@ -57,7 +61,9 @@ class CaveRoutePlannerRepository(application: Application) {
                 )
             )
             nodesList[node.id] = nodeDBID.toInt()
+            Log.d("DEBUGLOG", "Saved Node $nodeDBID")
         }
+        Log.d("DEBUGLOG", "Saved Nodes")
 
         for (path in surveyPaths) {
             val ends = Pair(nodesList[path.ends.first], nodesList[path.ends.second])

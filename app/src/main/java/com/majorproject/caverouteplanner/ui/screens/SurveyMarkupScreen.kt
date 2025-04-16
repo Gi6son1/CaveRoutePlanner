@@ -585,13 +585,7 @@ fun SurveyMarkupScreen(
                         snackbarHostState.showSnackbar(errorMessage)
                     }
                 } else {
-                    var resizePercentage = 0f
-                    if (pixelsPerMeter > 100f) {
-                        resizePercentage = 100f/ pixelsPerMeter
-                        pixelsPerMeter = pixelsPerMeter * resizePercentage
-                    }
-
-                    savedSurveyReference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg", compressPercentage = resizePercentage)
+                    savedSurveyReference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg")
                 }
             }
         )
@@ -658,6 +652,16 @@ private fun validateInputs(
     distanceMarker1: Offset,
     distanceMarker2: Offset,
 ) : String?{
+    fun validateNodeConnections(): Boolean {
+        for (node in nodesList) {
+            if (pathsList.none { it.getPathEnds().first == node.getNodeId() || it.getPathEnds().second == node.getNodeId() }) {
+                return false
+            }
+        }
+        return true
+    }
+
+
     var errorMessage: String? = null
     if (name.isNullOrBlank()){
         errorMessage = "Name cannot be blank"
@@ -671,6 +675,8 @@ private fun validateInputs(
         errorMessage = "Please add at least one path"
     } else if (distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero){
         errorMessage = "Please calibrate the distance markers"
+    } else if (!validateNodeConnections()){
+        errorMessage = "All nodes must be have at least one path connected to it"
     }
     return errorMessage
 }

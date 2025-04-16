@@ -184,7 +184,6 @@ fun SurveyNavScreen(
                                 scope.launch {
                                     snackbarHostState.showSnackbar(message = "No route from source has been found")
                                 }
-                                pinPointNode = null
                             }
                         }
                     }

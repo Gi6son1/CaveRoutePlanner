@@ -86,6 +86,7 @@ fun PreJourneyLayout(
                 distance = currentRoute.totalDistance,
                 time = currentRoute.getTotalPathTravelTime()
             )
+        }
 
             CustomTextButton(
                 onClick = { setSource() },
@@ -121,7 +122,7 @@ fun PreJourneyLayout(
                 iconImage = R.drawable.exit_icon,
                 contentDescription = "Exit Cave From Flag"
             )
-        }
+
 
         TravelConditionsDialog(
             dialogIsOpen = openConditionsDialog,

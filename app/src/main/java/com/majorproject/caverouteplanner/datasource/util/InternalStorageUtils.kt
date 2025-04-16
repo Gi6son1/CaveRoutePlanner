@@ -57,7 +57,6 @@ fun copyImageToInternalStorageFromAssets(
 fun copyImageToInternalStorageFromTemp(
     context: Context,
     imageName: String,
-    compressPercentage: Float = 0f
 ): String? {
 
     val destinationDirectory = File(context.filesDir, "surveys")
@@ -71,18 +70,12 @@ fun copyImageToInternalStorageFromTemp(
     val sourceFile = File(context.filesDir, "temp_images/temp_image.jpg")
 
     try {
-        if (compressPercentage > 0f && compressPercentage <= 1f) {
             val bitmap = BitmapFactory.decodeFile(sourceFile.absolutePath)
             val outputStream = FileOutputStream(destinationFile)
 
-            val newWidth = (bitmap.width * compressPercentage).toInt()
-            val newHeight = (bitmap.height * compressPercentage).toInt()
-            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
-
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
             outputStream.close()
             return destinationFile.absolutePath
-        }
     } catch (e: IOException) {
         return null
     } finally {

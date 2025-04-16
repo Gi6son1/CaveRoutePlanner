@@ -24,6 +24,8 @@ turn off sensor when not on compass screen
 
 have loading text when loading image on survey
 
+make it so that if flag on route with no route, do not allow to go
+
 make composables stateless
 
 do validation for cave survey data input
