@@ -174,10 +174,14 @@ fun SurveyMarkupScreen(
 
             var formattedPathList = convertToMeters(pathsList, pixelsPerMeter)
 
-            var northAngle = calculateAngle(
-                Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
-                Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
-            ).toFloat() - 90f
+            var northAngle: Float = if (northMarker == Offset.Zero && centreMarker == Offset.Zero) {
+                -90f
+            } else {
+                calculateAngle(
+                    Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
+                    Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
+                ).toFloat() - 90f
+            }
 
             var surveyProperties: SurveyProperties = SurveyProperties(
                 width = imageBitmap.width,

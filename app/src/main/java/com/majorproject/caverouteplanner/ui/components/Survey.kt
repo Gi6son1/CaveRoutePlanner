@@ -35,7 +35,7 @@ data class SurveyProperties(
     val pixelsPerMeter: Float,
     val width: Int,
     val height: Int,
-    val northAngle: Float
+    val northAngle: Float = -90f
 ) : Parcelable
 
 @Parcelize
