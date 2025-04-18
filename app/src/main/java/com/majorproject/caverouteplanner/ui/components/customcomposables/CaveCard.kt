@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,6 +76,13 @@ fun CaveCard(cave: Cave) {
     ) {
         var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromInternalStorage(filePath = cave.surveyProperties.imageReference)) }
 
+        var lengthText by rememberSaveable { mutableStateOf("") }
+        lengthText = if (cave.caveProperties.length >= 1000){
+            "${(cave.caveProperties.length / 1000f)}km"
+        } else {
+            "${cave.caveProperties.length}m"
+        }
+
         Row {
             if (imageBitmap != null){
                 Card {
@@ -90,7 +98,7 @@ fun CaveCard(cave: Cave) {
                 Text(text = cave.caveProperties.name, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.surface)
                 Text(text = cave.caveProperties.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Length: ${cave.caveProperties.length}km", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
+                    Text(text = "Length: $lengthText", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.inverseOnSurface)
                     Spacer(modifier = Modifier.width(5.dp))
                     VerticalDivider(modifier = Modifier.height(16.dp))
                     Spacer(modifier = Modifier.width(5.dp))
@@ -110,7 +118,7 @@ fun CaveCardPreview(
             Cave(
                 caveProperties = CaveProperties(
                     name = "Llygad Lchwr",
-                    length = 1.2f,
+                    length = 1200,
                     description = "Contains dry high level and an active river level, separated by sumps.",
                     difficulty = "Novice",
                     location = "South Wales",

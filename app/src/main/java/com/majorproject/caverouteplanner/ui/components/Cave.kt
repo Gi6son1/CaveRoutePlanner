@@ -19,7 +19,7 @@ data class CaveProperties(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    val length: Float,
+    val length: Int,
     val description: String,
     val difficulty: String,
     val location: String,

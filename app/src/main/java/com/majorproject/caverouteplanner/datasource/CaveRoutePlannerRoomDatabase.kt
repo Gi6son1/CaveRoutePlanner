@@ -89,9 +89,9 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             val llCaveProperties = CaveProperties(
                 name = "Llygadlchwr",
                 description = "Contains dry high level and an active river level, separated by sumps.",
-                difficulty = "Novice",
+                difficulty = "Easy",
                 location = "South Wales",
-                length = 1.2f,
+                length = 1200,
                 surveyId = llSurveyId.toInt()
             )
 

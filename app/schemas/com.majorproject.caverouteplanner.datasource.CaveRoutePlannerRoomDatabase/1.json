@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f14f893b524762dc0f6c5241fa889c6b",
+    "identityHash": "70cd5e683eea17aa674e59bdbf26618d",
     "entities": [
       {
         "tableName": "surveys",
@@ -206,7 +206,7 @@
       },
       {
         "tableName": "caves",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `length` REAL NOT NULL, `description` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `location` TEXT NOT NULL, `surveyId` INTEGER NOT NULL, FOREIGN KEY(`surveyId`) REFERENCES `surveys`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `length` INTEGER NOT NULL, `description` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `location` TEXT NOT NULL, `surveyId` INTEGER NOT NULL, FOREIGN KEY(`surveyId`) REFERENCES `surveys`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -223,7 +223,7 @@
           {
             "fieldPath": "length",
             "columnName": "length",
-            "affinity": "REAL",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -276,7 +276,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f14f893b524762dc0f6c5241fa889c6b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '70cd5e683eea17aa674e59bdbf26618d')"
     ]
   }
 }

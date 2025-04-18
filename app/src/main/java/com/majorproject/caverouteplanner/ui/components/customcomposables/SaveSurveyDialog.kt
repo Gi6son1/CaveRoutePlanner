@@ -48,17 +48,17 @@ import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 fun SaveSurveyDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open
     dialogOpen: (Boolean) -> Unit = {}, //method used for closing the dialog,
-    saveSurvey: (String, Float, String, Difficulty, String) -> Unit
+    saveSurvey: (String, Int, String, Difficulty, String) -> Unit
 ) {
     var name: String by rememberSaveable { mutableStateOf("") }
-    var length: Float by rememberSaveable { mutableStateOf(0f) }
+    var length: Int by rememberSaveable { mutableIntStateOf(0) }
     var description: String by rememberSaveable { mutableStateOf("") }
     var difficulty: Difficulty by rememberSaveable { mutableStateOf(Difficulty.NONE) }
     var location: String by rememberSaveable { mutableStateOf("") }
 
     val nameCharLimit = 20
     val descriptionCharLimit = 100
-    val floatCharLimit = 10
+    val intCharLimit = 10
     val locationCharLimit = 20
 
     if (dialogIsOpen) {
@@ -92,10 +92,12 @@ fun SaveSurveyDialog(
                     OutlinedTextField(
                         value = length.toString(),
                         onValueChange = {
-                            if (it.isNotEmpty() && it.all { char -> char.isDigit() }){
-                                if (it.length <= floatCharLimit) length = it.toFloat()
+                            if (it.isEmpty()) {
+                                length = -1
+                            } else if (it.all { char -> char.isDigit() } && it.length <= intCharLimit) {
+                                    length = it.toInt()
                             }
-                                        },
+                        },
                         label = { Text(text = "Length (m)") },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -112,7 +114,9 @@ fun SaveSurveyDialog(
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        modifier = Modifier.fillMaxWidth().align(Alignment.Start),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start),
                         text = "Cave Difficulty"
                     )
                     SingleChoiceSegmentedButtonRow {
@@ -133,7 +137,8 @@ fun SaveSurveyDialog(
                                 )
                                 {
                                     Text(
-                                        text = difficultyList[index].toString().lowercase().replaceFirstChar{ it.uppercase() },
+                                        text = difficultyList[index].toString().lowercase()
+                                            .replaceFirstChar { it.uppercase() },
                                         fontSize = 12.sp
                                     )
                                 }

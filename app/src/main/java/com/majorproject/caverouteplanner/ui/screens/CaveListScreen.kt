@@ -110,7 +110,7 @@ fun CaveListScreenPreview(){
                 Cave(
                     caveProperties = CaveProperties(
                         name = "Llygadlchwr",
-                        length = 1.2f,
+                        length = 1200,
                         description = "Contains dry high level and an active river level, separated by sumps.",
                         difficulty = "Novice",
                         location = "South Wales",

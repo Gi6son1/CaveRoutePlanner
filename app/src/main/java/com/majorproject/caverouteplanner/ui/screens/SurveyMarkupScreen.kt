@@ -146,7 +146,7 @@ fun SurveyMarkupScreen(
 
     var savedSurveyReference by rememberSaveable { mutableStateOf<String?>(null) }
     var name by rememberSaveable { mutableStateOf("") }
-    var length by rememberSaveable { mutableFloatStateOf(0.0f) }
+    var length by rememberSaveable { mutableIntStateOf(0) }
     var description by rememberSaveable { mutableStateOf("") }
     var difficulty by rememberSaveable { mutableStateOf(Difficulty.NONE) }
     var location by rememberSaveable { mutableStateOf("") }
@@ -625,22 +625,17 @@ private fun cleanupFromNode(
 ) {
     var currentNode: SurveyNode? = nodes.find { it.getNodeId() == startNodeId }
     while (currentNode != null && !currentNode.isEntrance && !currentNode.isJunction) {
-        // Remove the current node
         nodes.remove(currentNode)
 
-        // Find the connecting path
         val connectingPath =
             paths.find { it.getPathEnds().first == currentNode.getNodeId() || it.getPathEnds().second == currentNode.getNodeId() }
 
         if (connectingPath != null) {
-            // Remove the connecting path
             paths.remove(connectingPath)
 
-            // Determine the next node
             val nextNodeId = connectingPath.next(currentNode.getNodeId())
             currentNode = nodes.find { it.getNodeId() == nextNodeId }
         } else {
-            // No connecting path, stop the cleanup
             currentNode = null
         }
     }
@@ -648,7 +643,7 @@ private fun cleanupFromNode(
 
 private fun validateInputs(
     name: String,
-    length: Float,
+    length: Int,
     difficulty: Difficulty,
     nodesList: List<SurveyNode>,
     pathsList: List<SurveyPath>,
@@ -666,10 +661,10 @@ private fun validateInputs(
 
 
     var errorMessage: String? = null
-    if (name.isNullOrBlank()){
+    if (name.isBlank()){
         errorMessage = "Name cannot be blank"
-    } else if (length < 0f){
-        errorMessage = "Length cannot be negative"
+    } else if (length < 0){
+        errorMessage = "Length cannot be negative or empty"
     } else if (difficulty == Difficulty.NONE){
         errorMessage = "Please choose a difficulty for this cave"
     } else if (nodesList.isEmpty()){
