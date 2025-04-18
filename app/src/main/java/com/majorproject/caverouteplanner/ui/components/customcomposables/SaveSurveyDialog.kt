@@ -27,11 +27,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.components.enums.Difficulty
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
@@ -83,7 +85,7 @@ fun SaveSurveyDialog(
                     OutlinedTextField(
                         value = name,
                         onValueChange = { if (it.length <= nameCharLimit) name = it },
-                        label = { Text(text = "Name") },
+                        label = { Text(text = stringResource(R.string.name)) },
                         modifier = Modifier
                             .fillMaxWidth()
                     )
@@ -98,7 +100,7 @@ fun SaveSurveyDialog(
                                     length = it.toInt()
                             }
                         },
-                        label = { Text(text = "Length (m)") },
+                        label = { Text(text = stringResource(R.string.length_m)) },
                         modifier = Modifier
                             .fillMaxWidth()
                     )
@@ -106,7 +108,7 @@ fun SaveSurveyDialog(
                     OutlinedTextField(
                         value = description,
                         onValueChange = { if (it.length <= descriptionCharLimit) description = it },
-                        label = { Text(text = "Description") },
+                        label = { Text(text = stringResource(R.string.description)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(100.dp)
@@ -117,7 +119,7 @@ fun SaveSurveyDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.Start),
-                        text = "Cave Difficulty"
+                        text = stringResource(R.string.cave_difficulty)
                     )
                     SingleChoiceSegmentedButtonRow {
                         var selectedIndex by rememberSaveable { mutableIntStateOf(-1) }
@@ -151,7 +153,7 @@ fun SaveSurveyDialog(
                     OutlinedTextField(
                         value = location,
                         onValueChange = { if (it.length <= locationCharLimit) location = it },
-                        label = { Text(text = "Location") },
+                        label = { Text(text = stringResource(R.string.location)) },
                         modifier = Modifier
                             .fillMaxWidth()
                     )

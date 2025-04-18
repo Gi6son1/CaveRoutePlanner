@@ -28,8 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.ui.components.Cave
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
@@ -110,7 +112,7 @@ fun CaveCard(cave: Cave) {
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Length: $lengthText",
+                        text = stringResource(R.string.length, lengthText),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.inverseOnSurface
                     )
@@ -118,7 +120,7 @@ fun CaveCard(cave: Cave) {
                     VerticalDivider(modifier = Modifier.height(16.dp))
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = "Difficulty: ${cave.caveProperties.difficulty}",
+                        text = stringResource(R.string.difficulty, cave.caveProperties.difficulty),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.inverseOnSurface
                     )

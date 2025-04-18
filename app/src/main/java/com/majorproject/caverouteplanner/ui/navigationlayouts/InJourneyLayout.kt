@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.R
@@ -59,7 +60,7 @@ fun InJourneyLayout(
 
         CustomTextButton(
             onClick = { currentRoute.nextStage() },
-            text = "Next Stage",
+            text = stringResource(R.string.next_stage),
             modifier = Modifier.constrainAs(nextStage) {
                 bottom.linkTo(parent.bottom, 40.dp)
                 end.linkTo(parent.end, 10.dp)
@@ -69,7 +70,7 @@ fun InJourneyLayout(
 
         CustomTextButton(
             onClick = { currentRoute.previousStage() },
-            text = "Previous Stage",
+            text = stringResource(R.string.previous_stage),
             modifier = Modifier.constrainAs(prevStage) {
                 bottom.linkTo(parent.bottom, 40.dp)
                 start.linkTo(parent.start, 10.dp)
@@ -117,7 +118,7 @@ fun InJourneyLayout(
                     end.linkTo(parent.end, 20.dp)
                 },
                 iconVector = Icons.Outlined.Cancel,
-                contentDescription = "Cancel"
+                contentDescription = stringResource(R.string.cancel)
             )
         }
 
@@ -125,7 +126,7 @@ fun InJourneyLayout(
             dialogIsOpen = openCancelRouteCheckDialog,
             dialogOpen = { openCancelRouteCheckDialog = it },
             confirmAction = { cancelRoute() },
-            message = "Are you sure you want to remove this route? You'll lose your progress if you do."
+            message = stringResource(R.string.are_you_sure_you_want_to_remove_this_route_you_ll_lose_your_progress_if_you_do)
         )
 
         CaveExitDialog(

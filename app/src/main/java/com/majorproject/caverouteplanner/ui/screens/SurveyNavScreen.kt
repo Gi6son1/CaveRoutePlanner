@@ -25,6 +25,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.navigation.Route
@@ -124,6 +125,8 @@ fun SurveyNavScreen(
             mutableStateOf(false)
         }
 
+        val context = LocalContext.current
+
         fun resetRouteFinder(tempFlags: Triple<Boolean, Boolean, Boolean>? = null) {
             routeFinder = RouteFinder(
                 sourceNode = sourceNode,
@@ -184,7 +187,7 @@ fun SurveyNavScreen(
                                 displaySnackbarWithMessage(
                                     scope,
                                     snackbarHostState,
-                                    "No route from source has been found"
+                                    context.getString(R.string.no_route_from_source_has_been_found)
                                 )
                             }
                         }
@@ -227,7 +230,7 @@ fun SurveyNavScreen(
                             displaySnackbarWithMessage(
                                 scope,
                                 snackbarHostState,
-                                "No route from source has been found"
+                                context.getString(R.string.no_route_from_source_has_been_found)
                             )
                             pinPointNode = null
                         }
@@ -247,7 +250,7 @@ fun SurveyNavScreen(
                             displaySnackbarWithMessage(
                                 scope,
                                 snackbarHostState,
-                                "No route from source has been found"
+                                context.getString(R.string.no_route_from_source_has_been_found)
                             )
                             pinPointNode = null
                         }
@@ -281,7 +284,7 @@ fun SurveyNavScreen(
                                 displaySnackbarWithMessage(
                                     scope,
                                     snackbarHostState,
-                                    "No route from source has been found"
+                                    context.getString(R.string.no_route_from_source_has_been_found)
                                 )
                                 pinPointNode = null
                             }

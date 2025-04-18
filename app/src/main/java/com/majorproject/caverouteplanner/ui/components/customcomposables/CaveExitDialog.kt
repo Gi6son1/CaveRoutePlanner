@@ -20,11 +20,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
@@ -46,7 +48,7 @@ fun CaveExitDialog(
                 Column {
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
-                        text = "Route To Nearest Exit",
+                        text = stringResource(R.string.route_to_nearest_exit),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -67,9 +69,9 @@ fun CaveExitDialog(
                                 .wrapContentHeight()
                                 .weight(6f)
                         ) {
-                            Text(text = "Standard")
+                            Text(text = stringResource(R.string.standard))
                             Text(
-                                text = "Takes the best path given current travel conditions",
+                                text = stringResource(R.string.takes_the_best_path_given_current_travel_conditions),
                                 fontSize = 12.sp
                             )
                         }
@@ -103,9 +105,9 @@ fun CaveExitDialog(
                                 .wrapContentHeight()
                                 .weight(6f)
                         ) {
-                            Text(text = "Emergency Flood Exit")
+                            Text(text = stringResource(R.string.emergency_flood_exit))
                             Text(
-                                text = "Takes the highest altitude paths, ignoring other travel conditions",
+                                text = stringResource(R.string.takes_the_highest_altitude_paths_ignoring_other_travel_conditions),
                                 fontSize = 12.sp
                             )
                         }

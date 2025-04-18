@@ -1,5 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
+import android.content.Context
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -7,9 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Save
@@ -33,10 +32,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromTemp
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
@@ -231,7 +232,11 @@ fun SurveyMarkupScreen(
     BackGroundScaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Stage ${markupStage + 1}: ${titleList[markupStage]}") },
+                title = { Text(text = stringResource(
+                    R.string.stage,
+                    markupStage + 1,
+                    titleList[markupStage]
+                )) },
             )
         },
         snackbarHost = {
@@ -276,7 +281,7 @@ fun SurveyMarkupScreen(
                             centreMarker = { centreMarker = it },
                             distanceMarker1 = { distanceMarker1 = it },
                             distanceMarker2 = { distanceMarker2 = it },
-                            )
+                        )
                     }
 
                     1 -> {
@@ -384,7 +389,7 @@ fun SurveyMarkupScreen(
 
             HelpMessageBox(
                 message = markupHelpList[markupStage],
-                modifier = Modifier.constrainAs(helpBox){
+                modifier = Modifier.constrainAs(helpBox) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
                     end.linkTo(parent.end, margin = 10.dp)
                     start.linkTo(parent.start, margin = 10.dp)
@@ -489,7 +494,7 @@ fun SurveyMarkupScreen(
             dialogIsOpen = openHomeButtonDialog,
             dialogOpen = { openHomeButtonDialog = it },
             confirmAction = { returnToMenu() },
-            message = "Are you sure you'd like to go back to the main menu? You will lose your current markup if you do."
+            message = stringResource(R.string.are_you_sure_you_d_like_to_go_back_to_the_main_menu_you_will_lose_your_current_markup_if_you_do)
         )
 
         SaveSurveyDialog(
@@ -504,7 +509,8 @@ fun SurveyMarkupScreen(
                     nodesList,
                     pathsList,
                     distanceMarker1,
-                    distanceMarker2
+                    distanceMarker2,
+                    context = context
                 )
 
                 name = enterName
@@ -526,11 +532,13 @@ fun SurveyMarkupScreen(
     }
 }
 
-private fun handleMarkupStage0(currentlySelectedMarkupOption : Int, tapPosition: Offset,
-                               northMarker: (Offset) -> Unit,
-                               centreMarker: (Offset) -> Unit,
-                               distanceMarker1: (Offset) -> Unit,
-                               distanceMarker2: (Offset) -> Unit){
+private fun handleMarkupStage0(
+    currentlySelectedMarkupOption: Int, tapPosition: Offset,
+    northMarker: (Offset) -> Unit,
+    centreMarker: (Offset) -> Unit,
+    distanceMarker1: (Offset) -> Unit,
+    distanceMarker2: (Offset) -> Unit
+) {
     when (currentlySelectedMarkupOption) {
         1 -> northMarker(tapPosition)
         2 -> centreMarker(tapPosition)
@@ -549,7 +557,7 @@ private fun handleMarkupStage1(
     bitmapSize: IntSize,
     nodeIdCount: Int,
     updateNodeIdCount: (Int) -> Unit
-){
+) {
     if (currentlySelectedMarkupOption == 1 || currentlySelectedMarkupOption == 2) {
         val adjustedPixelsCoordinates = calculateCoordinatePixels(
             tapPosition,
@@ -600,7 +608,7 @@ private fun handleMarkupStage2(
     updateNodeIdCount: (Int) -> Unit,
     currentlySelectedSurveyNode: SurveyNode?,
     updateCurrentlySelectedSurveyNode: (SurveyNode?) -> Unit
-){
+) {
     if (currentlySelectedMarkupOption == 1 && currentlySelectedSurveyNode != null) {
         var nextSurveyNode = getNearestNode(
             tapPosition,
@@ -684,7 +692,7 @@ private fun handleMarkupStage3(
     pathsList: List<SurveyPath>,
     bitmapSize: IntSize,
     newPathsList: (List<SurveyPath>) -> Unit
-){
+) {
     val foundPath = getNearestLine(
         tapPosition,
         nodesList,
@@ -718,7 +726,7 @@ private fun handleMarkupStage4(
     pathsList: List<SurveyPath>,
     newPathsList: (List<SurveyPath>) -> Unit,
     bitmapSize: IntSize,
-){
+) {
     val foundPath = getNearestLine(
         tapPosition,
         nodesList,
@@ -783,6 +791,7 @@ private fun validateInputs(
     pathsList: List<SurveyPath>,
     distanceMarker1: Offset,
     distanceMarker2: Offset,
+    context: Context
 ): String? {
     fun validateNodeConnections(): Boolean {
         for (node in nodesList) {
@@ -795,13 +804,13 @@ private fun validateInputs(
 
 
     return when {
-        name.isBlank() -> "Name cannot be blank"
-        length < 0 -> "Length cannot be negative or empty"
-        difficulty == Difficulty.NONE -> "Please choose a difficulty for this cave"
-        nodesList.isEmpty() -> "Please add at least one node"
-        pathsList.isEmpty() -> "Please add at least one path"
-        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> "Please calibrate the distance markers"
-        !validateNodeConnections() -> "All nodes must be have at least one path connected to it"
+        name.isBlank() -> context.getString(R.string.name_cannot_be_blank)
+        length < 0 -> context.getString(R.string.length_cannot_be_negative_or_empty)
+        difficulty == Difficulty.NONE -> context.getString(R.string.please_choose_a_difficulty_for_this_cave)
+        nodesList.isEmpty() -> context.getString(R.string.please_add_at_least_one_node)
+        pathsList.isEmpty() -> context.getString(R.string.please_add_at_least_one_path)
+        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> context.getString(R.string.please_calibrate_the_distance_markers)
+        !validateNodeConnections() -> context.getString(R.string.all_nodes_must_be_have_at_least_one_path_connected_to_it)
         else -> null
     }
 }

@@ -25,11 +25,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.chillibits.composenumberpicker.HorizontalNumberPicker
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
@@ -59,7 +61,7 @@ fun TravelConditionsDialog(
                 Column {
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
-                        text = "Travel Conditions",
+                        text = stringResource(R.string.travel_conditions),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -79,8 +81,8 @@ fun TravelConditionsDialog(
                                 .fillMaxHeight()
                                 .wrapContentHeight()
                         ) {
-                            Text(text = "No water preferred")
-                            Text(text = "Paths with water will be avoided", fontSize = 12.sp)
+                            Text(text = stringResource(R.string.no_water_preferred))
+                            Text(text = stringResource(R.string.paths_with_water_will_be_avoided), fontSize = 12.sp)
                         }
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -106,9 +108,9 @@ fun TravelConditionsDialog(
                                 .fillMaxHeight()
                                 .wrapContentHeight()
                         ) {
-                            Text(text = "No hard traverse preferred")
+                            Text(text = stringResource(R.string.no_hard_traverse_preferred))
                             Text(
-                                text = "Paths with hard traverses will be avoided",
+                                text = stringResource(R.string.paths_with_hard_traverses_will_be_avoided),
                                 fontSize = 12.sp
                             )
                         }
@@ -135,8 +137,8 @@ fun TravelConditionsDialog(
                                 .fillMaxHeight()
                                 .wrapContentHeight()
                         ) {
-                            Text(text = "High altitude preferred")
-                            Text(text = "Lower altitude paths will be avoided", fontSize = 12.sp)
+                            Text(text = stringResource(R.string.high_altitude_preferred))
+                            Text(text = stringResource(R.string.lower_altitude_paths_will_be_avoided), fontSize = 12.sp)
                         }
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -157,7 +159,7 @@ fun TravelConditionsDialog(
                             .height(50.dp)
                     ) {
                         Text(
-                            text = "How many cavers?",
+                            text = stringResource(R.string.how_many_cavers),
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .wrapContentHeight()
@@ -177,7 +179,7 @@ fun TravelConditionsDialog(
                     Row(modifier = Modifier.padding(10.dp)) {
                         CustomTextButton(
                             onClick = { dialogOpen(false) },
-                            text = "Cancel",
+                            text = stringResource(R.string.cancel),
                             iconVector = Icons.Outlined.Close,
                             modifier = Modifier.weight(1f)
                         )
@@ -194,7 +196,7 @@ fun TravelConditionsDialog(
                                     numberOfTravellers
                                 )
                             },
-                            text = "Confirm Choices",
+                            text = stringResource(R.string.confirm_choices),
                             iconVector = Icons.Outlined.Check,
                             modifier = Modifier.weight(1f)
                         )

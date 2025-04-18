@@ -15,9 +15,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateMap
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.Cave
@@ -61,7 +63,7 @@ fun CaveListScreen(
     BackGroundScaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Cave Surveys") },
+                title = { Text(text = stringResource(R.string.cave_surveys)) },
             )
         },
         floatingActionButton = {
@@ -77,7 +79,10 @@ fun CaveListScreen(
             List(caveList.size) { index: Int -> index to true}.toMutableStateMap()
         }
 
-        LazyColumn(modifier = Modifier.padding(innerPadding).fillMaxSize().padding(10.dp)) {
+        LazyColumn(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+            .padding(10.dp)) {
             caveList.forEachIndexed {index, caveListSection ->
                 Section(
                     caveList = caveListSection,

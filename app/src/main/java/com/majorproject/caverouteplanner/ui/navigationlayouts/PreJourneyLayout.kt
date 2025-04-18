@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -99,9 +100,9 @@ fun PreJourneyLayout(
                     start.linkTo(cancel.end)
                     end.linkTo(parent.end, 10.dp)
                 },
-                text = "Set As Source",
+                text = stringResource(R.string.set_as_source),
                 iconVector = Icons.Outlined.LocationOn,
-                contentDescription = "Set as source"
+                contentDescription = stringResource(R.string.set_as_source)
             )
 
             CustomTextButton(
@@ -111,9 +112,9 @@ fun PreJourneyLayout(
                     end.linkTo(setSource.start, 10.dp)
                     start.linkTo(parent.start, 10.dp)
                 },
-                text = "Remove Flag Pin",
+                text = stringResource(R.string.remove_flag_pin),
                 iconVector = Icons.Outlined.Flag,
-                contentDescription = "Remove Pin"
+                contentDescription = stringResource(R.string.remove_flag_pin)
             )
 
             CustomTextButton(
@@ -122,9 +123,9 @@ fun PreJourneyLayout(
                     top.linkTo(changeConditions.bottom, 20.dp)
                     end.linkTo(parent.end, 10.dp)
                 },
-                text = "Exit Cave From Flag",
+                text = stringResource(R.string.exit_cave_from_flag),
                 iconImage = R.drawable.exit_icon,
-                contentDescription = "Exit Cave From Flag"
+                contentDescription = stringResource(R.string.exit_cave_from_flag)
             )
         } else {
             HelpMessageBox(
@@ -133,7 +134,7 @@ fun PreJourneyLayout(
                     start.linkTo(parent.start, 10.dp)
                     end.linkTo(parent.end, 10.dp)
                 },
-                message = "Long press a point on the survey to select a location",
+                message = stringResource(R.string.long_press_a_point_on_the_survey_to_select_a_location),
                 boxHeight = 68.dp
             )
         }
@@ -153,7 +154,7 @@ fun PreJourneyLayout(
             dialogIsOpen = openHomeButtonDialog,
             dialogOpen = { openHomeButtonDialog = it },
             confirmAction = { returnToMenu() },
-            message = "Are you sure you'd like to go back to the main menu? You will lose your current route setup if you do."
+            message = stringResource(R.string.are_you_sure_you_d_like_to_go_back_to_the_main_menu_you_will_lose_your_current_route_setup_if_you_do)
         )
     }
 }

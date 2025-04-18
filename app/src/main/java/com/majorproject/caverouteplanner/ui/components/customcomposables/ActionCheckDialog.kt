@@ -18,10 +18,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
@@ -42,7 +44,7 @@ fun ActionCheckDialog(
                 Column {
                     Spacer(modifier = Modifier.height(15.dp))
                     Text(
-                        text = "Are You Sure?",
+                        text = stringResource(R.string.are_you_sure),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -66,7 +68,7 @@ fun ActionCheckDialog(
                     Row(modifier = Modifier.padding(10.dp)) {
                         CustomTextButton(
                             onClick = { dialogOpen(false) },
-                            text = "Cancel",
+                            text = stringResource(R.string.cancel),
                             iconVector = Icons.Outlined.Close,
                             modifier = Modifier.weight(1f)
                         )
@@ -78,7 +80,7 @@ fun ActionCheckDialog(
                                 dialogOpen(false)
                                 confirmAction()
                             },
-                            text = "I am sure",
+                            text = stringResource(R.string.i_am_sure),
                             iconVector = Icons.Outlined.Check,
                             modifier = Modifier.weight(1f)
                         )

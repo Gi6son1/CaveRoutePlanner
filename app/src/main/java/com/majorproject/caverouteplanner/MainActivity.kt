@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -95,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     }
                 } else {
                     BackGroundScaffold(
-                        topBar = { TopAppBar(title = {Text("Cave Surveys")} )}
+                        topBar = { TopAppBar(title = {Text(stringResource(id = R.string.cave_surveys))} )}
                     ) {}
                 }
             }
