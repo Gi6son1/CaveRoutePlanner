@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromTemp
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
 import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
@@ -61,9 +59,9 @@ import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
 import com.majorproject.caverouteplanner.ui.util.calculateDistance
 import com.majorproject.caverouteplanner.ui.util.calculateMetersFromFractionalOffsets
 import com.majorproject.caverouteplanner.ui.util.calculatePixelsPerMeter
+import com.majorproject.caverouteplanner.ui.util.displaySnackbarWithMessage
 import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
-import kotlinx.coroutines.launch
 import kotlin.math.round
 
 val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
@@ -78,7 +76,13 @@ fun SurveyMarkupScreenTopLevel(
 ) {
     val context = LocalContext.current
 
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromTempInternalStorage(context)) }
+    var imageBitmap by remember {
+        mutableStateOf<ImageBitmap?>(
+            getBitmapFromTempInternalStorage(
+                context
+            )
+        )
+    }
 
     if (imageBitmap != null) {
         SurveyMarkupScreen(
@@ -100,7 +104,7 @@ fun SurveyMarkupScreenTopLevel(
 fun SurveyMarkupScreen(
     returnToMenu: () -> Unit = {},
     imageBitmap: ImageBitmap,
-    saveCaveAndSurvey: (CaveProperties, SurveyProperties, List<SurveyNode>, List<SurveyPath>) -> Unit = {_, _, _, _ ->}
+    saveCaveAndSurvey: (CaveProperties, SurveyProperties, List<SurveyNode>, List<SurveyPath>) -> Unit = { _, _, _, _ -> }
 ) {
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
     val titleList = remember {
@@ -135,8 +139,16 @@ fun SurveyMarkupScreen(
 
     var northMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var centreMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
-    var distanceMarker1: Offset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
-    var distanceMarker2: Offset by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var distanceMarker1: Offset by rememberSaveable(stateSaver = OffsetSaver) {
+        mutableStateOf(
+            Offset.Zero
+        )
+    }
+    var distanceMarker2: Offset by rememberSaveable(stateSaver = OffsetSaver) {
+        mutableStateOf(
+            Offset.Zero
+        )
+    }
     var pixelsPerMeter by rememberSaveable { mutableFloatStateOf(1f) }
 
     var currentlySelectedSurveyNode by rememberSaveable { mutableStateOf<SurveyNode?>(null) }
@@ -153,7 +165,10 @@ fun SurveyMarkupScreen(
 
     LaunchedEffect(savedSurveyReference) {
         if (savedSurveyReference != null) {
-            fun convertToMeters(pathList: List<SurveyPath>, pixelsPerMeter: Float): List<SurveyPath> {
+            fun convertToMeters(
+                pathList: List<SurveyPath>,
+                pixelsPerMeter: Float
+            ): List<SurveyPath> {
                 var convertedPathList = pathList
                 for (path in convertedPathList) {
                     path.distance = (path.distance / pixelsPerMeter)
@@ -583,12 +598,13 @@ fun SurveyMarkupScreen(
                 difficulty = enterDifficulty
                 location = enterLocation
 
-                if (errorMessage != null){
-                    scope.launch {
-                        snackbarHostState.showSnackbar(errorMessage)
-                    }
+                if (errorMessage != null) {
+                    displaySnackbarWithMessage(scope, snackbarHostState, errorMessage)
                 } else {
-                    savedSurveyReference = copyImageToInternalStorageFromTemp(context = context, imageName = "$name.jpg")
+                    savedSurveyReference = copyImageToInternalStorageFromTemp(
+                        context = context,
+                        imageName = "$name.jpg"
+                    )
                 }
             }
         )
@@ -601,21 +617,13 @@ fun cleanupGraphFromEdge(
     nodes: MutableList<SurveyNode>,
     paths: MutableList<SurveyPath>
 ) {
-    val newPathList = paths.toMutableList()
-    val newNodeList = nodes.toMutableList()
-
-    newPathList.remove(foundEdge)
+    paths.remove(foundEdge)
 
     // Cleanup from the first node of the edge
-    cleanupFromNode(foundEdge.getPathEnds().first, newNodeList, newPathList)
+    cleanupFromNode(foundEdge.getPathEnds().first, nodes, paths)
 
     // Cleanup from the second node of the edge
-    cleanupFromNode(foundEdge.getPathEnds().second, newNodeList, newPathList)
-
-    paths.clear()
-    paths.addAll(newPathList)
-    nodes.clear()
-    nodes.addAll(newNodeList)
+    cleanupFromNode(foundEdge.getPathEnds().second, nodes, paths)
 }
 
 private fun cleanupFromNode(
@@ -649,7 +657,7 @@ private fun validateInputs(
     pathsList: List<SurveyPath>,
     distanceMarker1: Offset,
     distanceMarker2: Offset,
-) : String?{
+): String? {
     fun validateNodeConnections(): Boolean {
         for (node in nodesList) {
             if (pathsList.none { it.getPathEnds().first == node.getNodeId() || it.getPathEnds().second == node.getNodeId() }) {
@@ -660,21 +668,14 @@ private fun validateInputs(
     }
 
 
-    var errorMessage: String? = null
-    if (name.isBlank()){
-        errorMessage = "Name cannot be blank"
-    } else if (length < 0){
-        errorMessage = "Length cannot be negative or empty"
-    } else if (difficulty == Difficulty.NONE){
-        errorMessage = "Please choose a difficulty for this cave"
-    } else if (nodesList.isEmpty()){
-        errorMessage = "Please add at least one node"
-    } else if (pathsList.isEmpty()){
-        errorMessage = "Please add at least one path"
-    } else if (distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero){
-        errorMessage = "Please calibrate the distance markers"
-    } else if (!validateNodeConnections()){
-        errorMessage = "All nodes must be have at least one path connected to it"
+    return when {
+        name.isBlank() -> "Name cannot be blank"
+        length < 0 -> "Length cannot be negative or empty"
+        difficulty == Difficulty.NONE -> "Please choose a difficulty for this cave"
+        nodesList.isEmpty() -> "Please add at least one node"
+        pathsList.isEmpty() -> "Please add at least one path"
+        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> "Please calibrate the distance markers"
+        !validateNodeConnections() -> "All nodes must be have at least one path connected to it"
+        else -> null
     }
-    return errorMessage
 }

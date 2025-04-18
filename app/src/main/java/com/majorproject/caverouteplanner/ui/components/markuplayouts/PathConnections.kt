@@ -8,10 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,9 +19,11 @@ fun PathConnectionsLayout(
     modifier: Modifier = Modifier,
     updateCurrentlySelected: (Int) -> Unit,
     currentlySelectedSetting: Int
-){
-    Column(modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End) {
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
         Text(
             text = "Markup Mode:",
             modifier = Modifier.background(

@@ -108,7 +108,7 @@ data class RouteFinder(
                 return Triple(null, null, 0f)
             }
             val neighbour =
-                if (foundEdge.getPathEnds().first == id.getNodeId()) foundEdge.getPathEnds().second else foundEdge.getPathEnds()?.first
+                if (foundEdge.getPathEnds().first == id.getNodeId()) foundEdge.getPathEnds().second else foundEdge.getPathEnds().first
             val neighbourNode = survey.nodes.find { it.getNodeId() == neighbour }
 
             return Triple(foundEdge, neighbourNode, foundEdge.distance)

@@ -1,6 +1,5 @@
 package com.majorproject.caverouteplanner.ui.screens
 
-import android.app.Application
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +25,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.navigation.Route
@@ -37,14 +35,14 @@ import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.navigationlayouts.InJourneyLayout
 import com.majorproject.caverouteplanner.ui.navigationlayouts.PreJourneyLayout
-import kotlinx.coroutines.launch
+import com.majorproject.caverouteplanner.ui.util.displaySnackbarWithMessage
 
 @Composable
 fun SurveyNavScreenTopLevel(
     surveyId: Int,
     backToMenu: () -> Unit = {},
     surveyViewModel: CaveRoutePlannerViewModel
-){
+) {
     val context = LocalContext.current.applicationContext
 
     var sensorReading: Double? by rememberSaveable { mutableStateOf(null) }
@@ -52,7 +50,7 @@ fun SurveyNavScreenTopLevel(
     val surveyList = surveyViewModel.surveyList.collectAsStateWithLifecycle()
     val survey = surveyList.value.find { it.properties.id == surveyId }
 
-    if (survey != null){
+    if (survey != null) {
         SurveyNavScreen(
             survey = survey,
             backToMenu = { backToMenu() },
@@ -183,9 +181,11 @@ fun SurveyNavScreen(
                             pinPointNode = nearestNode
                             currentRoute = routeFinder?.getRouteToNode(nearestNode)
                             if (currentRoute == null) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(message = "No route from source has been found")
-                                }
+                                displaySnackbarWithMessage(
+                                    scope,
+                                    snackbarHostState,
+                                    "No route from source has been found"
+                                )
                             }
                         }
                     }
@@ -194,7 +194,7 @@ fun SurveyNavScreen(
                 currentRoute = currentRoute,
                 pinpointSourceNode = sourceNode,
                 onTap = {
-                    if (currentRoute != null && currentRoute!!.routeStarted){
+                    if (currentRoute != null && currentRoute!!.routeStarted) {
                         inJourneyExtended = !inJourneyExtended
                     }
                 },
@@ -224,26 +224,31 @@ fun SurveyNavScreen(
                     if (pinPointNode != null) {
                         currentRoute = routeFinder?.getRouteToNode(pinPointNode!!)
                         if (currentRoute == null) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(message = "No route from source has been found")
-                            }
+                            displaySnackbarWithMessage(
+                                scope,
+                                snackbarHostState,
+                                "No route from source has been found"
+                            )
                             pinPointNode = null
                         }
                     }
                 },
                 caveExit = {
-                    if (pinPointNode != null){
+                    if (pinPointNode != null) {
                         sourceNode = pinPointNode!!
 
                         resetRouteFinder()
 
                         val nearestExit = routeFinder?.findNearestExit()
                         pinPointNode = nearestExit
-                        if (nearestExit != null) currentRoute = routeFinder?.getRouteToNode(nearestExit)
+                        if (nearestExit != null) currentRoute =
+                            routeFinder?.getRouteToNode(nearestExit)
                         if (currentRoute == null) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(message = "No route from source has been found")
-                            }
+                            displaySnackbarWithMessage(
+                                scope,
+                                snackbarHostState,
+                                "No route from source has been found"
+                            )
                             pinPointNode = null
                         }
                     }
@@ -273,9 +278,11 @@ fun SurveyNavScreen(
                             currentRoute = routeFinder?.getRouteToNode(nearestExit)
 
                             if (currentRoute == null) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(message = "No route from source has been found")
-                                }
+                                displaySnackbarWithMessage(
+                                    scope,
+                                    snackbarHostState,
+                                    "No route from source has been found"
+                                )
                                 pinPointNode = null
                             }
                         }

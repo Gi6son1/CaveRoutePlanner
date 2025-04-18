@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
+
             var tempImagePath: String? by rememberSaveable { mutableStateOf(null) }
 
             val launcher = rememberLauncherForActivityResult(
@@ -105,14 +106,14 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         SensorActivity(
             context = this
-        ).onResume()
+        ).start()
     }
 
     override fun onPause() {
         super.onPause()
         SensorActivity(
             context = this
-        ).onPause()
+        ).stop()
     }
 }
 

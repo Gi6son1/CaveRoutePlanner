@@ -150,29 +150,29 @@ fun MarkupImageAndGraphOverlay(
         ) {
 
 
-                Image(
-                    bitmap = imageBitmap!!,
-                    contentDescription = "survey",
-                    modifier = Modifier,
-                    contentScale = ContentScale.Fit
-                )
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = "survey",
+                modifier = Modifier,
+                contentScale = ContentScale.Fit
+            )
 
-                MarkupGraphOverlay(
-                    nodes = nodes,
-                    modifier = Modifier.matchParentSize(),
-                    surveySize = IntSize(
-                        width = imageBitmap.width,
-                        height = imageBitmap.height
-                    ),
-                    paths = paths,
-                    markupStage = markupStage,
-                    northMarker = northMarker,
-                    centreMarker = centreMarker,
-                    distanceMarker1 = distanceMarker1,
-                    distanceMarker2 = distanceMarker2,
-                    currentlySelectedSurveyNode = currentlySelectedSurveyNode
-                )
-            }
+            MarkupGraphOverlay(
+                nodes = nodes,
+                modifier = Modifier.matchParentSize(),
+                surveySize = IntSize(
+                    width = imageBitmap.width,
+                    height = imageBitmap.height
+                ),
+                paths = paths,
+                markupStage = markupStage,
+                northMarker = northMarker,
+                centreMarker = centreMarker,
+                distanceMarker1 = distanceMarker1,
+                distanceMarker2 = distanceMarker2,
+                currentlySelectedSurveyNode = currentlySelectedSurveyNode
+            )
+        }
 
     }
 }
@@ -208,13 +208,13 @@ fun MarkupGraphOverlay(
     }
 
     Canvas(modifier = modifier) {
-        if (markupStage == 0){
+        if (markupStage == 0) {
             drawCircle(
                 color = Color(0xFF05166b),
                 radius = 2f,
                 center = Offset(
                     northMarker.x * size.width,
-                    northMarker.y* size.height
+                    northMarker.y * size.height
                 )
             )
             drawCircle(
@@ -222,7 +222,7 @@ fun MarkupGraphOverlay(
                 radius = 2f,
                 center = Offset(
                     centreMarker.x * size.width,
-                    centreMarker.y* size.height
+                    centreMarker.y * size.height
                 )
             )
             drawCircle(
@@ -230,7 +230,7 @@ fun MarkupGraphOverlay(
                 radius = 2f,
                 center = Offset(
                     distanceMarker1.x * size.width,
-                    distanceMarker1.y* size.height
+                    distanceMarker1.y * size.height
                 )
             )
             drawCircle(
@@ -238,7 +238,7 @@ fun MarkupGraphOverlay(
                 radius = 2f,
                 center = Offset(
                     distanceMarker2.x * size.width,
-                    distanceMarker2.y* size.height
+                    distanceMarker2.y * size.height
                 )
             )
         }
@@ -246,9 +246,12 @@ fun MarkupGraphOverlay(
         if (markupStage == 1 || markupStage == 2) {
             nodes.forEach { node ->
                 drawCircle(
-                    color = if (node.isEntrance) Color(0xFF05166b) else if (node.isJunction) Color(
-                        0xFF730606
-                    ) else if (markupStage == 1) Color.Transparent else Color.DarkGray,
+                    color = when {
+                        node.isEntrance -> Color(0xFF05166b)
+                        node.isJunction -> Color(0xFF730606)
+                        markupStage == 1 -> Color.Transparent
+                        else -> Color.DarkGray
+                    },
                     radius = if (currentlySelectedSurveyNode == node && markupStage == 2) 5f else if (node.isEntrance || node.isJunction) 3f else 2f,
                     center = Offset(
                         (node.x / surveySize.width.toFloat()) * size.width,

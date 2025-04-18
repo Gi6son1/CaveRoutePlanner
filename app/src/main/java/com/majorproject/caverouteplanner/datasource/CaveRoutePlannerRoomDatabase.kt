@@ -60,13 +60,13 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
                     Log.d("CaveRoutePlannerRoomDatabase", "onCreate")
 
                     coroutineScope.launch {
-                        populateDatabase(context, getDatabase(context)!!)
+                        populateDatabase(getDatabase(context)!!)
                     }
                 }
             }
         }
 
-        private fun populateDatabase(context: Context, db: CaveRoutePlannerRoomDatabase) {
+        private fun populateDatabase(db: CaveRoutePlannerRoomDatabase) {
             val surveyDao = db.surveyDao()
             val surveyNodeDao = db.surveyNodeDao()
             val surveyPathDao = db.surveyPathDao()

@@ -5,35 +5,28 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import kotlin.math.round
 
-class SensorActivity(val context: Context,
-    val sensorReading: (Double) -> Unit = {},) : SensorEventListener {
-    private var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+class SensorActivity(
+    val context: Context,
+    val sensorReading: (Double) -> Unit = {},
+) : SensorEventListener {
+    private var sensorManager: SensorManager =
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-    private  var rotationSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+    private var rotationSensor: Sensor? =
+        sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
     private val rotationVectorReading = FloatArray(5)
 
     private val rotationMatrix = FloatArray(9)
     private val orientationAngles = FloatArray(3)
 
-    fun start(){
+    fun start() {
         sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI)
     }
 
-    fun stop(){
-        sensorManager.unregisterListener(this);
-    }
-
-    fun onResume(){
-        Log.d("SensorActivity", "onResume")
-        sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_UI);
-    }
-
-    fun onPause(){
-        Log.d("SensorActivity", "onPause")
-        sensorManager.unregisterListener(this);
+    fun stop() {
+        sensorManager.unregisterListener(this)
     }
 
     fun updateOrientationAngles() {

@@ -193,7 +193,7 @@ fun SaveSurveyDialogPreview() {
         SaveSurveyDialog(
             dialogIsOpen = true,
             dialogOpen = {},
-            saveSurvey = { name, length, description, difficulty, location -> }
+            saveSurvey = { _, _, _, _, _ -> }
         )
     }
 }

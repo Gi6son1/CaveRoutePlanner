@@ -13,7 +13,6 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 class CaveRoutePlannerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = CaveRoutePlannerRepository(application)

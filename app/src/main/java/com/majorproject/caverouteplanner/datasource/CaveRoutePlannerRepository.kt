@@ -8,14 +8,15 @@ import com.majorproject.caverouteplanner.ui.components.Survey
 import com.majorproject.caverouteplanner.ui.components.SurveyNode
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
-import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import kotlinx.coroutines.flow.Flow
 
 class CaveRoutePlannerRepository(application: Application) {
     private val caveDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.caveDao()
     private val surveyDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyDao()
-    private val surveyNodeDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyNodeDao()
-    private val surveyPathDao = CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyPathDao()
+    private val surveyNodeDao =
+        CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyNodeDao()
+    private val surveyPathDao =
+        CaveRoutePlannerRoomDatabase.getDatabase(application)!!.surveyPathDao()
 
     fun getCavePropertiesById(caveId: Int) = caveDao.getCaveProperties(caveId)
     fun getAllCaves(): Flow<List<Cave>> = caveDao.getAllCaves()
@@ -32,7 +33,12 @@ class CaveRoutePlannerRepository(application: Application) {
 
     fun getSurveyWithDataById(surveyId: Int) = surveyDao.getSurveyWithDataById(surveyId)
 
-    fun saveCaveAndSurvey(caveProperties: CaveProperties, surveyProps: SurveyProperties, surveyNodes: List<SurveyNode>, surveyPaths: List<SurveyPath>) {
+    fun saveCaveAndSurvey(
+        caveProperties: CaveProperties,
+        surveyProps: SurveyProperties,
+        surveyNodes: List<SurveyNode>,
+        surveyPaths: List<SurveyPath>
+    ) {
         val surveyId = surveyDao.insertSurvey(surveyProps)
         Log.d("DEBUGLOG", "Saved Survey")
 
