@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,7 +11,6 @@ import androidx.room.Relation
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromInternalStorage
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
 import kotlinx.parcelize.Parcelize
-import kotlin.math.pow
 
 @Parcelize
 data class OldSurveyType(
@@ -35,7 +33,7 @@ data class SurveyProperties(
     val pixelsPerMeter: Float,
     val width: Int,
     val height: Int,
-    val northAngle: Float = -90f
+    val northAngle: Float
 ) : Parcelable
 
 @Parcelize

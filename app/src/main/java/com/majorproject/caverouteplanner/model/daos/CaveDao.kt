@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.Cave
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CaveDao{
@@ -17,9 +18,9 @@ interface CaveDao{
     fun getCaveProperties(caveId: Int): CaveProperties?
 
     @Query("SELECT * FROM caves")
-    fun getAllCaves(): List<Cave>
+    fun getAllCaves(): Flow<List<Cave>>
 
     @Transaction
     @Query("SELECT * FROM caves WHERE id = :caveId")
-    fun getCaveById(caveId: Int): Cave?
+    fun getCaveById(caveId: Int): Flow<Cave?>
 }

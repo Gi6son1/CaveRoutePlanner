@@ -39,6 +39,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromTemp
 import com.majorproject.caverouteplanner.datasource.util.getBitmapFromTempInternalStorage
+import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.MarkupImageAndGraphOverlay
@@ -72,7 +73,8 @@ val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
 
 @Composable
 fun SurveyMarkupScreenTopLevel(
-    returnToMenu: () -> Unit = {}
+    returnToMenu: () -> Unit = {},
+    viewModel: CaveRoutePlannerViewModel
 ) {
     val context = LocalContext.current
 
@@ -82,10 +84,7 @@ fun SurveyMarkupScreenTopLevel(
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
             saveCaveAndSurvey = { caveProperties, surveyProperties, nodes, paths ->
-
-                val repository =
-                    CaveRoutePlannerRepository(context.applicationContext as Application)
-                repository.saveCaveAndSurvey(caveProperties, surveyProperties, nodes, paths)
+                viewModel.saveNewCave(caveProperties, surveyProperties, nodes, paths)
                 returnToMenu()
             },
             imageBitmap = imageBitmap!!

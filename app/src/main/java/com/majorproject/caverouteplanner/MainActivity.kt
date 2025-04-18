@@ -9,9 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,9 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,6 +31,7 @@ import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.datasource.util.clearTempStorage
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromAssets
 import com.majorproject.caverouteplanner.datasource.util.saveUploadedImageToTempStorage
+import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.llSurveyReference
 import com.majorproject.caverouteplanner.ui.components.screennavigation.Screen
@@ -135,7 +132,8 @@ fun setupFiles(context: Context): Boolean {
 private fun BuildNavigationGraph(
     uploadImageCall: () -> Unit,
     uploadImagePath: String? = null,
-    clearTempStorage: () -> Unit
+    clearTempStorage: () -> Unit,
+    viewModel: CaveRoutePlannerViewModel = viewModel(),
 ) {
     val navController = rememberNavController()
     var selectedSurveyId by remember { mutableIntStateOf(0) }
@@ -167,7 +165,8 @@ private fun BuildNavigationGraph(
                 },
                 markupNewSurvey = {
                     uploadImageCall()
-                }
+                },
+                cavesViewModel = viewModel
             )
         }
 
@@ -187,6 +186,7 @@ private fun BuildNavigationGraph(
                     backToMenu = {
                         navController.popBackStack(Screen.CaveListScreen.route, inclusive = false)
                     },
+                    surveyViewModel = viewModel
                 )
             }
         }
@@ -196,7 +196,8 @@ private fun BuildNavigationGraph(
                 returnToMenu = {
                     navController.popBackStack(Screen.CaveListScreen.route, inclusive = false)
                     clearTempStorage()
-                }
+                },
+                viewModel = viewModel
             )
         }
     }

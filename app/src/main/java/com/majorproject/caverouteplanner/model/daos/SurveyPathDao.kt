@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SurveyPathDao {
@@ -12,9 +13,9 @@ interface SurveyPathDao {
     fun insertSurveyPath(surveyPath: SurveyPath): Long
 
     @Query("SELECT * FROM surveyPaths WHERE surveyId = :surveyId")
-    fun getSurveyPathsBySurveyId(surveyId: Int): List<SurveyPath>
+    fun getSurveyPathsBySurveyId(surveyId: Int): Flow<List<SurveyPath>>
 
     @Query("SELECT * FROM surveyPaths WHERE id = :pathId")
-    fun getSurveyPathById(pathId: Int) : SurveyPath?
+    fun getSurveyPathById(pathId: Int) : Flow<SurveyPath?>
 
 }

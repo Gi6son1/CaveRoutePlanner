@@ -1,7 +1,6 @@
 package com.majorproject.caverouteplanner.ui.screens
 
 import androidx.compose.runtime.Composable
-import android.app.Application
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,31 +15,27 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateMap
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
 import com.majorproject.caverouteplanner.ui.components.Cave
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
-import com.majorproject.caverouteplanner.ui.components.customcomposables.CaveCardButton
-import com.majorproject.caverouteplanner.ui.components.customcomposables.CollapsableListHeader
 import com.majorproject.caverouteplanner.ui.components.customcomposables.Section
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 @Composable
 fun CaveListScreenTopLevel(
     navigateToSurvey: (Int) -> Unit = {},
-    markupNewSurvey: () -> Unit = {}
+    markupNewSurvey: () -> Unit = {},
+    cavesViewModel: CaveRoutePlannerViewModel
 ) {
-    val context = LocalContext.current.applicationContext
-    val repository = CaveRoutePlannerRepository(context as Application)
-    val caves = repository.getAllCaves()
+    val caves = cavesViewModel.caveList.collectAsStateWithLifecycle()
 
     val caveLocationMap = mutableMapOf<String, MutableList<Cave>>()
-    for (cave in caves){
+    for (cave in caves.value){
         caveLocationMap.getOrPut(cave.caveProperties.location.uppercase().trim(), defaultValue = {mutableListOf()} ).add(cave)
     }
     val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase().trim() }

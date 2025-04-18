@@ -25,8 +25,10 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.majorproject.caverouteplanner.datasource.CaveRoutePlannerRepository
 import com.majorproject.caverouteplanner.datasource.SensorActivity
+import com.majorproject.caverouteplanner.model.viewmodel.CaveRoutePlannerViewModel
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.navigation.RouteFinder
 import com.majorproject.caverouteplanner.ui.BackGroundScaffold
@@ -41,14 +43,14 @@ import kotlinx.coroutines.launch
 fun SurveyNavScreenTopLevel(
     surveyId: Int,
     backToMenu: () -> Unit = {},
+    surveyViewModel: CaveRoutePlannerViewModel
 ){
     val context = LocalContext.current.applicationContext
 
     var sensorReading: Double? by rememberSaveable { mutableStateOf(null) }
 
-    val repository = CaveRoutePlannerRepository(context as Application)
-
-    val survey = repository.getSurveyWithDataById(surveyId)
+    val surveyList = surveyViewModel.surveyList.collectAsStateWithLifecycle()
+    val survey = surveyList.value.find { it.properties.id == surveyId }
 
     if (survey != null){
         SurveyNavScreen(

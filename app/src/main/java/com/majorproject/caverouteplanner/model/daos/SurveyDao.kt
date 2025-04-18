@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.Survey
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SurveyDao {
@@ -14,17 +15,17 @@ interface SurveyDao {
     fun insertSurvey(cave: SurveyProperties): Long
 
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
-    fun getSurveyById(surveyId: Int): SurveyProperties?
+    fun getSurveyById(surveyId: Int): Flow<SurveyProperties?>
 
     @Query("SELECT * FROM surveys")
-    fun getAllSurveys(): List<SurveyProperties>
+    fun getAllSurveys(): Flow<List<SurveyProperties>>
 
     @Transaction
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
-    fun getSurveyWithDataById(surveyId: Int): Survey?
+    fun getSurveyWithDataById(surveyId: Int): Flow<Survey?>
 
     @Transaction
     @Query("SELECT * FROM surveys")
-    fun getAllSurveysWithData(): List<Survey>
+    fun getAllSurveysWithData(): Flow<List<Survey>>
 
 }
