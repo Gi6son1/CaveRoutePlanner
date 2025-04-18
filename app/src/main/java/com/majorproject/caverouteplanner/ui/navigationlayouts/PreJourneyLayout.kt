@@ -2,6 +2,8 @@ package com.majorproject.caverouteplanner.ui.navigationlayouts
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Flag
@@ -15,12 +17,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
+import com.majorproject.caverouteplanner.ui.components.customcomposables.HelpMessageBox
 import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelConditionsDialog
 
 @Composable
@@ -86,7 +90,7 @@ fun PreJourneyLayout(
                 distance = currentRoute.totalDistance,
                 time = currentRoute.getTotalPathTravelTime()
             )
-        }
+
 
             CustomTextButton(
                 onClick = { setSource() },
@@ -122,6 +126,17 @@ fun PreJourneyLayout(
                 iconImage = R.drawable.exit_icon,
                 contentDescription = "Exit Cave From Flag"
             )
+        } else {
+            HelpMessageBox(
+                modifier = Modifier.constrainAs(goButton) {
+                    bottom.linkTo(parent.bottom, 80.dp)
+                    start.linkTo(parent.start, 10.dp)
+                    end.linkTo(parent.end, 10.dp)
+                },
+                message = "Long press a point on the survey to select a location",
+                boxHeight = 68.dp
+            )
+        }
 
 
         TravelConditionsDialog(

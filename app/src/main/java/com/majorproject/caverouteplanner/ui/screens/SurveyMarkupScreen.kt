@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Save
@@ -47,6 +49,7 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomIconButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
+import com.majorproject.caverouteplanner.ui.components.customcomposables.HelpMessageBox
 import com.majorproject.caverouteplanner.ui.components.customcomposables.SaveSurveyDialog
 import com.majorproject.caverouteplanner.ui.components.enums.Difficulty
 import com.majorproject.caverouteplanner.ui.components.markuplayouts.AltitudesLayout
@@ -114,6 +117,16 @@ fun SurveyMarkupScreen(
             "Connect Paths",
             "Water/Hard Traverse",
             "Altitude"
+        )
+    }
+
+    val markupHelpList = remember {
+        listOf(
+            "Calibrate the compass and distance measurements provided by the survey. Tap to add calibration points.",
+            "Mark all cave entrances and path junctions on the survey. Tap to add/remove nodes.",
+            "Long press in annotate mode to select entrance/junction to start from. Tap to add path from that node.",
+            "Tap paths that you want to mark as water or hard traverse, or reset their annotations.",
+            "Tap paths that you want to mark altitudes for, with respect to the whole survey."
         )
     }
 
@@ -326,7 +339,7 @@ fun SurveyMarkupScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            val (stageButtons, homeButton, customLayout, saveButton) = createRefs()
+            val (stageButtons, homeButton, customLayout, saveButton, helpBox) = createRefs()
 
             CustomIconButton(
                 onClick = { openHomeButtonDialog = true },
@@ -369,11 +382,21 @@ fun SurveyMarkupScreen(
                 }
             }
 
+            HelpMessageBox(
+                message = markupHelpList[markupStage],
+                modifier = Modifier.constrainAs(helpBox){
+                    bottom.linkTo(stageButtons.top, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 10.dp)
+                    start.linkTo(parent.start, margin = 10.dp)
+                },
+                boxHeight = 85.dp
+            )
+
             when (markupStage) {
                 0 -> DistanceAndCompassCalibrationLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
-                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            bottom.linkTo(helpBox.top, margin = 20.dp)
                             end.linkTo(parent.end, margin = 10.dp)
                             top.linkTo(parent.top, 20.dp)
                             height = Dimension.fillToConstraints
@@ -407,7 +430,7 @@ fun SurveyMarkupScreen(
                 1 -> EntrancesAndJunctionsLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
-                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            bottom.linkTo(helpBox.top, margin = 20.dp)
                             end.linkTo(parent.end, margin = 10.dp)
                             top.linkTo(parent.top, 20.dp)
                             height = Dimension.fillToConstraints
@@ -421,7 +444,7 @@ fun SurveyMarkupScreen(
                 2 -> PathConnectionsLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
-                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            bottom.linkTo(helpBox.top, margin = 20.dp)
                             end.linkTo(parent.end, margin = 10.dp)
                             top.linkTo(parent.top, 20.dp)
                             height = Dimension.fillToConstraints
@@ -435,7 +458,7 @@ fun SurveyMarkupScreen(
                 3 -> WaterAndHardTraverseLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
-                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            bottom.linkTo(helpBox.top, margin = 20.dp)
                             end.linkTo(parent.end, margin = 10.dp)
                             top.linkTo(parent.top, 20.dp)
                             height = Dimension.fillToConstraints
@@ -449,7 +472,7 @@ fun SurveyMarkupScreen(
                 4 -> AltitudesLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
-                            bottom.linkTo(stageButtons.top, margin = 20.dp)
+                            bottom.linkTo(helpBox.top, margin = 20.dp)
                             end.linkTo(parent.end, margin = 10.dp)
                             top.linkTo(parent.top, 20.dp)
                             height = Dimension.fillToConstraints
