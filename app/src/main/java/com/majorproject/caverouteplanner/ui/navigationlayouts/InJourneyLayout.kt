@@ -125,7 +125,7 @@ fun InJourneyLayout(
             dialogIsOpen = openCancelRouteCheckDialog,
             dialogOpen = { openCancelRouteCheckDialog = it },
             confirmAction = { cancelRoute() },
-            message = "Are you sure you want to cancel this route? You'll lose your progress if you do."
+            message = "Are you sure you want to remove this route? You'll lose your progress if you do."
         )
 
         CaveExitDialog(

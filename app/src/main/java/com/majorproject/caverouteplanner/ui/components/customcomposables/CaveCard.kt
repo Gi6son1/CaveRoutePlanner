@@ -51,7 +51,7 @@ import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 fun CaveCardButton(
     cave: Cave,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ){
     Button(
         onClick = { onClick() },
@@ -71,7 +71,7 @@ fun CaveCard(cave: Cave) {
             .width(500.dp)
             .height(120.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.outline
+            containerColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     ) {
         var imageBitmap by remember { mutableStateOf<ImageBitmap?>(getBitmapFromInternalStorage(filePath = cave.surveyProperties.imageReference)) }
