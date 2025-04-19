@@ -38,6 +38,7 @@ fun PreJourneyLayout(
     caveExit: () -> Unit = {},
     currentTravelConditions: Triple<Boolean, Boolean, Boolean>,
     numberOfTravellers: Int,
+    displayCaveExitButton: Boolean
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -117,16 +118,18 @@ fun PreJourneyLayout(
                 contentDescription = stringResource(R.string.remove_flag_pin)
             )
 
-            CustomTextButton(
-                onClick = { caveExit() },
-                modifier = Modifier.constrainAs(caveExit) {
-                    top.linkTo(changeConditions.bottom, 20.dp)
-                    end.linkTo(parent.end, 10.dp)
-                },
-                text = stringResource(R.string.exit_cave_from_flag),
-                iconImage = R.drawable.exit_icon,
-                contentDescription = stringResource(R.string.exit_cave_from_flag)
-            )
+            if (displayCaveExitButton) {
+                CustomTextButton(
+                    onClick = { caveExit() },
+                    modifier = Modifier.constrainAs(caveExit) {
+                        top.linkTo(changeConditions.bottom, 20.dp)
+                        end.linkTo(parent.end, 10.dp)
+                    },
+                    text = stringResource(R.string.exit_cave_from_flag),
+                    iconImage = R.drawable.exit_icon,
+                    contentDescription = stringResource(R.string.exit_cave_from_flag)
+                )
+            }
         } else {
             HelpMessageBox(
                 modifier = Modifier.constrainAs(goButton) {

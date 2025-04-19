@@ -258,7 +258,8 @@ fun SurveyNavScreen(
                 },
                 currentTravelConditions = currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers,
-                returnToMenu = { backToMenu() }
+                returnToMenu = { backToMenu() },
+                displayCaveExitButton = !survey.caveExits().contains(pinPointNode)
             )
         } else if (currentRoute != null) {
             InJourneyLayout(
