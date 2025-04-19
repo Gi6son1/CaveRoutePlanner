@@ -9,6 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -157,7 +159,17 @@ private fun BuildNavigationGraph(
     }
 
     NavHost(navController = navController, startDestination = Screen.CaveListScreen.route) {
-        composable(Screen.CaveListScreen.routePath()) {
+        composable(Screen.CaveListScreen.routePath(),
+            enterTransition = {
+                return@composable slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, tween(500)
+                )
+            }) {
             CaveListScreenTopLevel(
                 navigateToSurvey = { surveyId ->
                     val destination = "${Screen.SurveyNavScreen.basePath}${surveyId}"
@@ -176,7 +188,17 @@ private fun BuildNavigationGraph(
             route = Screen.SurveyNavScreen.routePath(),
             arguments = listOf(navArgument(Screen.SurveyNavScreen.argument) {
                 type = NavType.IntType
-            })
+            }),
+            enterTransition = {
+                return@composable slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, tween(500)
+                )
+            }
         ) { backStackEntry ->
             backStackEntry.arguments?.let {
                 if (it.containsKey(Screen.SurveyNavScreen.argument)) {
@@ -193,7 +215,17 @@ private fun BuildNavigationGraph(
             }
         }
 
-        composable(route = Screen.SurveyMarkupScreen.routePath()) {
+        composable(route = Screen.SurveyMarkupScreen.routePath(),
+            enterTransition = {
+                return@composable slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Start, tween(500)
+                )
+            },
+            exitTransition = {
+                return@composable slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.End, tween(500)
+                )
+            }) {
             SurveyMarkupScreenTopLevel(
                 returnToMenu = {
                     navController.popBackStack(Screen.CaveListScreen.route, inclusive = false)
