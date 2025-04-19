@@ -30,6 +30,22 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.majorproject.caverouteplanner.ui.util.calculateFractionalOffset
 import kotlin.math.max
 
+/**
+ * Composable to hold the iamge and graph overlay for the markup screen, it is a reduced version of the image and graph overlay composable
+ *
+ * @param paths list of paths to display
+ * @param nodes list of nodes to display
+ * @param modifier modifier
+ * @param longPressPosition function to call when long press is detected
+ * @param onTapPosition function to call when tap is detected
+ * @param markupStage current markup stage that decided what should be displayed on the graph overlay
+ * @param northMarker north marker to display
+ * @param centreMarker centre marker to display
+ * @param distanceMarker1 distance marker 1 to display
+ * @param distanceMarker2 distance marker 2 to display
+ * @param imageBitmap image bitmap
+ * @param currentlySelectedSurveyNode currently selected survey node
+ */
 @Composable
 fun MarkupImageAndGraphOverlay(
     paths: List<SurveyPath>,
@@ -177,7 +193,19 @@ fun MarkupImageAndGraphOverlay(
     }
 }
 
-
+/**
+ * Composable to hold the graph overlay for the markup screen - it is a modified version of the graph overlay composable
+ * @param modifier modifier
+ * @param nodes list of nodes to display
+ * @param paths list of paths to display
+ * @param surveySize size of the survey
+ * @param markupStage current markup stage that decided what should be displayed on the graph overlay
+ * @param northMarker north marker to display
+ * @param centreMarker centre marker to display
+ * @param distanceMarker1 distance marker 1 to display
+ * @param distanceMarker2 distance marker 2 to display
+ * @param currentlySelectedSurveyNode currently selected survey node
+ */
 @Composable
 fun MarkupGraphOverlay(
     modifier: Modifier = Modifier,
@@ -191,7 +219,7 @@ fun MarkupGraphOverlay(
     distanceMarker2: Offset,
     currentlySelectedSurveyNode: SurveyNode?
 ) {
-    val altitudeColours = remember {
+    val altitudeColours = remember { //colours for the different altitudes
         listOf(
             Color(0xFF001433),
             Color(0xFF003366),
@@ -208,7 +236,7 @@ fun MarkupGraphOverlay(
     }
 
     Canvas(modifier = modifier) {
-        if (markupStage == 0) {
+        if (markupStage == 0) { //if the stage is 0, then only show the calibration markers
             drawCircle(
                 color = Color(0xFF05166b),
                 radius = 2f,
@@ -243,13 +271,13 @@ fun MarkupGraphOverlay(
             )
         }
 
-        if (markupStage == 1 || markupStage == 2) {
+        if (markupStage == 1 || markupStage == 2) { //if the stage is 1 or 2, then show the nodes
             nodes.forEach { node ->
                 drawCircle(
                     color = when {
                         node.isEntrance -> Color(0xFF05166b)
                         node.isJunction -> Color(0xFF730606)
-                        markupStage == 1 -> Color.Transparent
+                        markupStage == 1 -> Color.Transparent //if the stage is 1, then show the non-junction/entrance nodes as transparent
                         else -> Color.DarkGray
                     },
                     radius = if (currentlySelectedSurveyNode == node && markupStage == 2) 5f else if (node.isEntrance || node.isJunction) 3f else 2f,
@@ -260,15 +288,15 @@ fun MarkupGraphOverlay(
                 )
             }
         }
-        if (markupStage == 2 || markupStage == 3 || markupStage == 4) {
+        if (markupStage == 2 || markupStage == 3 || markupStage == 4) { //if the stage is 2 or 3 or 4, then show the paths
             paths.forEach { path ->
                 val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
                 val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
 
                 drawLine(
                     color = when {
-                        markupStage == 4 -> altitudeColours[path.altitude + 5]
-                        markupStage == 2 -> Color.DarkGray
+                        markupStage == 4 -> altitudeColours[path.altitude + 5] //if the stage is 4, then show the paths in the correct altitude colour
+                        markupStage == 2 -> Color.DarkGray //if the stage is 2, then show the paths in gray
                         path.isHardTraverse && path.hasWater -> Color(0xFF36056b)
                         path.isHardTraverse -> Color(0xFF730606)
                         path.hasWater -> Color(0xFF05166b)

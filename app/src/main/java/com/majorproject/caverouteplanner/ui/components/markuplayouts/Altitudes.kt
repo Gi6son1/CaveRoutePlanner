@@ -17,6 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
 
+/**
+ * This composable is used to display the altitude settings for the markup screen
+ *
+ * @param modifier The modifier to apply to the layout
+ * @param updateCurrentlySelected The method used to update the currently selected altitude
+ * @param currentlySelectedSetting The currently selected altitude
+ */
 @Composable
 fun AltitudesLayout(
     modifier: Modifier = Modifier,

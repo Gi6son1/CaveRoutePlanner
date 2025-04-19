@@ -9,6 +9,15 @@ import kotlinx.parcelize.Parcelize
 import java.util.PriorityQueue
 import kotlin.math.pow
 
+/**
+ * This class holds the data for the route finder, used for finding the shortest path from the source node to every other node in the survey
+ *
+ * @param sourceNode The source node of the route
+ * @param survey The survey to find the route in
+ * @param flags The flags for the route finder - whether to avoid water, hard traverses, or high altitude preferred
+ * @param avoidEdges A list of edges to avoid - not currently in use, but may be in the future, when some paths cannot be included in the navigation
+ * @param numberOfTravellers The number of travellers in the route - used for passing to the route object
+ */
 @Parcelize
 data class RouteFinder(
     val sourceNode: SurveyNode,
@@ -18,12 +27,20 @@ data class RouteFinder(
     val numberOfTravellers: Int
 ) : Parcelable {
     @IgnoredOnParcel //may be because it can be recreated in init everytime
-    var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf()
+    var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf() //map of nodes, showing the edge that is the best one to take to get to the source node
 
     @IgnoredOnParcel
-    var costMap: MutableMap<SurveyPath, Float> = mutableMapOf()
+    var costMap: MutableMap<SurveyPath, Float> = mutableMapOf() //map of edges, showing the cost of getting to the source node using that edge
 
+
+    /**
+     * This initialises the routeFinder, calculating the shortest path from the source node to every other node in the survey
+     * It's a modification of Dijkstra's algorithm, the difference being that the shortest path cost isn't stored, but the edge that gave the shortest path is stored instead
+     */
     init {
+        /**
+         * This function returns a list of edges that start or end at the given node
+         */
         fun getNodeEdges(nodeId: Int): List<SurveyPath> {
             var pathList: MutableList<SurveyPath> = mutableListOf()
 
@@ -46,7 +63,7 @@ data class RouteFinder(
         priorityQueue.add(Pair(0, sourceNode))
 
         while (priorityQueue.isNotEmpty()) {
-            val (currentDistance, currentNode) = priorityQueue.poll()
+            val currentNode = priorityQueue.poll().second
 
             if (visitedNodes[survey.nodes.indexOf(currentNode)]) {
                 continue
@@ -81,7 +98,7 @@ data class RouteFinder(
                 val neighbourRoute = routes[neighbour]
 
                 if (currentNodeRoute != null &&
-                    currentNodeRoute.first + weight < (neighbourRoute?.first ?: Float.MAX_VALUE)
+                    currentNodeRoute.first + weight < (neighbourRoute?.first ?: Float.MAX_VALUE) //if the new route is shorter than the current route, or if there is no current route, then update it
                 ) {
                     val neighbourRoutePair = Pair(currentNodeRoute.first + weight, edge)
 
@@ -93,18 +110,31 @@ data class RouteFinder(
 
             }
         }
-        routeMap = routes.mapValues { it.value.second }.toMutableMap()
+        routeMap = routes.mapValues { it.value.second }.toMutableMap() //sets the routeMap to the edge that is the best one to take to get to the source node
     }
 
 
+    /**
+     * This function returns a route to the given node, if one exists
+     *
+     * @param node The node to find a route to
+     *
+     * @return A route to the given node, or null if one does not exist
+     */
     fun getRouteToNode(node: SurveyNode?): Route? {
         var currentNode = node ?: return null
         var routeList: MutableList<MutableList<SurveyPath>> = mutableListOf()
         var totalDistance = 0f
 
+        /**
+         * This function is used to retrieve the edge from the given node that is the best one to take to get to the source
+         *
+         * @param id The node to get the edge from
+         * @return A triple containing the edge, the other node that the edge connects to, and the distance of the edge
+         */
         fun getEdgeFromNode(id: SurveyNode): Triple<SurveyPath?, SurveyNode?, Float> {
             val foundEdge = routeMap[id]
-            if (foundEdge == null) {
+            if (foundEdge == null) { //if there is no edge, then there is no route to the source node
                 return Triple(null, null, 0f)
             }
             val neighbour =
@@ -114,16 +144,16 @@ data class RouteFinder(
             return Triple(foundEdge, neighbourNode, foundEdge.distance)
         }
 
-        while (currentNode.getNodeId() != sourceNode.getNodeId()) {
-            val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode)
+        while (currentNode.getNodeId() != sourceNode.getNodeId()) { //while the current node is not the source node
+            val (edge, neighbour, newDistance) = getEdgeFromNode(currentNode) //get the edge from the current node
             if (edge == null) {
                 return null
             }
-            totalDistance += newDistance
-            if (currentNode.isJunction) {
+            totalDistance += newDistance //add the distance of the edge to the total distance
+            if (currentNode.isJunction) { //if the current node is a junction, then add the edge to the routeList under a new list to hold the new path
                 routeList.add(0, mutableListOf(edge))
             } else {
-                if (routeList.isEmpty()) {
+                if (routeList.isEmpty()) { //if the routeList is empty, then add a new list to hold the new path
                     routeList.add(mutableListOf())
                 }
                 routeList.first().add(0, edge)
@@ -133,7 +163,7 @@ data class RouteFinder(
         if (routeList.isEmpty()) {
             return null
         }
-        return Route(
+        return Route( //return the route object
             routeList = routeList,
             totalDistance = totalDistance,
             sourceNode = sourceNode.getNodeId(),
@@ -141,15 +171,20 @@ data class RouteFinder(
         )
     }
 
+    /**
+     * This function finds the nearest exit to the survey from the source node
+     *
+     * @return The nearest exit to the survey, or null if one does not exist
+     */
     fun findNearestExit(): SurveyNode? {
         val exitNodes = survey.caveExits()
         var nearestExitDistance: Float = Float.MAX_VALUE
         var nearestExit: SurveyNode? = null
 
-        for (exit in exitNodes) {
+        for (exit in exitNodes) { //for each exit node, find the route to it
             if (getRouteToNode(exit) != null) {
                 val exitRoute = getRouteToNode(exit)!!
-                if (exitRoute.totalDistance < nearestExitDistance) {
+                if (exitRoute.totalDistance < nearestExitDistance) { //if the route is shorter than the current nearest exit, then update the nearest exit
                     nearestExitDistance = exitRoute.totalDistance
                     nearestExit = exit
                 }

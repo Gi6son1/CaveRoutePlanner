@@ -14,6 +14,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * This class holds the view model for the application
+ *
+ * It holds the list of current surveys in the db and the list of current caves in the db, to be accessed when required
+ *
+ * It also has a function to save a new cave to the db
+ */
 class CaveRoutePlannerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = CaveRoutePlannerRepository(application)
 

@@ -1,5 +1,8 @@
 package com.majorproject.caverouteplanner.ui.components.screennavigation
 
+/**
+ * This file contains the sealed class for the different screens in the app, used to navigate between them with navigationGraph
+ */
 sealed class Screen(
     val route: String,
     val argument: String = ""

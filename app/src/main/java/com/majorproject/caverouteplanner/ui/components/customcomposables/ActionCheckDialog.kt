@@ -26,6 +26,14 @@ import androidx.compose.ui.window.Dialog
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
+/**
+ * This composable is used to display a dialog that asks the user if they are sure they want to do something
+ *
+ * @param dialogIsOpen Whether the dialog should be open
+ * @param dialogOpen A method used for closing the dialog
+ * @param message The message to display in the dialog
+ * @param confirmAction A method used for confirming the action if the user selects confirm
+ */
 @Composable
 fun ActionCheckDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open
@@ -38,7 +46,7 @@ fun ActionCheckDialog(
             onDismissRequest = {}, //sets it so that user cannot dismiss dialog by tapping outside
         ) {
 
-            BackHandler { dialogOpen(false) }
+            BackHandler { dialogOpen(false) } //if back button is pressed, close the dialog
 
             Card {
                 Column {

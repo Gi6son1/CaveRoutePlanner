@@ -16,6 +16,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * This composable is used to display a help message box
+ *
+ * @param modifier The modifier to apply to the box
+ * @param message The message to display
+ * @param boxHeight The height of the box - depends on how much height is needed to display the message
+ */
 @Composable
 fun HelpMessageBox(
     modifier: Modifier = Modifier,

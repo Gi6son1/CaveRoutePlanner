@@ -39,6 +39,13 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
 
+/**
+ * This composable is used to display a button that contains a cave info card
+ *
+ * @param cave The cave to display
+ * @param modifier The modifier to apply to the button
+ * @param onClick The action to perform when the button is clicked
+ */
 @Composable
 fun CaveCardButton(
     cave: Cave,
@@ -56,6 +63,9 @@ fun CaveCardButton(
     }
 }
 
+/**
+ * This composable is used to display a card that contains cave info
+ */
 @Composable
 fun CaveCard(cave: Cave) {
     Card(
@@ -75,7 +85,7 @@ fun CaveCard(cave: Cave) {
         }
 
         var lengthText by rememberSaveable { mutableStateOf("") }
-        lengthText = if (cave.caveProperties.length >= 1000) {
+        lengthText = if (cave.caveProperties.length >= 1000) { //if the distance is 1000 and over meters, convert to km instead of m
             "${(cave.caveProperties.length / 1000f)}km"
         } else {
             "${cave.caveProperties.length}m"

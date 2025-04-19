@@ -43,4 +43,21 @@
     <string name="please_add_at_least_one_node">Please add at least one node</string>
     <string name="please_calibrate_the_distance_markers">Please calibrate the distance markers</string>
     <string name="all_nodes_must_be_have_at_least_one_path_connected_to_it">All nodes must be have at least one path connected to it</string>
+    <string name="calibrate_compass">Calibrate compass:</string>
+    <string name="north_compass">North Compass</string>
+    <string name="centre_compass">Centre Compass</string>
+    <string name="calibrate_distance">Calibrate distance:</string>
+    <string name="distance_mark_1">Distance Mark 1</string>
+    <string name="distance_mark_2">Distance Mark 2</string>
+    <string name="distance_in_metres">Distance in metres:</string>
+    <string name="mark_as">Mark as:</string>
+    <string name="entrance">Entrance</string>
+    <string name="junction">Junction</string>
+    <string name="remove">Remove</string>
+    <string name="markup_mode">Markup Mode:</string>
+    <string name="annotate_path">Annotate Path</string>
+    <string name="remove_path">Remove Path</string>
+    <string name="water">Water</string>
+    <string name="hard_traverse">Hard Traverse</string>
+    <string name="reset">Reset</string>
 </resources>

@@ -40,6 +40,19 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
 
+/**
+ * This composable is used to display the image of the survey with the graph overlain on top
+ *
+ * @param survey The survey to display
+ * @param modifier The modifier to apply to the layout
+ * @param currentRoute The current route
+ * @param longPressPosition The method used to update the long press position
+ * @param onTap The method used to handle a tap
+ * @param pinpointSourceNode The node to add a source pinpoint to
+ * @param pinpointDestinationNode The node to add a destination pinpoint to
+ * @param compassEnabled Whether the compass should be enabled
+ * @param compassReading The current compass reading
+ */
 @Composable
 fun ImageWithGraphOverlay(
     survey: Survey,
@@ -74,12 +87,12 @@ fun ImageWithGraphOverlay(
 
     var currentlyTransformGesturing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(currentRoute?.currentStage) {
+    LaunchedEffect(currentRoute?.currentStage) { //this is called everytime the current stage changes
         if (currentRoute != null && currentRoute.currentStage != -1) {
-            performFocusedTransformation(
+            performFocusedTransformation( //retrieve the angle, size and centroid of the current route
                 currentRoute,
                 survey.nodes,
-            ) { angle, distance, centroid ->
+            ) { angle, distance, centroid -> //change the zoom, rotation and offset of the image to focus on the current route
                 focusedCentroid = centroid
 
 
@@ -193,7 +206,7 @@ fun ImageWithGraphOverlay(
                     boxSize = coordinates.size
                 }
                 .pointerInput(currentlyTransformGesturing) {
-                    if (!currentlyTransformGesturing) {
+                    if (!currentlyTransformGesturing) { //only allow long press if not currently using transform gestures
                         detectTapGestures(
                             onLongPress = { longPressLoc ->
                                 val fractionalTapPosition =
@@ -210,7 +223,7 @@ fun ImageWithGraphOverlay(
         ) {
             var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
-            LaunchedEffect(survey) {
+            LaunchedEffect(survey) { //called each time a survey changes
                 imageBitmap = getBitmapFromInternalStorage(
                     survey.properties.imageReference
                 )
@@ -244,11 +257,25 @@ fun ImageWithGraphOverlay(
     }
 }
 
-fun performFocusedTransformation(
+/**
+ * Function for returning the values for a focused view of a given route
+ *
+ * @param currentRoute The current route
+ * @param nodes The nodes of the survey
+ * @param calculatedTransformation The method used to update the transformation values
+ */
+private fun performFocusedTransformation(
     currentRoute: Route,
     nodes: List<SurveyNode>,
     calculatedTransformation: (Float, Float, Pair<Int, Int>?) -> Unit
 ) {
+    /**
+     * Calculates the centroid of the current route, finds the combined centroid of all paths on the route
+     *
+     * @param currentStage The current stage of the route
+     * @return The centroid of the route
+     *
+     */
     fun calculateCentroid(currentStage: List<SurveyPath>): Pair<Int, Int>? {
         var cumulativeCentroidX = 0f
         var cumulativeCentroidY = 0f
@@ -285,6 +312,20 @@ fun performFocusedTransformation(
     calculatedTransformation(finalAngle.toFloat(), finalDistance, centroid)
 }
 
+/**
+ * This composable is used to display the graph canvas overlay on top of the survey image
+ *
+ * @param modifier The modifier to apply to the layout
+ * @param nodes The nodes of the survey
+ * @param paths The paths of the survey
+ * @param surveySize The size of the survey
+ * @param currentRoute The current route
+ * @param pinpointNode The node to pinpoint
+ * @param destinationNode The node to pinpoint to
+ * @param currentRotation The current rotation of the image
+ * @param currentZoom The current zoom of the image
+ * @param compassRotation The current compass rotation
+ */
 @Composable
 fun GraphOverlay(
     modifier: Modifier = Modifier,
@@ -303,12 +344,12 @@ fun GraphOverlay(
     val currentDirectionIcon = ImageBitmap.imageResource(id = R.drawable.direction_icon)
     val arrowHead = ImageBitmap.imageResource(id = R.drawable.arrow_head)
 
-    val adjustedZoom = if (currentZoom == 0f) 0.000001f else currentZoom
+    val adjustedZoom = if (currentZoom == 0f) 0.000001f else currentZoom //avoid division by zero
 
     Canvas(modifier = modifier) {
-        if (currentRoute != null) {
+        if (currentRoute != null) { //if there is a current route, draw the route with paths
             currentRoute.routeList.forEachIndexed { index, pathList ->
-                if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) {
+                if (currentRoute.currentStage != -1 && index == currentRoute.currentStage) { //draw the current path in green
                     currentRoute.getCurrentStage().forEach { path ->
                         val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
                         val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
@@ -327,7 +368,7 @@ fun GraphOverlay(
                             cap = StrokeCap.Round
                         )
                     }
-                } else {
+                } else { //draw the rest of the paths in blue or grey
                     pathList.forEach { path ->
                         val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
                         val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
@@ -348,7 +389,7 @@ fun GraphOverlay(
                     }
                 }
             }
-        } else {
+        } else { //otherwise, draw all paths in the survey, but make them slightly transparent
             paths.forEach { path ->
                 val startNode = nodes.find { it.getNodeId() == path.getPathEnds().first }!!
                 val endNode = nodes.find { it.getNodeId() == path.getPathEnds().second }!!
@@ -371,7 +412,7 @@ fun GraphOverlay(
             }
         }
 
-        if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) {
+        if (pinpointNode != null && (currentRoute == null || currentRoute.routeStarted == false)) { //draw the pinpoint (source) icon if the route hasn't started
             val iconOffsetX = pinpointIcon.width
             val iconOffsetY = pinpointIcon.height.toFloat() * 2
 
@@ -416,7 +457,7 @@ fun GraphOverlay(
 
 
 
-        if (currentRoute?.routeStarted == true) {
+        if (currentRoute?.routeStarted == true) { //if the route has started, draw the direction icon on the start node of the current path and the arrow at the end of the path
             val currentStartNode =
                 nodes.find { it.getNodeId() == currentRoute.getCurrentStartingNode() }
             if (currentStartNode == null) {
@@ -543,7 +584,7 @@ fun GraphOverlay(
         }
 
 
-        if (destinationNode != null) {
+        if (destinationNode != null) { //if there is a destination node, draw the destination icon at the end of the route
             val iconOffsetX = 0
             val iconOffsetY = destinationIcon.height.toFloat() * 2
 

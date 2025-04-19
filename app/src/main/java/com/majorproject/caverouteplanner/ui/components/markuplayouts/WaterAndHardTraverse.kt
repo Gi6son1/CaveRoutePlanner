@@ -11,9 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
 
+/**
+ * This composable is used to display the water and hard traverse settings for the markup screen - when the user is marking water and hard traverse paths
+ *
+ * @param modifier The modifier to apply to the layout
+ * @param updateCurrentlySelected The method used to update the currently selected setting
+ * @param currentlySelectedSetting The currently selected setting
+ */
 @Composable
 fun WaterAndHardTraverseLayout(
     modifier: Modifier = Modifier,
@@ -25,7 +34,7 @@ fun WaterAndHardTraverseLayout(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = "Mark as:",
+            text = stringResource(R.string.mark_as),
             modifier = Modifier.background(
                 MaterialTheme.colorScheme.surfaceBright,
             ),
@@ -35,7 +44,7 @@ fun WaterAndHardTraverseLayout(
             onClick = {
                 updateCurrentlySelected(1)
             },
-            text = "Water",
+            text = stringResource(R.string.water),
             currentlySelected = currentlySelectedSetting == 1,
             buttonColour = Color(0xFF05166b),
             textColour = Color.White
@@ -45,7 +54,7 @@ fun WaterAndHardTraverseLayout(
             onClick = {
                 updateCurrentlySelected(2)
             },
-            text = "Hard Traverse",
+            text = stringResource(R.string.hard_traverse),
             currentlySelected = currentlySelectedSetting == 2,
             buttonColour = Color(0xFF730606),
             textColour = Color.White
@@ -55,7 +64,7 @@ fun WaterAndHardTraverseLayout(
             onClick = {
                 updateCurrentlySelected(3)
             },
-            text = "Reset",
+            text = stringResource(R.string.reset),
             currentlySelected = currentlySelectedSetting == 3,
             removeButton = true
         )

@@ -9,7 +9,9 @@ import androidx.room.TypeConverters
 import com.majorproject.caverouteplanner.datasource.util.PairConverter
 import kotlinx.parcelize.Parcelize
 
-//Parcelised so that it can be stored in remember saveables
+/**
+ * This old class holds the path data for the ll survey, which now only applies to the ll survey
+ */
 @Parcelize
 data class OldSurveyPathType(
     var id: Int,
@@ -28,6 +30,16 @@ data class OldSurveyPathType(
     }
 }
 
+/**
+ * This class holds data for an object in the survey node table
+ * @param id The id of the path
+ * @param ends The ends of the path
+ * @param distance The distance of the path
+ * @param hasWater Whether the path has water
+ * @param altitude The altitude of the path
+ * @param isHardTraverse Whether the path is hard to traverse
+ * @param surveyId The id of the survey that the path belongs to
+ */
 @Parcelize
 @Entity(
     tableName = "surveypaths",
@@ -52,6 +64,13 @@ data class SurveyPath(
     var isHardTraverse: Boolean = false,
     val surveyId: Int
 ): Parcelable {
+
+    /**
+     * this function returns the id of the other node connected to the path
+     *
+     * @param currentId the id of the current node
+     * @return the id of the other node connected to the path
+     */
     fun next(currentId: Int) : Int {
         return if (ends.first - 1  == currentId) {
             ends.second - 1
@@ -60,7 +79,13 @@ data class SurveyPath(
         }
     }
 
+    /**
+     * this function returns the ends of the path as a pair of ints, modified to account for database id differences
+     */
     fun getPathEnds() = Pair(ends.first - 1, ends.second - 1)
 
+    /**
+     * this function returns the id of the path - 1 is subtracted from the id to get the correct id since database ids start at 1, which breaks lists in the implementation
+     */
     fun getPathId() = id - 1
 }

@@ -21,6 +21,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
+/**
+ * This class holds the Room database for the application
+ */
 @Database(
     entities = [SurveyProperties::class, SurveyNode::class, SurveyPath::class, CaveProperties::class],
     version = 1
@@ -38,7 +42,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
 
         @Synchronized
         fun getDatabase(context: Context): CaveRoutePlannerRoomDatabase? {
-            if (instance == null) {
+            if (instance == null) { //if the database doesn't exist, create it
                 instance =
                     Room.databaseBuilder<CaveRoutePlannerRoomDatabase>(
                         context.applicationContext,
@@ -66,6 +70,9 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * This function populates the database with the Llygadlchwr survey
+         */
         private fun populateDatabase(db: CaveRoutePlannerRoomDatabase) {
             val surveyDao = db.surveyDao()
             val surveyNodeDao = db.surveyNodeDao()

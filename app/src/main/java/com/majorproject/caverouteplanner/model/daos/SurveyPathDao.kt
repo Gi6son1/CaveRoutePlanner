@@ -7,6 +7,9 @@ import androidx.room.Query
 import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * This interface holds the database queries for the survey paths
+ */
 @Dao
 interface SurveyPathDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

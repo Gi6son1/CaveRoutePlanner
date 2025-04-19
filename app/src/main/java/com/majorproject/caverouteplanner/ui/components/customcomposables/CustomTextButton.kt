@@ -31,6 +31,17 @@ import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.round
 
+/**
+ * This composable is used to display a custom text button
+ *
+ * @param onClick The action to perform when the button is clicked
+ * @param modifier The modifier to apply to the button
+ * @param text The text to display on the button
+ * @param iconVector The icon to display if it's a vector
+ * @param iconImage The icon to display if it's an image
+ * @param contentDescription The content description of the icon
+ * @param flipped Whether the text and icon positions should be flipped
+ */
 @Composable
 fun CustomTextButton(
     onClick: () -> Unit,
@@ -111,6 +122,15 @@ fun CustomTextButton(
     }
 }
 
+/**
+ * This composable is used to display a custom trip info box - it's a modification of the custom button composable
+ * @param onClick The action to perform when the button is clicked
+ * @param isGoButton Whether the button should be a go button - makes it interactable if it is
+ * @param modifier The modifier to apply to the button
+ * @param distance The distance of the trip
+ * @param time The time of the trip
+ * @param pathNotDest Whether the text is supposed to be for a path, not the entire journey
+ */
 @Composable
 fun CustomTripInfoBox(
     onClick: () -> Unit = {},
@@ -122,7 +142,7 @@ fun CustomTripInfoBox(
 ) {
     var roundedDistance = round(distance).toInt()
     var distanceString: String
-    if (roundedDistance < 100) {
+    if (roundedDistance < 100) { //if the distance is less than 100m, display it in metres
         distanceString = "${roundedDistance}m"
     } else {
         val newDistance = distance / 1000
@@ -130,7 +150,7 @@ fun CustomTripInfoBox(
     }
 
     val timeString: String
-    if (time < 60) {
+    if (time < 60) { //if the time is less than 1 minute, display it in seconds
         timeString = "${time.toInt()}s"
     } else {
         val newTime = ceil(time / 60f).toInt()

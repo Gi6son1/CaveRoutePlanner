@@ -9,7 +9,15 @@ import com.majorproject.caverouteplanner.ui.components.SurveyPath
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
+/**
+ * This class holds the route data for when a journey is in progress
+ *
+ * @param routeList A list of lists of survey paths, representing the route
+ * @param totalDistance The total distance of the route
+ * @param sourceNode The source node of the route
+ * @param numberOfTravellers The number of travellers in the route - used for calculating the time it takes to complete the route
+ */
+@Parcelize //this is used so that the survey can used properly with rememberSaveable
 data class Route(val routeList: List<List<SurveyPath>>,
                  val totalDistance: Float,
                  val sourceNode: Int,
@@ -17,22 +25,23 @@ data class Route(val routeList: List<List<SurveyPath>>,
     : Parcelable {
 
     @IgnoredOnParcel
-    var currentStage by mutableIntStateOf(-1)
+    var currentStage by mutableIntStateOf(-1) //this is used to keep track of the current stage of the route
 
     @IgnoredOnParcel
-    var routeStarted: Boolean by mutableStateOf(false)
+    var routeStarted: Boolean by mutableStateOf(false) //this is used to keep track of whether the route has started
 
     @IgnoredOnParcel
-    var pathDistances = mutableListOf<Float>()
+    var pathDistances = mutableListOf<Float>() //this is used to keep track of the distance of each path
 
     @IgnoredOnParcel
-    var pathTravelTimes = mutableListOf<Int>()
+    var pathTravelTimes = mutableListOf<Int>() //this is used to keep track of the time it takes to complete each path
 
     @IgnoredOnParcel
-    var startingNodes = mutableListOf<Int>()
+    var startingNodes = mutableListOf<Int>() //this is used to keep track of the starting node of each path
     @IgnoredOnParcel
-    var endingNodes = mutableListOf<Int>()
+    var endingNodes = mutableListOf<Int>() //this is used to keep track of the ending node of each path
 
+    //upon initialisation, all of the above variables are calculated
     init {
         currentStage = -1
         routeStarted = false
@@ -69,10 +78,10 @@ data class Route(val routeList: List<List<SurveyPath>>,
 
                     var timeForPath = (path.distance * 1.8) + (path.distance * (numberOfTravellers - 1) * 1.1f).toDouble()
                     if (path.hasWater) {
-                        timeForPath *= 1.5
+                        timeForPath *= 1.5 //increases time if the path has water
                     }
                     if (path.isHardTraverse) {
-                        timeForPath *= 3
+                        timeForPath *= 3 //increases time if the path has a hard traverse
                         timeForPath += (numberOfTravellers - 1) * 5 // 5 mins per additional person
                     }
                     totalPathTime += timeForPath.toFloat()
@@ -98,19 +107,37 @@ data class Route(val routeList: List<List<SurveyPath>>,
         }
     }
 
+    /**
+     * This function starts the journey and moves to the first stage
+     */
     fun beginJourney(){
         routeStarted = true
         nextStage()
     }
 
+    /**
+     * This function returns the current starting node of the route
+     *
+     * @return The current starting node
+     */
     fun getCurrentStartingNode(): Int {
         return startingNodes[currentStage]
     }
 
+    /**
+     * This function returns the current path travel time
+     *
+     * @return The current path travel time
+     */
     fun getCurrentPathTravelTime(): Int {
         return pathTravelTimes[currentStage]
     }
 
+    /**
+     * This function returns the total path travel time
+     *
+     * @return The total path travel time
+     */
     fun getTotalPathTravelTime(): Int {
         var totalTime = 0
         pathTravelTimes.forEach { time ->
@@ -119,10 +146,20 @@ data class Route(val routeList: List<List<SurveyPath>>,
         return totalTime
     }
 
+    /**
+     * This function returns the current ending node of the route
+     *
+     * @return The current ending node
+     */
     fun getCurrentEndingNode(): Int {
         return endingNodes[currentStage]
     }
 
+    /**
+     * This function returns the current path distance
+     *
+     * @return The current path distance, or 0 if the route has not started
+     */
     fun getCurrentPathDistance(): Float {
         if (currentStage >= 0) {
             return pathDistances[currentStage]
@@ -130,14 +167,25 @@ data class Route(val routeList: List<List<SurveyPath>>,
         return 0f
     }
 
+    /**
+     * This function returns the current stage of the route
+     *
+     * @return The list of survey paths in the current stage
+     */
     fun getCurrentStage(): List<SurveyPath> {
         return routeList[currentStage]
     }
 
+    /**
+     * This function moves to the previous stage of the route
+     */
     fun previousStage(){
         if (currentStage > 0 && routeStarted) currentStage--
     }
 
+    /**
+     * This function moves to the next stage of the route
+     */
     fun nextStage(){
         if (currentStage < routeList.size - 1 && routeStarted) currentStage++
     }

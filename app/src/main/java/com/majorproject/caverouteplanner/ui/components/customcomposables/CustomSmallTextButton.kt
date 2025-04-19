@@ -19,6 +19,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+/**
+ * This composable is used to display a custom text button
+ *
+ * @param onClick The action to perform when the button is clicked
+ * @param modifier The modifier to apply to the button
+ * @param text The text to display on the button
+ * @param currentlySelected Whether the button is currently selected
+ * @param buttonColour The colour of the button
+ * @param textColour The colour of the text
+ * @param square Whether the button should be square
+ * @param removeButton Whether the button should be a remove button
+ */
 @Composable
 fun CustomSmallTextButton(
     onClick: () -> Unit,
@@ -40,7 +52,7 @@ fun CustomSmallTextButton(
             )
             .width(if (square) 59.dp else 100.dp)
             .height(59.dp)
-            .alpha(if (currentlySelected) 1f else 0.65f),
+            .alpha(if (currentlySelected) 1f else 0.65f), //if the button is currently selected, make it more opaque
         shape = MaterialTheme.shapes.medium,
         contentPadding = PaddingValues(10.dp),
         elevation = ButtonDefaults.buttonElevation(10.dp),

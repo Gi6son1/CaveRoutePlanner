@@ -13,6 +13,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
+/**
+ * This composable is used to display a custom icon button
+ *
+ * @param onClick The action to perform when the button is clicked
+ * @param modifier The modifier to apply to the button
+ * @param invertedColour Whether the button colours should be inverted
+ * @param iconVector The icon to display if it's a vector
+ * @param iconImage The icon to display if it's an image
+ * @param contentDescription The content description of the icon
+ */
 @Composable
 fun CustomIconButton(
     onClick: () -> Unit,

@@ -34,6 +34,16 @@ import com.chillibits.composenumberpicker.HorizontalNumberPicker
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
+/**
+ * This composable is used to display a dialog for travel condition choices
+ * The user can choose if they prefer no water, no hard traverse or high altitude paths, as well as the number of cavers caving
+ *
+ * @param dialogIsOpen Whether the dialog should be open
+ * @param dialogOpen The method used to close the dialog
+ * @param currentConditions The current conditions of the journey
+ * @param updatedConditions The method used to update the conditions
+ * @param currentNumberOfTravellers The current number of cavers caving
+ */
 @Composable
 fun TravelConditionsDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open

@@ -11,9 +11,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomSmallTextButton
 
+/**
+ * This composable is used to display the path connections settings for the markup screen - when the user is creating paths between nodes
+ * @param modifier The modifier to apply to the layout
+ * @param updateCurrentlySelected The method used to update the currently selected setting
+ * @param currentlySelectedSetting The currently selected setting
+ *
+ */
 @Composable
 fun PathConnectionsLayout(
     modifier: Modifier = Modifier,
@@ -25,7 +34,7 @@ fun PathConnectionsLayout(
         horizontalAlignment = Alignment.End
     ) {
         Text(
-            text = "Markup Mode:",
+            text = stringResource(R.string.markup_mode),
             modifier = Modifier.background(
                 MaterialTheme.colorScheme.surfaceBright,
             ),
@@ -35,7 +44,7 @@ fun PathConnectionsLayout(
             onClick = {
                 updateCurrentlySelected(1)
             },
-            text = "Annotate Path",
+            text = stringResource(R.string.annotate_path),
             currentlySelected = currentlySelectedSetting == 1,
             buttonColour = Color(0xFF05166b),
             textColour = Color.White
@@ -45,7 +54,7 @@ fun PathConnectionsLayout(
             onClick = {
                 updateCurrentlySelected(2)
             },
-            text = "Remove Path",
+            text = stringResource(R.string.remove_path),
             currentlySelected = currentlySelectedSetting == 2,
             removeButton = true
         )

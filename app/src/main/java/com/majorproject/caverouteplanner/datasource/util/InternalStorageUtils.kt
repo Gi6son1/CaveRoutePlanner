@@ -14,6 +14,20 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
+/**
+ *  This file holds the functions for dealing with internal storage and the storing of image bitmaps
+ */
+
+
+/**
+ * This function copies an image from the assets folder to the internal storage of the device, used for the base LL example survey
+ *
+ * @param context The context of the activity
+ * @param assetFileName The name of the file in the assets folder
+ * @param imageName The name of the file to be saved in the internal storage
+ *
+ * @return The path of the file in the internal storage, or null if it failed
+ */
 fun copyImageToInternalStorageFromAssets(
     context: Context,
     assetFileName: String,
@@ -45,6 +59,14 @@ fun copyImageToInternalStorageFromAssets(
     }
 }
 
+/**
+ * This function copies an image from the temp folder to the internal storage of the device, used for the user uploaded survey once the survey is ready to be properly saved
+ *
+ * @param context The context of the activity
+ * @param imageName The name of the file to be saved in the internal storage
+ *
+ * @return The path of the file in the internal storage, or null if it failed
+ */
 fun copyImageToInternalStorageFromTemp(
     context: Context,
     imageName: String,
@@ -70,7 +92,15 @@ fun copyImageToInternalStorageFromTemp(
     }
 }
 
-
+/**
+ * This function saves an image to the temp folder of the device, used for the user uploaded survey while it is being marked-up
+ *
+ * @param bitmap The bitmap URI to be used to access the image
+ * @param contentResolver The content resolver to be used to access the image
+ * @param context The context of the activity
+ *
+ * @return The path of the file in the internal storage, or null if it failed
+ */
 fun saveUploadedImageToTempStorage(
     bitmap: Uri,
     contentResolver: ContentResolver,
@@ -95,6 +125,14 @@ fun saveUploadedImageToTempStorage(
     }
 }
 
+
+/**
+ * This function gets an image from the temp folder of the device, used for the user uploaded survey to be accessed in the markup screen
+ *
+ * @param context The context of the activity
+ *
+ * @return The bitmap of the image, or null if it failed
+ */
 fun getBitmapFromTempInternalStorage(context: Context): ImageBitmap? {
     var imageBitmap: ImageBitmap? = null
 
@@ -115,6 +153,14 @@ fun getBitmapFromTempInternalStorage(context: Context): ImageBitmap? {
     return imageBitmap
 }
 
+
+/**
+ * This function clears the temp folder of the device, used once the temp survey has been saved to internal storage
+ *
+ * @param context The context of the activity
+ *
+ * @return True if the temp folder was cleared, false otherwise
+ */
 fun clearTempStorage(context: Context): Boolean {
     try {
         val destinationDirectory = File(context.filesDir, "temp_images")
@@ -132,6 +178,13 @@ fun clearTempStorage(context: Context): Boolean {
     }
 }
 
+/**
+ * This function gets an image from the internal storage of the device, used when the user wants to access a survey to navigate
+ *
+ * @param filePath The path of the file in the internal storage
+ *
+ * @return The bitmap of the image, or null if it failed
+ */
 fun getBitmapFromInternalStorage(filePath: String): ImageBitmap? {
     var imageBitmap: ImageBitmap?
 

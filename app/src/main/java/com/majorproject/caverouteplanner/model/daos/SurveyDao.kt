@@ -9,10 +9,13 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.Survey
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * This interface holds the database queries for the surveys
+ */
 @Dao
 interface SurveyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSurvey(cave: SurveyProperties): Long
+    fun insertSurvey(cave: SurveyProperties): Long //this returns a long, which is the new id of the inserted survey in the database
 
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
     fun getSurveyById(surveyId: Int): Flow<SurveyProperties?>

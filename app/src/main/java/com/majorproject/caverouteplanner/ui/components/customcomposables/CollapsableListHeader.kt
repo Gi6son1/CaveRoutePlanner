@@ -20,8 +20,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import com.majorproject.caverouteplanner.ui.components.Cave
 
+/**
+ * Composable for storing the header of a cave card list section
+ */
 @Composable
-fun CollapsableListHeader(
+private fun CollapsableListHeader(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     isExpanded: Boolean,
@@ -44,6 +47,14 @@ fun CollapsableListHeader(
     }
 }
 
+/**
+ * Composable for storing a cave card list section
+ *
+ * @param caveList The list of caves to display
+ * @param isExpanded Whether the list is expanded
+ * @param onHeaderClick The action to perform when the header is clicked
+ * @param navigateSurvey The action to perform when a cave is clicked
+ */
 fun LazyListScope.Section(
     caveList: List<Cave>,
     isExpanded: Boolean,
@@ -59,7 +70,7 @@ fun LazyListScope.Section(
         )
     }
 
-    if (isExpanded) {
+    if (isExpanded) { //if the list is expanded, display the caves in the list
         items(items = caveList) { cave ->
             CaveCardButton(cave = cave,
                 onClick = { navigateSurvey(cave.caveProperties.surveyId) }

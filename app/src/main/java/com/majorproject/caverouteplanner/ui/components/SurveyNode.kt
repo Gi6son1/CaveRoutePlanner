@@ -7,6 +7,9 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This old class holds the node data for the ll survey, which now only applies to the ll survey
+ */
 @Parcelize
 data class OldSurveyNodeType(
     var id: Int,
@@ -16,6 +19,15 @@ data class OldSurveyNodeType(
     var edges: MutableList<Int>
 ) : Parcelable
 
+/**
+ * This class holds data for an object in the survey node table
+ * @param id The id of the node
+ * @param isEntrance Whether the node is an entrance
+ * @param isJunction Whether the node is a junction
+ * @param x The x coordinate of the node
+ * @param y The y coordinate of the node
+ * @param surveyId The id of the survey that the node belongs to
+ */
 @Parcelize
 @Entity(
     tableName = "surveynodes",
@@ -38,5 +50,8 @@ data class SurveyNode(
     val y: Int,
     val surveyId: Int
 ) : Parcelable {
+    /**
+     * This function returns the id of the node - 1 is subtracted from the id to get the correct id since database ids start at 1, which breaks lists in the implementation
+     */
     fun getNodeId() = id - 1
 }

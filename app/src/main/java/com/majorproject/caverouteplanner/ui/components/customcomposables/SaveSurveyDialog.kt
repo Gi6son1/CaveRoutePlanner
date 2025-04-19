@@ -37,15 +37,14 @@ import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.components.enums.Difficulty
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
-
 /**
- * val name: String,
- *     val length: Float,
- *     val description: String,
- *     val difficulty: String,
- *     val location: String,
+ * This composable is used to display a dialog for saving a survey
+ * The user can enter the name, length, description, difficulty and location of the cave
+ *
+ * @param dialogIsOpen Whether the dialog should be open
+ * @param dialogOpen The method used to close the dialog
+ * @param saveSurvey The method used to save the survey
  */
-
 @Composable
 fun SaveSurveyDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open

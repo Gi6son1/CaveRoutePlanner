@@ -1,5 +1,8 @@
 package com.majorproject.caverouteplanner.ui.components
 
+/**
+ * This file is used to hold the LL survey, used to prepopulating the database with
+ */
 val llSurveyReference = OldSurveyType(
     size = Pair(1991, 1429),
     pixelsPerMeter = 14.600609f,

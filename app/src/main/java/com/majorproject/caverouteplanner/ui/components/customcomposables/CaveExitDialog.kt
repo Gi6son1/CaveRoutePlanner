@@ -29,6 +29,14 @@ import androidx.compose.ui.window.DialogProperties
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
+/**
+ * This composable is used to display a dialog that asks the user if they want a route to the nearest exit
+ *
+ * @param dialogIsOpen Whether the dialog should be open
+ * @param dialogOpen A method used for closing the dialog
+ * @param highAltitudeExit A method used for when the emergency flood exit is selected
+ * @param normalExit A method used for when the standard exit is selected
+ */
 @Composable
 fun CaveExitDialog(
     dialogIsOpen: Boolean, //checks if the dialog should be open

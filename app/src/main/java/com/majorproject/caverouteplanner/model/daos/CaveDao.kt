@@ -9,6 +9,9 @@ import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.Cave
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * This interface holds the database queries for the caves
+ */
 @Dao
 interface CaveDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
