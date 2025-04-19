@@ -124,8 +124,28 @@ This gave a good base compass. I then started looking at filters to apply to the
 
 Enough procrastinating, I should probably work on the survey creation feature now, but it's just so long! And I can't be bothered.
 
+18/04/2025
 
+Work OVER! Completed!
 
+I used these to help me:
+https://stackoverflow.com/questions/68840221/kotlin-how-to-convert-image-uri-to-bitmap
+https://medium.com/@everydayprogrammer/implement-android-photo-picker-in-android-studio-3562a85c85f1
+https://developer.android.com/training/data-storage/shared/photopicker
 
+https://developer.android.com/develop/ui/compose/touch-input/pointer-input/understand-gestures#add-custom
+https://developer.android.com/reference/kotlin/androidx/compose/ui/input/pointer/AwaitPointerEventScope
 
+https://m3.material.io/components/segmented-buttons/overview
 
+https://stackoverflow.com/questions/17839388/creating-a-scaled-bitmap-with-createscaledbitmap-in-android
+
+https://stackoverflow.com/questions/28753285/how-can-i-create-static-method-for-enum-in-kotlin
+
+https://developer.android.com/develop/ui/compose/components/snackbar
+
+https://stackoverflow.com/questions/78343979/collecting-flow-from-room-the-correct-way
+
+https://dpw-developer.medium.com/simple-steps-to-saving-loading-and-deleting-bitmaps-in-android-storage-using-java-a974b9d97c4a
+
+https://stackoverflow.com/questions/15662258/how-to-save-a-bitmap-on-internal-storage
