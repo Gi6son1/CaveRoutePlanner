@@ -28,19 +28,29 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import com.majorproject.caverouteplanner.ui.components.customcomposables.Section
 import com.majorproject.caverouteplanner.ui.theme.CaveRoutePlannerTheme
 
+/**
+ * This file holds the composables for the cave list screen
+ */
+
+/**
+ * Top level composable for the cave list screen
+ * @param navigateToSurvey The function to navigate to the survey screen
+ * @param markupNewSurvey The function to navigate to the survey markup screen
+ * @param cavesViewModel The view model for the caves
+ */
 @Composable
 fun CaveListScreenTopLevel(
     navigateToSurvey: (Int) -> Unit = {},
     markupNewSurvey: () -> Unit = {},
     cavesViewModel: CaveRoutePlannerViewModel
 ) {
-    val caves = cavesViewModel.caveList.collectAsStateWithLifecycle()
+    val caves = cavesViewModel.caveList.collectAsStateWithLifecycle() // collectAsStateWithLifecycle is used to convert the flow from the viewmodel to a readable state
 
     val caveLocationMap = mutableMapOf<String, MutableList<Cave>>()
     for (cave in caves.value){
-        caveLocationMap.getOrPut(cave.caveProperties.location.uppercase().trim(), defaultValue = {mutableListOf()} ).add(cave)
+        caveLocationMap.getOrPut(cave.caveProperties.location.uppercase().trim(), defaultValue = {mutableListOf()} ).add(cave)  //sorts caves into lists by location
     }
-    val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase().trim() }
+    val orderedList = caveLocationMap.values.toList().sortedBy { it.first().caveProperties.location.uppercase().trim() } //orders the lists by location alphabetically
 
 
     CaveListScreen(caveList = orderedList,
@@ -53,6 +63,12 @@ fun CaveListScreenTopLevel(
     )
 }
 
+/**
+ * Composable for the cave list screen
+ * @param caveList The list of caves to display
+ * @param navigateSurvey The function to navigate to the survey screen
+ * @param markupNewSurvey The function to navigate to the survey markup screen
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CaveListScreen(
@@ -66,7 +82,7 @@ fun CaveListScreen(
                 title = { Text(text = stringResource(R.string.cave_surveys)) },
             )
         },
-        floatingActionButton = {
+        floatingActionButton = { //floating action button for adding a new survey
             LargeFloatingActionButton(onClick = { markupNewSurvey() },
                 ){
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
@@ -79,7 +95,7 @@ fun CaveListScreen(
             List(caveList.size) { index: Int -> index to true}.toMutableStateMap()
         }
 
-        LazyColumn(modifier = Modifier
+        LazyColumn(modifier = Modifier //column to display the caves
             .padding(innerPadding)
             .fillMaxSize()
             .padding(10.dp)) {

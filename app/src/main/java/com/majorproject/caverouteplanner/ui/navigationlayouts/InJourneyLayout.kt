@@ -23,6 +23,17 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomI
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTextButton
 import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomTripInfoBox
 
+/**
+ * Composable to hold the inJourneyLayout - the layout the user will see if they are currently in a journey
+ *
+ * @param currentRoute the current route
+ * @param cancelRoute function to call when the cancel route button is pressed
+ * @param caveExit function to call when the cave exit button is pressed
+ * @param extendedView whether the extended view is enabled
+ * @param onCompassClick function to call when the compass button is pressed
+ * @param compassEnabled whether the compass is enabled
+ *
+ */
 @Composable
 fun InJourneyLayout(
     currentRoute: Route,
@@ -35,7 +46,7 @@ fun InJourneyLayout(
     var openCancelRouteCheckDialog by rememberSaveable { mutableStateOf(false) }
     var openCaveExitDialog by rememberSaveable { mutableStateOf(false) }
 
-    BackHandler { openCancelRouteCheckDialog = true }
+    BackHandler { openCancelRouteCheckDialog = true } //if the back button is pressed, show the cancel route check dialog
 
     ConstraintLayout(
         modifier = Modifier
@@ -49,7 +60,7 @@ fun InJourneyLayout(
             nextStage,
             prevStage) = createRefs()
 
-        CustomTripInfoBox(
+        CustomTripInfoBox( //show journey details
             modifier = Modifier.constrainAs(routeDetails) {
                 top.linkTo(parent.top, 40.dp)
                 start.linkTo(parent.start, 20.dp)
@@ -100,7 +111,7 @@ fun InJourneyLayout(
         )
 
 
-        if (extendedView){
+        if (extendedView){ //if extended view is enabled, show the path details
             CustomTripInfoBox(
                 modifier = Modifier.constrainAs(pathDetails) {
                     top.linkTo(routeDetails.bottom, 20.dp)

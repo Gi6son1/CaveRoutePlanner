@@ -12,6 +12,9 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+/**
+ * Composable to hold the custom background scaffold for the app
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackGroundScaffold(

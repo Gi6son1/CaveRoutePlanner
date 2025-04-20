@@ -2,8 +2,6 @@ package com.majorproject.caverouteplanner.ui.navigationlayouts
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Flag
@@ -18,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.majorproject.caverouteplanner.R
 import com.majorproject.caverouteplanner.navigation.Route
 import com.majorproject.caverouteplanner.ui.components.customcomposables.ActionCheckDialog
@@ -28,6 +25,18 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.CustomT
 import com.majorproject.caverouteplanner.ui.components.customcomposables.HelpMessageBox
 import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelConditionsDialog
 
+/**
+ * Composable to hold the preJourneyLayout - the layout the user will see if they are not currently in a journey
+ * @param currentRoute the current route
+ * @param returnToMenu function to call when the return to menu button is pressed
+ * @param setSource function to call when the set source button is pressed
+ * @param removePin function to call when the remove pin button is pressed
+ * @param changeConditions function to call when the change conditions button is pressed
+ * @param caveExit function to call when the cave exit button is pressed
+ * @param currentTravelConditions the current travel conditions
+ * @param numberOfTravellers the number of travellers
+ * @param displayCaveExitButton whether the cave exit button should be displayed
+ */
 @Composable
 fun PreJourneyLayout(
     currentRoute: Route?,
@@ -55,7 +64,7 @@ fun PreJourneyLayout(
             mutableStateOf(false)
         }
 
-        BackHandler { openHomeButtonDialog = true }
+        BackHandler { openHomeButtonDialog = true } //if the back button is pressed, show the home button dialog
 
 
         CustomIconButton(
@@ -80,7 +89,7 @@ fun PreJourneyLayout(
         )
 
 
-        if (currentRoute != null && currentRoute.routeStarted == false) {
+        if (currentRoute != null && currentRoute.routeStarted == false) { //if the route has not been started, show the below buttons
             CustomTripInfoBox(
                 onClick = { currentRoute.beginJourney() },
                 isGoButton = true,
@@ -118,7 +127,7 @@ fun PreJourneyLayout(
                 contentDescription = stringResource(R.string.remove_flag_pin)
             )
 
-            if (displayCaveExitButton) {
+            if (displayCaveExitButton) { //if the cave exit button should be displayed, show it
                 CustomTextButton(
                     onClick = { caveExit() },
                     modifier = Modifier.constrainAs(caveExit) {
@@ -130,7 +139,7 @@ fun PreJourneyLayout(
                     contentDescription = stringResource(R.string.exit_cave_from_flag)
                 )
             }
-        } else {
+        } else { //if there is no current route, show the help box
             HelpMessageBox(
                 modifier = Modifier.constrainAs(goButton) {
                     bottom.linkTo(parent.bottom, 80.dp)

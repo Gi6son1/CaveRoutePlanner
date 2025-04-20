@@ -57,12 +57,12 @@ class MainActivity : ComponentActivity() {
 
             var tempImagePath: String? by rememberSaveable { mutableStateOf(null) }
 
-            val launcher = rememberLauncherForActivityResult(
+            val launcher = rememberLauncherForActivityResult( //create launcher for when image is required from the gallery for marking up a survey
                 contract = PickVisualMedia(),
                 onResult = { uri ->
                     if (uri != null) {
                         tempImagePath =
-                            saveUploadedImageToTempStorage(uri, this.contentResolver, context)
+                            saveUploadedImageToTempStorage(uri, this.contentResolver, context) //once launched, save image to temp storage
                     }
                 }
             )
@@ -72,14 +72,14 @@ class MainActivity : ComponentActivity() {
             CaveRoutePlannerTheme {
                 LaunchedEffect(true) {
                     launch {
-                        val result = withContext(Dispatchers.IO) {
+                        val result = withContext(Dispatchers.IO) { //set up files on startup
                             setupFiles(context)
                         }
                         setupComplete = result
                     }
                 }
 
-                if (setupComplete) {
+                if (setupComplete) { //if setup is complete, show the app
                     BackGroundScaffold {
                         BuildNavigationGraph(
                             uploadImageCall = {
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
-                } else {
+                } else { //until setup is complete, show a blank menu screen
                     BackGroundScaffold(
                         topBar = { TopAppBar(title = {Text(stringResource(id = R.string.cave_surveys))} )}
                     ) {}
@@ -104,24 +104,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        SensorActivity(
-            context = this
-        ).start()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        SensorActivity(
-            context = this
-        ).stop()
-    }
 }
 
-
-fun setupFiles(context: Context): Boolean {
+/**
+ * Function that initialises the LL jpeg image into internal storage for the example survey
+ *
+ * @param context The context of the app
+ * @return True if the setup was successful, false otherwise
+ */
+private fun setupFiles(context: Context): Boolean {
     val internalStoragePath =
         copyImageToInternalStorageFromAssets(context, "llygadlchwr.jpg", "llygadlchwr.jpg")
 
@@ -132,6 +123,14 @@ fun setupFiles(context: Context): Boolean {
     return true
 }
 
+/**
+ * Navigation graph for the app, this controls the navigation between screens
+ *
+ * @param uploadImageCall Function to call when an image is required from the gallery for marking up a survey
+ * @param uploadImagePath Path to the image that is returned after uploading to temp storage
+ * @param clearTempStorage Function to call when the temp storage is to be cleared
+ * @param viewModel The view model for the app
+ */
 @Composable
 private fun BuildNavigationGraph(
     uploadImageCall: () -> Unit,
@@ -143,24 +142,24 @@ private fun BuildNavigationGraph(
     var selectedSurveyId by remember { mutableIntStateOf(0) }
     var navigateToMarkupScreen by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(uploadImagePath) {
+    LaunchedEffect(uploadImagePath) { //when the image path is returned, navigate to the markup screen
         if (uploadImagePath != null) {
             navigateToMarkupScreen = true
             Log.d("LOGSDEBUG", "Image path: $uploadImagePath")
         }
     }
 
-    if (navigateToMarkupScreen) {
+    if (navigateToMarkupScreen) { //if the image path is returned, navigate to the markup screen
         Log.d("LOGSDEBUG", "Navigating to markup screen")
-        navController.navigate(Screen.SurveyMarkupScreen.route) {
+        navController.navigate(Screen.SurveyMarkupScreen.route) { //navigate to the markup screen
             launchSingleTop = true
         }
-        navigateToMarkupScreen = false
+        navigateToMarkupScreen = false //reset the flag
     }
 
     NavHost(navController = navController, startDestination = Screen.CaveListScreen.route) {
         composable(Screen.CaveListScreen.routePath(),
-            enterTransition = {
+            enterTransition = { //animations for transitioning between screens
                 return@composable slideIntoContainer(
                     AnimatedContentTransitionScope.SlideDirection.End, tween(500)
                 )
@@ -202,7 +201,7 @@ private fun BuildNavigationGraph(
         ) { backStackEntry ->
             backStackEntry.arguments?.let {
                 if (it.containsKey(Screen.SurveyNavScreen.argument)) {
-                    selectedSurveyId = it.getInt(Screen.SurveyNavScreen.argument)
+                    selectedSurveyId = it.getInt(Screen.SurveyNavScreen.argument) //allows a survey Id to be passed to the survey nav screen
                 }
 
                 SurveyNavScreenTopLevel(

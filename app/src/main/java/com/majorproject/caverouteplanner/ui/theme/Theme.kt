@@ -264,7 +264,7 @@ fun CaveRoutePlannerTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> darkScheme
+        darkTheme -> darkScheme //show dark theme
         else -> lightScheme
     }
 

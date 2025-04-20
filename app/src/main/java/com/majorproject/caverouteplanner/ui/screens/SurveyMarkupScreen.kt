@@ -68,11 +68,24 @@ import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
 import kotlin.math.round
 
+
+/**
+ * File containing the survey markup screen composables
+ */
+
+/**
+ * Saver for the Offset class - because it's not a native compose type
+ */
 val OffsetSaver = Saver<Offset, Pair<Float, Float>>(
     save = { offset -> Pair(offset.x, offset.y) },
     restore = { pair -> Offset(pair.first, pair.second) }
 )
 
+/**
+ * Top level Composable for the survey markup screen
+ * @param returnToMenu A function to return to the menu screen
+ * @param viewModel The view model for the survey
+ */
 @Composable
 fun SurveyMarkupScreenTopLevel(
     returnToMenu: () -> Unit = {},
@@ -80,7 +93,7 @@ fun SurveyMarkupScreenTopLevel(
 ) {
     val context = LocalContext.current
 
-    var imageBitmap by remember {
+    var imageBitmap by remember { //saves the image bitmap to a remember variable so it isn't recomposed everytime
         mutableStateOf<ImageBitmap?>(
             getBitmapFromTempInternalStorage(
                 context
@@ -88,21 +101,27 @@ fun SurveyMarkupScreenTopLevel(
         )
     }
 
-    if (imageBitmap != null) {
+    if (imageBitmap != null) { //if bitmap can be found, open surveyMarkupScreen composable
         SurveyMarkupScreen(
             returnToMenu = returnToMenu,
-            saveCaveAndSurvey = { caveProperties, surveyProperties, nodes, paths ->
+            saveCaveAndSurvey = { caveProperties, surveyProperties, nodes, paths -> //if this is called, save the cave using the viewmodel
                 viewModel.saveNewCave(caveProperties, surveyProperties, nodes, paths)
                 returnToMenu()
             },
             imageBitmap = imageBitmap!!
         )
     } else {
-        returnToMenu()
+        returnToMenu() //if no bitmap can be found, go back to main menu
     }
 
 }
 
+/**
+ * Composable for the survey markup screen
+ * @param returnToMenu A function to return to the menu screen
+ * @param saveCaveAndSurvey A function to save the cave and survey to the database
+ * @param imageBitmap The image bitmap to be displayed
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SurveyMarkupScreen(
@@ -111,7 +130,7 @@ fun SurveyMarkupScreen(
     saveCaveAndSurvey: (CaveProperties, SurveyProperties, List<SurveyNode>, List<SurveyPath>) -> Unit = { _, _, _, _ -> }
 ) {
     var markupStage by rememberSaveable { mutableIntStateOf(0) }
-    val titleList = remember {
+    val titleList = remember { //list of survey markup titles
         listOf(
             "Compass/Distance calibration",
             "Entrances/Junctions",
@@ -121,7 +140,7 @@ fun SurveyMarkupScreen(
         )
     }
 
-    val markupHelpList = remember {
+    val markupHelpList = remember { //list of survey markup help messages
         listOf(
             "Calibrate the compass and distance measurements provided by the survey. Tap to add calibration points.",
             "Mark all cave entrances and path junctions on the survey. Tap to add/remove nodes.",
@@ -133,7 +152,7 @@ fun SurveyMarkupScreen(
 
     var currentlySelectedMarkupOption by rememberSaveable { mutableIntStateOf(0) }
 
-    LaunchedEffect(markupStage) {
+    LaunchedEffect(markupStage) { //when the markup stage changes, reset the currently selected markup option (means no buttons are currently selected)
         currentlySelectedMarkupOption = 0
     }
 
@@ -146,12 +165,12 @@ fun SurveyMarkupScreen(
 
     var openSaveDialog by rememberSaveable { mutableStateOf(false) }
 
-    var nodeIdCount by rememberSaveable { mutableIntStateOf(0) }
+    var nodeIdCount by rememberSaveable { mutableIntStateOf(0) } //used for adding new nodes properly if earlier ones are deleted
 
     var nodesList by rememberSaveable { mutableStateOf(listOf<SurveyNode>()) }
     var pathsList by rememberSaveable { mutableStateOf(listOf<SurveyPath>()) }
 
-    var northMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
+    var northMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) } //saves the calibration markers to a remember variable so it isn't reset if the screen is recomposed
     var centreMarker by rememberSaveable(stateSaver = OffsetSaver) { mutableStateOf(Offset.Zero) }
     var distanceMarker1: Offset by rememberSaveable(stateSaver = OffsetSaver) {
         mutableStateOf(
@@ -170,15 +189,22 @@ fun SurveyMarkupScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var savedSurveyReference by rememberSaveable { mutableStateOf<String?>(null) }
+    var savedSurveyReference by rememberSaveable { mutableStateOf<String?>(null) } //saves the cave data to a remember variable so it isn't reset if the screen is recomposed
     var name by rememberSaveable { mutableStateOf("") }
     var length by rememberSaveable { mutableIntStateOf(0) }
     var description by rememberSaveable { mutableStateOf("") }
     var difficulty by rememberSaveable { mutableStateOf(Difficulty.NONE) }
     var location by rememberSaveable { mutableStateOf("") }
 
-    LaunchedEffect(savedSurveyReference) {
+    LaunchedEffect(savedSurveyReference) { //if the survey has been saved, prepare to save the cave and survey data to the database
         if (savedSurveyReference != null) {
+
+            /**
+             * Function to convert path distances to meters, since they are currently stored as pixel differences
+             * @param pathList The list of paths to be converted
+             * @param pixelsPerMeter The number of pixels per meter
+             * @return The list of paths with the distances converted to meters
+             */
             fun convertToMeters(
                 pathList: List<SurveyPath>,
                 pixelsPerMeter: Float
@@ -191,7 +217,7 @@ fun SurveyMarkupScreen(
             }
 
 
-            var caveProperties: CaveProperties = CaveProperties(
+            var caveProperties: CaveProperties = CaveProperties( //create the cave properties object
                 name = name,
                 length = length,
                 description = description,
@@ -200,18 +226,18 @@ fun SurveyMarkupScreen(
                 surveyId = -1
             )
 
-            var formattedPathList = convertToMeters(pathsList, pixelsPerMeter)
+            var formattedPathList = convertToMeters(pathsList, pixelsPerMeter) //convert the path distances to meters
 
-            var northAngle: Float = if (northMarker == Offset.Zero && centreMarker == Offset.Zero) {
+            var northAngle: Float = if (northMarker == Offset.Zero && centreMarker == Offset.Zero) { //if no calibration points have been found, set the north angle to 0
                 -90f
-            } else {
+            } else { //if calibration points have been found, calculate the north angle
                 calculateAngle(
                     Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
                     Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
                 ).toFloat() - 90f
             }
 
-            var surveyProperties: SurveyProperties = SurveyProperties(
+            var surveyProperties: SurveyProperties = SurveyProperties( //create the survey properties object
                 width = imageBitmap.width,
                 height = imageBitmap.height,
                 pixelsPerMeter = pixelsPerMeter,
@@ -219,7 +245,7 @@ fun SurveyMarkupScreen(
                 northAngle = northAngle
             )
 
-            saveCaveAndSurvey(
+            saveCaveAndSurvey( //save the cave and survey data to the database
                 caveProperties,
                 surveyProperties,
                 nodesList,
@@ -234,7 +260,7 @@ fun SurveyMarkupScreen(
             TopAppBar(
                 title = { Text(text = stringResource(
                     R.string.stage,
-                    markupStage + 1,
+                    markupStage + 1, //display the current markup stage as the title of the scaffold
                     titleList[markupStage]
                 )) },
             )
@@ -244,7 +270,7 @@ fun SurveyMarkupScreen(
         }
     ) { innerPadding ->
 
-        BackHandler { openHomeButtonDialog = true }
+        BackHandler { openHomeButtonDialog = true } //if the back button is pressed, open the home button dialog
 
         MarkupImageAndGraphOverlay(
             nodes = nodesList,
@@ -258,7 +284,7 @@ fun SurveyMarkupScreen(
             distanceMarker2 = distanceMarker2,
             currentlySelectedSurveyNode = currentlySelectedSurveyNode,
             longPressPosition = { longPressPosition ->
-                if (markupStage == 2 && currentlySelectedMarkupOption == 1) {
+                if (markupStage == 2 && currentlySelectedMarkupOption == 1) { //if markup stage is 2 and the currently selected option is 1 (add path), find the nearest node
                     val foundNode = getNearestNode(
                         longPressPosition,
                         nodesList,
@@ -267,12 +293,12 @@ fun SurveyMarkupScreen(
                         0.01f
                     )
                     if (foundNode != null && (foundNode.isEntrance || foundNode.isJunction)) {
-                        currentlySelectedSurveyNode = foundNode
+                        currentlySelectedSurveyNode = foundNode //set the currently selected node to the nearest node (used when adding paths to newly created path end nodes)
                     }
                 }
             },
             onTapPosition = { tapPosition ->
-                when (markupStage) {
+                when (markupStage) { //handle the markup stage based on the current markup stage
                     0 -> {
                         handleMarkupStage0(
                             currentlySelectedMarkupOption = currentlySelectedMarkupOption,
@@ -368,7 +394,7 @@ fun SurveyMarkupScreen(
                 contentDescription = "Save",
             )
 
-            Row(
+            Row( //display the markup stage buttons to choose between markup stages
                 modifier = Modifier.constrainAs(stageButtons) {
                     bottom.linkTo(parent.bottom, 20.dp)
                     start.linkTo(parent.start, 10.dp)
@@ -387,7 +413,7 @@ fun SurveyMarkupScreen(
                 }
             }
 
-            HelpMessageBox(
+            HelpMessageBox( //display the help message for the current markup stage
                 message = markupHelpList[markupStage],
                 modifier = Modifier.constrainAs(helpBox) {
                     bottom.linkTo(stageButtons.top, margin = 20.dp)
@@ -397,7 +423,7 @@ fun SurveyMarkupScreen(
                 boxHeight = 85.dp
             )
 
-            when (markupStage) {
+            when (markupStage) { //depending on the markup stage, display the corresponding markup layout
                 0 -> DistanceAndCompassCalibrationLayout(
                     modifier = Modifier
                         .constrainAs(customLayout) {
@@ -497,12 +523,12 @@ fun SurveyMarkupScreen(
             message = stringResource(R.string.are_you_sure_you_d_like_to_go_back_to_the_main_menu_you_will_lose_your_current_markup_if_you_do)
         )
 
-        SaveSurveyDialog(
+        SaveSurveyDialog( //display the save survey dialog when the save button is pressed
             dialogIsOpen = openSaveDialog,
             dialogOpen = { openSaveDialog = it },
             saveSurvey = { enterName, enterLength, enterDescription, enterDifficulty, enterLocation ->
 
-                val errorMessage = validateInputs(
+                val errorMessage = validateInputs( //validate the inputs before attempting to saving the survey
                     enterName,
                     enterLength,
                     enterDifficulty,
@@ -519,9 +545,9 @@ fun SurveyMarkupScreen(
                 difficulty = enterDifficulty
                 location = enterLocation
 
-                if (errorMessage != null) {
+                if (errorMessage != null) { //if there is a validation error message, display it
                     displaySnackbarWithMessage(scope, snackbarHostState, errorMessage)
-                } else {
+                } else { //if there is no validation error message, save the survey to internal storage and update the savedSurveyReference variable
                     savedSurveyReference = copyImageToInternalStorageFromTemp(
                         context = context,
                         imageName = "$name.jpg"
@@ -532,6 +558,15 @@ fun SurveyMarkupScreen(
     }
 }
 
+/**
+ * Function to handle the markup stage 0 - calibrate the compass and distance measurements
+ * @param currentlySelectedMarkupOption The currently selected markup option
+ * @param tapPosition The position of the tap
+ * @param northMarker A function to set the north marker
+ * @param centreMarker A function to set the centre marker
+ * @param distanceMarker1 A function to set the distance marker 1
+ * @param distanceMarker2 A function to set the distance marker 2
+ */
 private fun handleMarkupStage0(
     currentlySelectedMarkupOption: Int, tapPosition: Offset,
     northMarker: (Offset) -> Unit,
@@ -547,6 +582,18 @@ private fun handleMarkupStage0(
     }
 }
 
+/**
+ * Function to handle the markup stage 1 - add entrance/junction nodes to the graph
+ * @param currentlySelectedMarkupOption The currently selected markup option
+ * @param tapPosition The position of the tap
+ * @param nodesList The current list of nodes
+ * @param pathsList The current list of paths
+ * @param newNodesList A function to set the new list of nodes
+ * @param newPathsList A function to set the new list of paths
+ * @param bitmapSize The size of the bitmap
+ * @param nodeIdCount The current node id count
+ * @param updateNodeIdCount A function to update the node id count
+ */
 private fun handleMarkupStage1(
     currentlySelectedMarkupOption: Int,
     tapPosition: Offset,
@@ -558,7 +605,7 @@ private fun handleMarkupStage1(
     nodeIdCount: Int,
     updateNodeIdCount: (Int) -> Unit
 ) {
-    if (currentlySelectedMarkupOption == 1 || currentlySelectedMarkupOption == 2) {
+    if (currentlySelectedMarkupOption == 1 || currentlySelectedMarkupOption == 2) { //if the currently selected option is 1 or 2, add a node to the graph
         val adjustedPixelsCoordinates = calculateCoordinatePixels(
             tapPosition,
             IntSize(
@@ -576,7 +623,7 @@ private fun handleMarkupStage1(
         )
         newNodesList(newList)
         updateNodeIdCount(nodeIdCount + 1)
-    } else if (currentlySelectedMarkupOption == 3) {
+    } else if (currentlySelectedMarkupOption == 3) { //if the currently selected option is 3, remove a node from the graph
         val foundNode = getNearestNode(
             tapPosition,
             nodesList,
@@ -590,12 +637,24 @@ private fun handleMarkupStage1(
             newNodesList(newList)
 
             val newPathList = pathsList.toMutableList()
-            newPathList.removeIf { it.getPathEnds().first == foundNode.id || it.getPathEnds().second == foundNode.id }
+            newPathList.removeIf { it.getPathEnds().first == foundNode.id || it.getPathEnds().second == foundNode.id } //remove all paths that contain the removed node
             newPathsList(newPathList)
         }
     }
 }
 
+/**
+ * Function to handle the markup stage 2 - add path connections to the graph
+ * @param currentlySelectedMarkupOption The currently selected markup option
+ * @param tapPosition The position of the tap
+ * @param nodesList The current list of nodes
+ * @param pathsList The current list of paths
+ * @param newNodesList A function to set the new list of nodes
+ * @param newPathsList A function to set the new list of paths
+ * @param bitmapSize The size of the bitmap
+ * @param nodeIdCount The current node id count
+ * @param updateNodeIdCount A function to update the node id count
+ */
 private fun handleMarkupStage2(
     currentlySelectedMarkupOption: Int,
     tapPosition: Offset,
@@ -609,7 +668,7 @@ private fun handleMarkupStage2(
     currentlySelectedSurveyNode: SurveyNode?,
     updateCurrentlySelectedSurveyNode: (SurveyNode?) -> Unit
 ) {
-    if (currentlySelectedMarkupOption == 1 && currentlySelectedSurveyNode != null) {
+    if (currentlySelectedMarkupOption == 1 && currentlySelectedSurveyNode != null) { //if the currently selected option is 1 and a node is currently selected, add a path to the graph from the currently selected node to the tapped one
         var nextSurveyNode = getNearestNode(
             tapPosition,
             nodesList,
@@ -656,7 +715,7 @@ private fun handleMarkupStage2(
         newPathsList(newPathList)
         updateCurrentlySelectedSurveyNode(nextSurveyNode)
 
-    } else if (currentlySelectedMarkupOption == 2) {
+    } else if (currentlySelectedMarkupOption == 2) { //if the currently selected option is 2, remove a path from the graph
         val foundEdge = getNearestLine(
             tapPosition,
             nodesList,
@@ -669,7 +728,7 @@ private fun handleMarkupStage2(
             val newPathList = pathsList.toMutableList()
             val newNodeList = nodesList.toMutableList()
 
-            cleanupGraphFromEdge(
+            cleanupGraphFromEdge( //remove the edge from the graph, including all the edges that connect to it up until a junction or entrance is reached
                 foundEdge,
                 newNodeList,
                 newPathList,
@@ -685,6 +744,14 @@ private fun handleMarkupStage2(
 
 }
 
+/**
+ * Function to handle the markup stage 3 - add water and hard traverse to the graph
+ * @param currentlySelectedMarkupOption The currently selected markup option
+ * @param tapPosition The position of the tap
+ * @param nodesList The current list of nodes
+ * @param pathsList The current list of paths
+ * @param newPathsList A function to set the new list of paths
+ */
 private fun handleMarkupStage3(
     currentlySelectedMarkupOption: Int,
     tapPosition: Offset,
@@ -693,7 +760,7 @@ private fun handleMarkupStage3(
     bitmapSize: IntSize,
     newPathsList: (List<SurveyPath>) -> Unit
 ) {
-    val foundPath = getNearestLine(
+    val foundPath = getNearestLine( //get the nearest line to the tap position
         tapPosition,
         nodesList,
         pathsList,
@@ -701,7 +768,7 @@ private fun handleMarkupStage3(
         bitmapSize.height,
         0.5f
     )
-    if (foundPath != null) {
+    if (foundPath != null) { //if a path is found, update the path with the new water and hard traverse properties
         val newList = pathsList.toMutableList()
         when (currentlySelectedMarkupOption) {
             1 -> newList[newList.indexOf(foundPath)] =
@@ -710,7 +777,7 @@ private fun handleMarkupStage3(
             2 -> newList[newList.indexOf(foundPath)] =
                 foundPath.copy(isHardTraverse = true)
 
-            3 -> {
+            3 -> { //if the currently selected option is 3, remove the water and hard traverse properties from the path
                 newList[newList.indexOf(foundPath)] =
                     foundPath.copy(hasWater = false, isHardTraverse = false)
             }
@@ -719,6 +786,15 @@ private fun handleMarkupStage3(
     }
 }
 
+/**
+ * Function to handle the markup stage 4 - add altitudes to the graph
+ * @param currentlySelectedMarkupOption The currently selected markup option
+ * @param tapPosition The position of the tap
+ * @param nodesList The current list of nodes
+ * @param pathsList The current list of paths
+ * @param newPathsList A function to set the new list of paths
+ * @param bitmapSize The size of the bitmap
+ */
 private fun handleMarkupStage4(
     currentlySelectedMarkupOption: Int,
     tapPosition: Offset,
@@ -727,7 +803,7 @@ private fun handleMarkupStage4(
     newPathsList: (List<SurveyPath>) -> Unit,
     bitmapSize: IntSize,
 ) {
-    val foundPath = getNearestLine(
+    val foundPath = getNearestLine( //get the nearest line to the tap position
         tapPosition,
         nodesList,
         pathsList,
@@ -735,7 +811,7 @@ private fun handleMarkupStage4(
         bitmapSize.height,
         0.5f
     )
-    if (foundPath != null) {
+    if (foundPath != null) { //if a path is found, update the path with the new altitude property
         val newList = pathsList.toMutableList()
         newList[newList.indexOf(foundPath)] = foundPath.copy(
             altitude =
@@ -746,7 +822,13 @@ private fun handleMarkupStage4(
     }
 }
 
-fun cleanupGraphFromEdge(
+/**
+ * Function to cleanup the graph from an edge - remove the edge and all the edges that connect to it up until a junction or entrance is reached
+ * @param foundEdge The edge to be removed
+ * @param nodes The list of nodes
+ * @param paths The list of paths
+ */
+private fun cleanupGraphFromEdge(
     foundEdge: SurveyPath,
     nodes: MutableList<SurveyNode>,
     paths: MutableList<SurveyPath>
@@ -760,29 +842,47 @@ fun cleanupGraphFromEdge(
     cleanupFromNode(foundEdge.getPathEnds().second, nodes, paths)
 }
 
+/**
+ * Function to cleanup the graph from a node - remove the node and all the edges that connect to it up until a junction or entrance is reached
+ * @param startNodeId The id of the node to be removed
+ * @param nodes The list of nodes to inspect
+ * @param paths The list of paths to inspect
+ */
 private fun cleanupFromNode(
     startNodeId: Int,
     nodes: MutableList<SurveyNode>,
     paths: MutableList<SurveyPath>
 ) {
     var currentNode: SurveyNode? = nodes.find { it.getNodeId() == startNodeId }
-    while (currentNode != null && !currentNode.isEntrance && !currentNode.isJunction) {
+    while (currentNode != null && !currentNode.isEntrance && !currentNode.isJunction) { //while the current node is not an entrance or junction, remove it from the graph
         nodes.remove(currentNode)
 
         val connectingPath =
             paths.find { it.getPathEnds().first == currentNode.getNodeId() || it.getPathEnds().second == currentNode.getNodeId() }
 
-        if (connectingPath != null) {
+        if (connectingPath != null) { //if a connecting path is found, remove it from the graph
             paths.remove(connectingPath)
 
             val nextNodeId = connectingPath.next(currentNode.getNodeId())
-            currentNode = nodes.find { it.getNodeId() == nextNodeId }
+            currentNode = nodes.find { it.getNodeId() == nextNodeId } //set the next node on the edge as the current node
         } else {
             currentNode = null
         }
     }
 }
 
+/**
+ * Function to validate the inputs for saving a survey
+ * @param name The name of the survey
+ * @param length The length of the survey
+ * @param difficulty The difficulty of the survey
+ * @param nodesList The list of nodes
+ * @param pathsList The list of paths
+ * @param distanceMarker1 The first distance marker
+ * @param distanceMarker2 The second distance marker
+ * @param context The context of the application
+ * @return A string containing an error message if there is an error, null otherwise
+ */
 private fun validateInputs(
     name: String,
     length: Int,
@@ -793,6 +893,9 @@ private fun validateInputs(
     distanceMarker2: Offset,
     context: Context
 ): String? {
+    /**
+     * Function to validate the node connections - ensure that all nodes have at least one path connected to them
+     */
     fun validateNodeConnections(): Boolean {
         for (node in nodesList) {
             if (pathsList.none { it.getPathEnds().first == node.getNodeId() || it.getPathEnds().second == node.getNodeId() }) {
@@ -803,7 +906,7 @@ private fun validateInputs(
     }
 
 
-    return when {
+    return when { //validate the inputs
         name.isBlank() -> context.getString(R.string.name_cannot_be_blank)
         length < 0 -> context.getString(R.string.length_cannot_be_negative_or_empty)
         difficulty == Difficulty.NONE -> context.getString(R.string.please_choose_a_difficulty_for_this_cave)
