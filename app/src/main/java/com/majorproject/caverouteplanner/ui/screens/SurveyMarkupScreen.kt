@@ -907,13 +907,13 @@ private fun validateInputs(
 
 
     return when { //validate the inputs
+        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> context.getString(R.string.please_calibrate_the_distance_markers)
+        nodesList.isEmpty() -> context.getString(R.string.please_add_at_least_one_node)
+        pathsList.isEmpty() -> context.getString(R.string.please_add_at_least_one_path)
+        !validateNodeConnections() -> context.getString(R.string.all_nodes_must_be_have_at_least_one_path_connected_to_it)
         name.isBlank() -> context.getString(R.string.name_cannot_be_blank)
         length < 0 -> context.getString(R.string.length_cannot_be_negative_or_empty)
         difficulty == Difficulty.NONE -> context.getString(R.string.please_choose_a_difficulty_for_this_cave)
-        nodesList.isEmpty() -> context.getString(R.string.please_add_at_least_one_node)
-        pathsList.isEmpty() -> context.getString(R.string.please_add_at_least_one_path)
-        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> context.getString(R.string.please_calibrate_the_distance_markers)
-        !validateNodeConnections() -> context.getString(R.string.all_nodes_must_be_have_at_least_one_path_connected_to_it)
         else -> null
     }
 }
