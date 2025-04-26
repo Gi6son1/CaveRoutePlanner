@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SurveyPathDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSurveyPath(surveyPath: SurveyPath): Long
+    suspend fun insertSurveyPath(surveyPath: SurveyPath): Long
 
     @Query("SELECT * FROM surveyPaths WHERE surveyId = :surveyId")
     fun getSurveyPathsBySurveyId(surveyId: Int): Flow<List<SurveyPath>>

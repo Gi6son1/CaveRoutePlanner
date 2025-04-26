@@ -2,6 +2,7 @@ package com.majorproject.caverouteplanner.datasource
 
 import android.app.Application
 import android.util.Log
+import androidx.room.Transaction
 import com.majorproject.caverouteplanner.ui.components.Cave
 import com.majorproject.caverouteplanner.ui.components.CaveProperties
 import com.majorproject.caverouteplanner.ui.components.Survey
@@ -43,7 +44,8 @@ class CaveRoutePlannerRepository(application: Application) {
      *
      * In order, the cave properties, survey properties, survey nodes and survey paths are saved to the database - one at a time in order to ensure that the foreign keys are correct
      */
-    fun saveCaveAndSurvey(
+    @Transaction //this means that if any of the operations fail, then all of them fail and nothing gets half-saved
+    suspend fun saveCaveAndSurvey(
         caveProperties: CaveProperties,
         surveyProps: SurveyProperties,
         surveyNodes: List<SurveyNode>,
@@ -67,7 +69,6 @@ class CaveRoutePlannerRepository(application: Application) {
 
         var nodesList: MutableList<Int> = //creates a list of integers that will be used to store the foreign keys for the survey nodes
             MutableList(surveyNodes.size) { _ -> 0 }
-
 
         for (node in surveyNodes) {
             val nodeDBID = surveyNodeDao.insertSurveyNode( //for each node added, update the list with the foreign key for that node

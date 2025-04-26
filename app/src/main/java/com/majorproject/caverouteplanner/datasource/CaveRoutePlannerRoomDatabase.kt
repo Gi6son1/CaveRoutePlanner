@@ -73,7 +73,7 @@ abstract class CaveRoutePlannerRoomDatabase : RoomDatabase() {
         /**
          * This function populates the database with the Llygadlchwr survey
          */
-        private fun populateDatabase(db: CaveRoutePlannerRoomDatabase) {
+        private suspend fun populateDatabase(db: CaveRoutePlannerRoomDatabase) {
             val surveyDao = db.surveyDao()
             val surveyNodeDao = db.surveyNodeDao()
             val surveyPathDao = db.surveyPathDao()

@@ -37,7 +37,7 @@
     <string name="are_you_sure_you_d_like_to_go_back_to_the_main_menu_you_will_lose_your_current_markup_if_you_do">Are you sure you\'d like to go back to the main menu? You will lose your current markup if you do.</string>
     <string name="no_route_from_source_has_been_found">No route from source has been found</string>
     <string name="name_cannot_be_blank">Name cannot be blank</string>
-    <string name="length_cannot_be_zero">Length cannot be negative or empty</string>
+    <string name="length_cannot_be_zero">Length cannot be zero</string>
     <string name="please_choose_a_difficulty_for_this_cave">Please choose a difficulty for this cave</string>
     <string name="please_add_at_least_one_path">Please add at least one path</string>
     <string name="please_add_at_least_one_node">Please add at least one node</string>

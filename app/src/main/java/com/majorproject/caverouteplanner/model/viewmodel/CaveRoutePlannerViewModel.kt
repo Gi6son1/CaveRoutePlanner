@@ -13,6 +13,7 @@ import com.majorproject.caverouteplanner.ui.components.SurveyProperties
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * This class holds the view model for the application
@@ -37,7 +38,9 @@ class CaveRoutePlannerViewModel(application: Application) : AndroidViewModel(app
     )
 
     fun saveNewCave(caveProperties: CaveProperties, surveyProps: SurveyProperties, surveyNodes: List<SurveyNode>, surveyPaths: List<SurveyPath>){
+        viewModelScope.launch {
             repository.saveCaveAndSurvey(caveProperties, surveyProps, surveyNodes, surveyPaths)
+        }
     }
 
 }

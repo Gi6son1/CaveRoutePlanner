@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SurveyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertSurvey(cave: SurveyProperties): Long //this returns a long, which is the new id of the inserted survey in the database
+    suspend fun insertSurvey(cave: SurveyProperties): Long //this returns a long, which is the new id of the inserted survey in the database
 
     @Query("SELECT * FROM surveys WHERE id = :surveyId")
     fun getSurveyById(surveyId: Int): Flow<SurveyProperties?>
