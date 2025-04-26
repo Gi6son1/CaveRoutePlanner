@@ -94,7 +94,7 @@ fun SaveSurveyDialog(
                         value = length.toString(),
                         onValueChange = {
                             if (it.isEmpty()) {
-                                length = -1
+                                length = 0
                             } else if (it.all { char -> char.isDigit() } && it.length <= intCharLimit) {
                                     length = it.toInt()
                             }

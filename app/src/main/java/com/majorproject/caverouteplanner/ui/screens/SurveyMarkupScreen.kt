@@ -912,7 +912,7 @@ private fun validateInputs(
         pathsList.isEmpty() -> context.getString(R.string.please_add_at_least_one_path)
         !validateNodeConnections() -> context.getString(R.string.all_nodes_must_be_have_at_least_one_path_connected_to_it)
         name.isBlank() -> context.getString(R.string.name_cannot_be_blank)
-        length < 0 -> context.getString(R.string.length_cannot_be_negative_or_empty)
+        length <= 0 -> context.getString(R.string.length_cannot_be_negative_or_empty)
         difficulty == Difficulty.NONE -> context.getString(R.string.please_choose_a_difficulty_for_this_cave)
         else -> null
     }
