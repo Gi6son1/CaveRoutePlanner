@@ -30,7 +30,7 @@ fun calculateFractionalOffset(tapLoc: Offset, size: IntSize): Offset {
  * @param coord2 The second point
  * @return The angle between the two points
  */
-fun calculateAngle(coord1: Pair<Int, Int>, coord2: Pair<Int, Int>): Double {
+fun calculateAngle(coord1: Pair<Float, Float>, coord2: Pair<Float, Float>): Double {
     val angle = Math.toDegrees(
         atan2(
             (coord2.second - coord1.second).toDouble(),

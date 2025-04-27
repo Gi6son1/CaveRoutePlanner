@@ -20,7 +20,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,12 +60,10 @@ import com.majorproject.caverouteplanner.ui.components.markuplayouts.WaterAndHar
 import com.majorproject.caverouteplanner.ui.util.calculateAngle
 import com.majorproject.caverouteplanner.ui.util.calculateCoordinatePixels
 import com.majorproject.caverouteplanner.ui.util.calculateDistance
-import com.majorproject.caverouteplanner.ui.util.calculateMetersFromFractionalOffsets
 import com.majorproject.caverouteplanner.ui.util.calculatePixelsPerMeter
 import com.majorproject.caverouteplanner.ui.util.displaySnackbarWithMessage
 import com.majorproject.caverouteplanner.ui.util.getNearestLine
 import com.majorproject.caverouteplanner.ui.util.getNearestNode
-import kotlin.math.round
 
 
 /**
@@ -182,7 +179,7 @@ fun SurveyMarkupScreen(
             Offset.Zero
         )
     }
-    var pixelsPerMeter by rememberSaveable { mutableFloatStateOf(1f) }
+    var metersBetweenPoints by rememberSaveable { mutableIntStateOf(1) }
 
     var currentlySelectedSurveyNode by rememberSaveable { mutableStateOf<SurveyNode?>(null) }
 
@@ -225,6 +222,12 @@ fun SurveyMarkupScreen(
                 location = location,
                 surveyId = -1
             )
+            val pixelsPerMeter = calculatePixelsPerMeter(
+                distanceMarker1,
+                distanceMarker2,
+                IntSize(imageBitmap.width, imageBitmap.height),
+                metersBetweenPoints
+            )
 
             var formattedPathList = convertToMeters(pathsList, pixelsPerMeter) //convert the path distances to meters
 
@@ -232,8 +235,8 @@ fun SurveyMarkupScreen(
                 -90f
             } else { //if calibration points have been found, calculate the north angle
                 calculateAngle(
-                    Pair(round(northMarker.x).toInt(), round(northMarker.y).toInt()),
-                    Pair(round(centreMarker.x).toInt(), round(centreMarker.x).toInt())
+                    Pair(northMarker.x, northMarker.y),
+                    Pair(centreMarker.x, centreMarker.x)
                 ).toFloat() - 90f
             }
 
@@ -436,26 +439,8 @@ fun SurveyMarkupScreen(
                         .fillMaxWidth(0.5f),
                     updateCurrentlySelected = { currentlySelectedMarkupOption = it },
                     currentlySelectedSetting = currentlySelectedMarkupOption,
-                    metersBetweenPoints = (calculateMetersFromFractionalOffsets(
-                        distanceMarker1,
-                        distanceMarker2,
-                        IntSize(
-                            width = imageBitmap.width,
-                            height = imageBitmap.height
-                        ),
-                        pixelsPerMeter
-                    )),
-                    updatePixelsPerMeter = { numberOfMeters ->
-                        pixelsPerMeter = calculatePixelsPerMeter(
-                            distanceMarker1,
-                            distanceMarker2,
-                            IntSize(
-                                width = imageBitmap.width,
-                                height = imageBitmap.height
-                            ),
-                            numberOfMeters
-                        )
-                    }
+                    metersBetweenPoints = metersBetweenPoints,
+                    updateMetersBetweenPoints = { metersBetweenPoints = it}
                 )
 
                 1 -> EntrancesAndJunctionsLayout(
@@ -536,7 +521,6 @@ fun SurveyMarkupScreen(
                     pathsList,
                     distanceMarker1,
                     distanceMarker2,
-                    pixelsPerMeter,
                     context = context
                 )
 
@@ -892,7 +876,6 @@ private fun validateInputs(
     pathsList: List<SurveyPath>,
     distanceMarker1: Offset,
     distanceMarker2: Offset,
-    pixelsPerMeter: Float,
     context: Context
 ): String? {
     /**
@@ -909,7 +892,7 @@ private fun validateInputs(
 
 
     return when { //validate the inputs
-        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero || pixelsPerMeter == 0f -> context.getString(R.string.please_calibrate_the_distance_markers)
+        distanceMarker1 == Offset.Zero || distanceMarker2 == Offset.Zero -> context.getString(R.string.please_calibrate_the_distance_markers)
         nodesList.isEmpty() -> context.getString(R.string.please_add_at_least_one_node)
         pathsList.isEmpty() -> context.getString(R.string.please_add_at_least_one_path)
         !validateNodeConnections() -> context.getString(R.string.all_nodes_must_be_have_at_least_one_path_connected_to_it)

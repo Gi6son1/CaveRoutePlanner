@@ -19,8 +19,8 @@ class CalculatorUtilsTests {
 
     @Test
     fun calculateAngle_validPoints_returnsCorrectAngle() {
-        val coord1 = Pair(0, 0)
-        val coord2 = Pair(1, 1)
+        val coord1 = Pair(0f, 0f)
+        val coord2 = Pair(1f, 1f)
         val result = calculateAngle(coord1, coord2)
         assertEquals(45.0, result)
     }

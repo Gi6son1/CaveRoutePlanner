@@ -35,6 +35,7 @@ import com.majorproject.caverouteplanner.ui.components.customcomposables.TravelC
  * @param caveExit function to call when the cave exit button is pressed
  * @param currentTravelConditions the current travel conditions
  * @param numberOfTravellers the number of travellers
+ * @param pinpointFlagSet whether the flag pin has been set ()
  * @param displayCaveExitButton whether the cave exit button should be displayed
  */
 @Composable
@@ -47,7 +48,8 @@ fun PreJourneyLayout(
     caveExit: () -> Unit = {},
     currentTravelConditions: Triple<Boolean, Boolean, Boolean>,
     numberOfTravellers: Int,
-    displayCaveExitButton: Boolean
+    displayCaveExitButton: Boolean,
+    pinpointFlagSet: Boolean
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -89,20 +91,20 @@ fun PreJourneyLayout(
         )
 
 
-        if (currentRoute != null && currentRoute.routeStarted == false) { //if the route has not been started, show the below buttons
-            CustomTripInfoBox(
-                onClick = { currentRoute.beginJourney() },
-                isGoButton = true,
-                modifier = Modifier.constrainAs(goButton) {
-                    bottom.linkTo(setSource.top, 30.dp)
-                    start.linkTo(parent.start, 10.dp)
-                    end.linkTo(parent.end, 10.dp)
-                },
-                distance = currentRoute.totalDistance,
-                time = currentRoute.getTotalPathTravelTime()
-            )
-
-
+        if (pinpointFlagSet) { //if the destination pinpoint has been set, show the below buttons
+            if (currentRoute != null && currentRoute.routeStarted == false) { //if the route has not been started but exists, show the go buttton
+                CustomTripInfoBox(
+                    onClick = { currentRoute.beginJourney() },
+                    isGoButton = true,
+                    modifier = Modifier.constrainAs(goButton) {
+                        bottom.linkTo(setSource.top, 30.dp)
+                        start.linkTo(parent.start, 10.dp)
+                        end.linkTo(parent.end, 10.dp)
+                    },
+                    distance = currentRoute.totalDistance,
+                    time = currentRoute.getTotalPathTravelTime()
+                )
+            }
             CustomTextButton(
                 onClick = { setSource() },
                 modifier = Modifier.constrainAs(setSource) {
@@ -139,7 +141,7 @@ fun PreJourneyLayout(
                     contentDescription = stringResource(R.string.exit_cave_from_flag)
                 )
             }
-        } else { //if there is no current route, show the help box
+        } else { //if there is flag pin placed, show the help box
             HelpMessageBox(
                 modifier = Modifier.constrainAs(goButton) {
                     bottom.linkTo(parent.bottom, 80.dp)

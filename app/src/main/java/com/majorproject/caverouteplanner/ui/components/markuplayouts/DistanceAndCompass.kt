@@ -32,7 +32,7 @@ fun DistanceAndCompassCalibrationLayout(
     updateCurrentlySelected: (Int) -> Unit,
     currentlySelectedSetting: Int,
     metersBetweenPoints: Int,
-    updatePixelsPerMeter: (Int) -> Unit
+    updateMetersBetweenPoints: (Int) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -100,7 +100,7 @@ fun DistanceAndCompassCalibrationLayout(
             min = 1,
             max = 50,
             onValueChange = {
-                updatePixelsPerMeter(it)
+                updateMetersBetweenPoints(it)
             },
             default = metersBetweenPoints.coerceIn(1, 50)
         )

@@ -281,6 +281,7 @@ fun SurveyNavScreen(
                 currentTravelConditions = currentTravelConditions,
                 numberOfTravellers = currentNumberOfTravellers,
                 returnToMenu = { backToMenu() },
+                pinpointFlagSet = pinPointNode != null,
                 displayCaveExitButton = !survey.caveExits().contains(pinPointNode) //if the current source node is not a cave exit, display the cave exit button
             )
         } else if (currentRoute != null) { //if there is a current journey in play, display the inJourneyLayout

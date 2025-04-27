@@ -302,7 +302,7 @@ private fun performFocusedTransformation(
 
     if (startNode == null || endNode == null) return
 
-    val finalAngle = calculateAngle(Pair(startNode.x, startNode.y), Pair(endNode.x, endNode.y))
+    val finalAngle = calculateAngle(Pair(startNode.x.toFloat(), startNode.y.toFloat()), Pair(endNode.x.toFloat(), endNode.y.toFloat()))
 
     val centroid = calculateCentroid(currentStage)
 
@@ -470,8 +470,8 @@ fun GraphOverlay(
                 }
 
             val currentStartAngle = calculateAngle(
-                Pair(currentStartNode.x, currentStartNode.y),
-                Pair(currentPathEndNode!!.x, currentPathEndNode.y)
+                Pair(currentStartNode.x.toFloat(), currentStartNode.y.toFloat()),
+                Pair(currentPathEndNode!!.x.toFloat(), currentPathEndNode.y.toFloat())
             ).toFloat()
 
             val adjustedStartAngle = currentStartAngle + 90
@@ -534,8 +534,8 @@ fun GraphOverlay(
                 }
 
             val currentEndAngle = calculateAngle(
-                Pair(currentEndPathStartNode!!.x, currentEndPathStartNode.y),
-                Pair(currentEndNode.x, currentEndNode.y)
+                Pair(currentEndPathStartNode!!.x.toFloat(), currentEndPathStartNode.y.toFloat()),
+                Pair(currentEndNode.x.toFloat(), currentEndNode.y.toFloat())
             ).toFloat()
 
             val adjustedEndAngle = currentEndAngle + 90
