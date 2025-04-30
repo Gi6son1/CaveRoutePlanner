@@ -57,7 +57,6 @@ class RouteFinderTest {
 
         val expectedRouteList = listOf(listOf(pathA, pathB))
 
-        // Assert
         assertNotNull(route)
         assertThat(route?.routeList?.size, equalTo(1))
         assertEquals(expectedRouteList, route?.routeList)

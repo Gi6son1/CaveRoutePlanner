@@ -30,7 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.majorproject.caverouteplanner.datasource.SensorActivity
 import com.majorproject.caverouteplanner.datasource.util.clearTempStorage
 import com.majorproject.caverouteplanner.datasource.util.copyImageToInternalStorageFromAssets
 import com.majorproject.caverouteplanner.datasource.util.saveUploadedImageToTempStorage
