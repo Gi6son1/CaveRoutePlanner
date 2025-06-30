@@ -31,15 +31,15 @@ data class Route(val routeList: List<List<SurveyPath>>,
     var routeStarted: Boolean by mutableStateOf(false) //this is used to keep track of whether the route has started
 
     @IgnoredOnParcel
-    var pathDistances = mutableListOf<Float>() //this is used to keep track of the distance of each path
+    private var pathDistances = mutableListOf<Float>() //this is used to keep track of the distance of each path
 
     @IgnoredOnParcel
-    var pathTravelTimes = mutableListOf<Int>() //this is used to keep track of the time it takes to complete each path
+    private var pathTravelTimes = mutableListOf<Int>() //this is used to keep track of the time it takes to complete each path
 
     @IgnoredOnParcel
-    var startingNodes = mutableListOf<Int>() //this is used to keep track of the starting node of each path
+    private var startingNodes = mutableListOf<Int>() //this is used to keep track of the starting node of each path
     @IgnoredOnParcel
-    var endingNodes = mutableListOf<Int>() //this is used to keep track of the ending node of each path
+    private var endingNodes = mutableListOf<Int>() //this is used to keep track of the ending node of each path
 
     //upon initialisation, all of the above variables are calculated
     init {

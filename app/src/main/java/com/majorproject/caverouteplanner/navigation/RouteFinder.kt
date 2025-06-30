@@ -27,10 +27,10 @@ data class RouteFinder(
     val numberOfTravellers: Int
 ) : Parcelable {
     @IgnoredOnParcel //may be because it can be recreated in init everytime
-    var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf() //map of nodes, showing the edge that is the best one to take to get to the source node
+    private var routeMap: MutableMap<SurveyNode?, SurveyPath?> = mutableMapOf() //map of nodes, showing the edge that is the best one to take to get to the source node
 
     @IgnoredOnParcel
-    var costMap: MutableMap<SurveyPath, Float> = mutableMapOf() //map of edges, showing the cost of getting to the source node using that edge
+    private var costMap: MutableMap<SurveyPath, Float> = mutableMapOf() //map of edges, showing the cost of getting to the source node using that edge
 
 
     /**
